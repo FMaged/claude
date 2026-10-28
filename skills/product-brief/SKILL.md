@@ -28,7 +28,7 @@ It comes before any planning or code. Its main job is to help the user decide: b
 
 ## Steps
 
-1. **Read what you have.** Read the user's idea, notes, and files. If a `PRODUCT_BRIEF.md` already exists, update it instead of starting a new one.
+1. **Read what you have.** Read the user's idea, notes, and files. If `IDEA.md` exists, read it and do not ask again what it answers. If a `PRODUCT_BRIEF.md` already exists, update it instead of starting a new one.
 2. **Find the gaps.** Ask for missing information. Ask at most 5 questions at a time, most important first. The key questions:
    - What problem? Who has it? Give one real example.
    - How do people solve it today? Why is that not good enough?
@@ -105,6 +105,8 @@ Next step: <...>
 - Is it free of tech stack and tasks?
 
 ## Hand-off
+
+If `STATUS.md` exists, this skill is part of the zero-to-prod chain: end with "Run `/clear`, then `zero-to-prod` for the next stage." Your Go/Change/Stop verdict is a first opinion only; `z2p-validate` makes the call. Outside the chain, use the list below.
 
 - **Go:** First test the riskiest assumption with real people (talk to 5-10 target users, or show them a simple mockup). Update the brief with what you learn. Then use the project-planner skill to turn the brief into `PLAN.md` and `TASKS.md`.
 - **Change:** Update the brief and run this skill again.
