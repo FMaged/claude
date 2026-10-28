@@ -1,6 +1,6 @@
 ---
 name: schema-design
-description: Use when designing a database schema or modelling new data, before any DDL exists (e.g. "what tables do I need for this", "model this domain", "design the schema", "where does this new entity go", "should this be one table or two", "natural key or an id here"). Interviews, then records the grain, keys, and types of each table and why. For DDL that is already written as a migration, use the migration review skill instead.
+description: Use when designing a database schema or modelling new data, before any DDL exists (e.g. "what tables do I need for this", "model this domain", "design the schema", "where does this new entity go", "should this be one table or two", "natural key or an id here"). Interviews, then records the grain, keys, and types of each table and why. For DDL that is already written as a migration, use sql-review instead.
 ---
 
 # Schema Design
@@ -142,8 +142,9 @@ anything down.
 
 ## What to write down
 
-Put it where the project already keeps its schema notes (`doc/database.md`, `doc/entities.md`,
-a `## Schema` section of `PLAN.md`). Only create a new file if there is nowhere obvious.
+Put it where the project already keeps its schema notes. If `DESIGN.md` exists (zero-to-prod
+chain), write into its `## Database` section first. Otherwise use `doc/database.md`,
+`doc/entities.md`, or a `## Schema` section of `PLAN.md`. Only create a new file if there is nowhere obvious.
 
 Record, per table: the grain sentence, the primary key and why it is that key, the columns
 with their types and nullability, the foreign keys with their `ON DELETE`, the unique
@@ -161,5 +162,5 @@ Record the decisions separately, with the alternative that was rejected:
 A mermaid `erDiagram` of the relationships pays for itself the moment there are more than
 about eight tables.
 
-Then hand off: the schema becomes a migration, and the migration gets reviewed by the
-migration skill before it runs anywhere. Say that in one line and offer to write it.
+Then hand off: the schema becomes a migration, and the migration gets reviewed by
+`sql-review` before it runs anywhere. Say that in one line and offer to write it.
