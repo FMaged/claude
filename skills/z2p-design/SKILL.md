@@ -1,6 +1,6 @@
 ---
 name: z2p-design
-description: Use as zero-to-prod stage 6, after PLAN.md, to design how the parts fit together (e.g. "design the app", "write the design doc", "architecture and data model"). Writes DESIGN.md with flows, architecture, entities, database, interfaces, permissions, cross-cutting rules, folder layout, and decisions.
+description: Use as zero-to-prod stage 6, after PLAN.md, whenever the user asks to design the app or its architecture (e.g. "design the app", "write the design doc", "architecture and data model", "PLAN.md is ready, what next?"). Writes DESIGN.md with flows, architecture, entities, database, interfaces, permissions, cross-cutting rules, folder layout, and decisions. Not for logos, UI looks, or visual design.
 ---
 
 # Z2P Design (stage 6)

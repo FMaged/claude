@@ -1,0 +1,36 @@
+zero-to-prod	1	I want to take a new project from idea to production, the full way. Where do we start?
+zero-to-prod	1	next stage
+zero-to-prod	0	write a python function that parses a CSV file
+zero-to-prod	0	what is the next step in this recipe?
+z2p-idea	1	I want to build something but I don't know what. Help me find an idea.
+z2p-idea	1	I have no idea for a side project yet, can you interview me to find a problem worth solving?
+z2p-idea	0	give me a name for my bakery
+z2p-idea	0	summarize this article about startup ideas: https://example.com/a
+z2p-validate	1	Is my idea worth building? Test my risky assumptions before I plan anything.
+z2p-validate	1	validate my idea
+z2p-validate	0	validate this email address with a regex
+z2p-validate	0	add form validation to my login page
+z2p-requirements	1	Write the requirements for my app with acceptance criteria.
+z2p-requirements	1	what are the acceptance criteria for my product? write REQUIREMENTS.md
+z2p-requirements	0	install the requirements from requirements.txt
+z2p-requirements	0	what are the system requirements for Postgres 17?
+z2p-design	1	Write the design doc for my app: architecture and data model.
+z2p-design	1	design the app, I have a PLAN.md ready
+z2p-design	0	design a logo for my bakery
+z2p-design	0	make this landing page design look better
+z2p-deploy	1	Deploy the walking skeleton and set up hosting and CI.
+z2p-deploy	1	put hello world live and show me how to roll back
+z2p-deploy	0	deploy this k8s manifest to my cluster
+z2p-deploy	0	explain what a deploy key is in GitHub
+z2p-release	1	Are we ready to ship? Do the final review and release the MVP.
+z2p-release	1	release the MVP of my project
+z2p-release	0	write release notes for version 2.3 of my library from this git log
+z2p-release	0	how do I release a Python package to PyPI?
+z2p-operate	1	The MVP is live. Set up an uptime check and alert me when it is down, and start a backlog.
+z2p-operate	1	what should I fix next in my live product?
+z2p-operate	0	write a prometheus alert rule for high CPU on my k8s nodes
+z2p-operate	0	my server is down right now, help me debug it
+setup-claude-code	1	set up for Claude Code
+setup-claude-code	1	set up this PC
+setup-claude-code	0	set up a Python virtualenv for this project
+setup-claude-code	0	how do I install Claude Code?
