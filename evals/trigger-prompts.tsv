@@ -34,3 +34,7 @@ setup-claude-code	1	set up for Claude Code
 setup-claude-code	1	set up this PC
 setup-claude-code	0	set up a Python virtualenv for this project
 setup-claude-code	0	how do I install Claude Code?
+rust-clean-architecture	1	Add a use case to my Rust workspace that deactivates a user, with a trait in the domain crate and a sea-orm repository behind it.
+rust-clean-architecture	1	In my Rust app with a domain crate and adapter crates, where should a new Slack notifier go, and how do I add its config?
+rust-clean-architecture	0	write a rust function that reverses a string
+rust-clean-architecture	0	review my Dockerfile for a rust service
