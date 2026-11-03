@@ -1,9 +1,9 @@
 ---
-name: zero-to-prod
-description: Use to take a solo project from idea to production, one stage at a time (e.g. "zero to prod", "next stage", "where is my project", "start a new project the full way"). Finds the next stage from STATUS.md, runs it, checks its gate, and records the result.
+name: z2p
+description: Use to take a solo project from idea to production, one stage at a time (e.g. "z2p", "zero to prod", "next stage", "where is my project", "start a new project the full way"). Finds the next stage from STATUS.md, runs it, checks its gate, and records the result.
 ---
 
-# Zero to prod
+# z2p
 
 The orchestrator of the chain. It finds the next stage, runs it, checks the gate from the files, and writes `STATUS.md`. The rules, stage table, gates, and `STATUS.md` format are in `CONVENTIONS.md` next to this file. Read it first.
 
@@ -34,13 +34,12 @@ Set the stage to `doing`, then run its skill from the stage table.
 ## 3. After the stage
 
 1. Check the gate by reading the files, as `CONVENTIONS.md` lists it.
-2. At gates 3, 4, 5, 6, and 9, also ask the user for a yes.
+2. At gates 4, 5, 6, and 9, also ask the user for a yes.
 3. Write `STATUS.md`: state, gate result, date, note.
    - Gate passes: `done`.
    - Gate fails: keep `doing` and tell the user what is missing.
-   - Stage 3 with `Decision: Change` or `Stop`: follow Going back in `CONVENTIONS.md`.
 4. After stage 5 is `done`, add a line to `CLAUDE.md`: "Skills for this project: ..." with the skills that fit the chosen stack (for example `svelte`, `sql-writing`, `docker-review`).
-5. End with: "Run `/clear`, then `zero-to-prod` again."
+5. End with: "Run `/clear`, then `z2p` again."
 
 ## Going back
 

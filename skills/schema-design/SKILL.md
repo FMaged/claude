@@ -142,7 +142,7 @@ anything down.
 
 ## What to write down
 
-Put it where the project already keeps its schema notes. If `DESIGN.md` exists (zero-to-prod
+Put it where the project already keeps its schema notes. If `DESIGN.md` exists (z2p
 chain), write into its `## Database` section first. Otherwise use `doc/database.md`,
 `doc/entities.md`, or a `## Schema` section of `PLAN.md`. Only create a new file if there is nowhere obvious.
 

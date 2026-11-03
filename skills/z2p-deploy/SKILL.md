@@ -1,11 +1,11 @@
 ---
 name: z2p-deploy
-description: Use as the helper for the deploy tasks of a zero-to-prod project, like the walking skeleton and the release deploy (e.g. "deploy the skeleton", "set up hosting and CI", "put hello world live", "how do I roll back?"). Sets up host, secrets, CI, production database, error tracking, and one tried rollback, and writes the steps into RELEASE.md.
+description: Use as the helper for the deploy tasks of a z2p project, like the walking skeleton and the release deploy (e.g. "deploy the skeleton", "set up hosting and CI", "put hello world live", "how do I roll back?"). Sets up host, secrets, CI, production database, error tracking, and one tried rollback, and writes the steps into RELEASE.md.
 ---
 
 # Z2P Deploy (helper)
 
-Puts the product live the same safe way every time. It runs inside the Stage 1 tasks of `TASKS.md` (the walking skeleton, D8) and again at release. It is not a numbered stage and writes no gate file of its own. Read `~/.claude/skills/zero-to-prod/CONVENTIONS.md` first.
+Puts the product live the same safe way every time. It runs inside the Stage 1 tasks of `TASKS.md` (the walking skeleton, D8) and again at release. It is not a numbered stage and writes no gate file of its own. Read `~/.claude/skills/z2p/CONVENTIONS.md` first.
 
 ## Rules
 - Use the host chosen in `PLAN.md`. If it does not fit, stop and ask to change `PLAN.md` first.
@@ -52,4 +52,4 @@ If the user says "coach me" or "teach me", or the orchestrator says so, use proj
 ````
 
 ## Hand-off
-Return to the task that called you. If `STATUS.md` exists and no task is running, end with "Run `/clear`, then `zero-to-prod` for the next stage."
+Return to the task that called you. If `STATUS.md` exists and no task is running, end with "Run `/clear`, then `z2p` for the next stage."

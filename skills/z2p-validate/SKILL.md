@@ -1,11 +1,11 @@
 ---
 name: z2p-validate
-description: Use as zero-to-prod stage 3, after the product brief, to test its risky assumptions before any planning or code (e.g. "validate my idea", "is this worth building?"). Writes VALIDATION.md with a test plan, the evidence, and a Go, Change, or Stop decision.
+description: Use as z2p stage 3, after the product brief, to test its risky assumptions before any planning or code (e.g. "validate my idea", "is this worth building?"). Writes VALIDATION.md with a test plan, the evidence, and a Go, Change, or Stop decision.
 ---
 
 # Z2P Validate (stage 3)
 
-Test the brief's risky assumptions with the cheapest real evidence, and make the go/no-go call. This stage owns the decision; the brief's verdict was only a first opinion. Read `~/.claude/skills/zero-to-prod/CONVENTIONS.md` first.
+Test the brief's risky assumptions with the cheapest real evidence, and make the go/no-go call. This stage owns the decision; the brief's verdict was only a first opinion. Read `~/.claude/skills/z2p/CONVENTIONS.md` first.
 
 ## Rules
 - Decide what counts as go and what counts as stop **before** the test runs. Write it down first.
@@ -56,4 +56,4 @@ Reason: <1-3 sentences>
 ```
 
 ## Hand-off
-If `STATUS.md` exists, end with "Run `/clear`, then `zero-to-prod` for the next stage." (The orchestrator handles Change and Stop.) Otherwise, on Go, end with: "Next, use the z2p-requirements skill, or project-planner."
+If `STATUS.md` exists, end with "Run `/clear`, then `z2p` for the next stage." (The orchestrator handles Change and Stop.) Otherwise, on Go, end with: "Next, use the z2p-requirements skill, or project-planner."

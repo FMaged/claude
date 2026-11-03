@@ -12,4 +12,4 @@ description: Use when the user wants to implement tasks from TASKS.md (e.g. "nex
 5. Mark it done: `### [ ]` → `### [x]`. Only do this once it works.
 6. If a PLAN.md or DESIGN.md decision had to change, ask the user first, then update the file with a "Changed: <why>" line.
 7. When the last task of a TASKS.md stage is done, run the review skills that match the files changed in that stage (`sql-review` for SQL, `svelte-review` for Svelte, `docker-review` for Dockerfiles, and so on). Fix high findings now, or add them as tasks.
-8. Give a short summary. If `STATUS.md` exists, end with the hand-off line from `~/.claude/skills/zero-to-prod/CONVENTIONS.md` and do not write `STATUS.md`. Otherwise ask whether to continue.
+8. Give a short summary. If `STATUS.md` exists, end with the hand-off line from `~/.claude/skills/z2p/CONVENTIONS.md` and do not write `STATUS.md`. Otherwise ask whether to continue.

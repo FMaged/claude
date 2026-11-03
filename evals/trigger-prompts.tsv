@@ -1,7 +1,7 @@
-zero-to-prod	1	I want to take a new project from idea to production, the full way. Where do we start?
-zero-to-prod	1	next stage
-zero-to-prod	0	write a python function that parses a CSV file
-zero-to-prod	0	what is the next step in this recipe?
+z2p	1	I want to take a new project from idea to production, the full way. Where do we start?
+z2p	1	next stage
+z2p	0	write a python function that parses a CSV file
+z2p	0	what is the next step in this recipe?
 z2p-idea	1	I want to build something but I don't know what. Help me find an idea.
 z2p-idea	1	I have no idea for a side project yet, can you interview me to find a problem worth solving?
 z2p-idea	0	give me a name for my bakery

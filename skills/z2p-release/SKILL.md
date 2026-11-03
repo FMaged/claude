@@ -1,11 +1,11 @@
 ---
 name: z2p-release
-description: Use as zero-to-prod stage 9, when the build is done, to check everything once more and release the MVP (e.g. "release the MVP", "are we ready to ship?", "final review before launch"). Checks tests, CI, every Must requirement, reviews, backups, and rollback, then writes RELEASE.md and asks for the user's yes.
+description: Use as z2p stage 9, when the build is done, to check everything once more and release the MVP (e.g. "release the MVP", "are we ready to ship?", "final review before launch"). Checks tests, CI, every Must requirement, reviews, backups, and rollback, then writes RELEASE.md and asks for the user's yes.
 ---
 
 # Z2P Release (stage 9)
 
-The final proof before real users arrive. The release goes over the pipeline that the walking skeleton already built. Read `~/.claude/skills/zero-to-prod/CONVENTIONS.md` first.
+The final proof before real users arrive. The release goes over the pipeline that the walking skeleton already built. Read `~/.claude/skills/z2p/CONVENTIONS.md` first.
 
 ## Rules
 - Check, do not assume. Every line in `RELEASE.md` comes from something you ran or read.
@@ -59,4 +59,4 @@ _(from z2p-deploy)_
 ````
 
 ## Hand-off
-If `STATUS.md` exists, end with "Run `/clear`, then `zero-to-prod` for the next stage." Otherwise end with: "The MVP is released. Next, use the z2p-operate skill."
+If `STATUS.md` exists, end with "Run `/clear`, then `z2p` for the next stage." Otherwise end with: "The MVP is released. Next, use the z2p-operate skill."

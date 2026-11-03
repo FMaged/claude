@@ -1,11 +1,11 @@
 ---
 name: z2p-design
-description: Use as zero-to-prod stage 6, after PLAN.md, whenever the user asks to design the app or its architecture (e.g. "design the app", "write the design doc", "architecture and data model", "PLAN.md is ready, what next?"). Writes DESIGN.md with flows, architecture, entities, database, interfaces, permissions, cross-cutting rules, folder layout, and decisions. Not for logos, UI looks, or visual design.
+description: Use as z2p stage 6, after PLAN.md, whenever the user asks to design the app or its architecture (e.g. "design the app", "write the design doc", "architecture and data model", "PLAN.md is ready, what next?"). Writes DESIGN.md with flows, architecture, entities, database, interfaces, permissions, cross-cutting rules, folder layout, and decisions. Not for logos, UI looks, or visual design.
 ---
 
 # Z2P Design (stage 6)
 
-Turn `PLAN.md` and `REQUIREMENTS.md` into `DESIGN.md`, so code, tasks, and reviews follow one design. The data model is the most expensive thing to change later, so take it slowly. Read `~/.claude/skills/zero-to-prod/CONVENTIONS.md` first.
+Turn `PLAN.md` and `REQUIREMENTS.md` into `DESIGN.md`, so code, tasks, and reviews follow one design. The data model is the most expensive thing to change later, so take it slowly. Read `~/.claude/skills/z2p/CONVENTIONS.md` first.
 
 ## Rules
 - Follow the stack in `PLAN.md`. If the design needs a different one, stop and ask to change `PLAN.md` first.
@@ -67,4 +67,4 @@ flowchart LR
 ````
 
 ## Hand-off
-If `STATUS.md` exists, end with "Run `/clear`, then `zero-to-prod` for the next stage." Otherwise end with: "Next, use the plan-to-tasks skill."
+If `STATUS.md` exists, end with "Run `/clear`, then `z2p` for the next stage." Otherwise end with: "Next, use the plan-to-tasks skill."

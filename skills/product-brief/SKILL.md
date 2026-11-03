@@ -106,7 +106,7 @@ Next step: <...>
 
 ## Hand-off
 
-If `STATUS.md` exists, this skill is part of the zero-to-prod chain: end with "Run `/clear`, then `zero-to-prod` for the next stage." Your Go/Change/Stop verdict is a first opinion only; `z2p-validate` makes the call. Outside the chain, use the list below.
+If `STATUS.md` exists, this skill is part of the z2p chain: end with "Run `/clear`, then `z2p` for the next stage." Your Go/Change/Stop verdict is the call; there is no separate validation stage. Outside the chain, use the list below.
 
 - **Go:** First test the riskiest assumption with real people (talk to 5-10 target users, or show them a simple mockup). Update the brief with what you learn. Then use the project-planner skill to turn the brief into `PLAN.md` and `TASKS.md`.
 - **Change:** Update the brief and run this skill again.

@@ -1,11 +1,11 @@
 ---
 name: z2p-operate
-description: Use as zero-to-prod stage 10, after the release, to watch the live product and plan what comes next (e.g. "set up monitoring", "alert me when it is down", "what should I fix next?", "start a backlog"). Sets up an uptime check and an alert that reaches the user, and writes BACKLOG.md.
+description: Use as z2p stage 10, after the release, to watch the live product and plan what comes next (e.g. "set up monitoring", "alert me when it is down", "what should I fix next?", "start a backlog"). Sets up an uptime check and an alert that reaches the user, and writes BACKLOG.md.
 ---
 
 # Z2P Operate (stage 10)
 
-Makes production problems visible and turns them into the next round of work. Read `~/.claude/skills/zero-to-prod/CONVENTIONS.md` first.
+Makes production problems visible and turns them into the next round of work. Read `~/.claude/skills/z2p/CONVENTIONS.md` first.
 
 ## Rules
 - Use free or already-chosen tools first (`N7` in a project's `REQUIREMENTS.md` may set a cost limit).
@@ -45,4 +45,4 @@ Makes production problems visible and turns them into the next round of work. Re
 ````
 
 ## Hand-off
-If `STATUS.md` exists, end with "Run `/clear`, then `zero-to-prod` for the next stage." Otherwise end with: "Pick backlog items, then use the plan-to-tasks skill."
+If `STATUS.md` exists, end with "Run `/clear`, then `z2p` for the next stage." Otherwise end with: "Pick backlog items, then use the plan-to-tasks skill."

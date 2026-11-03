@@ -15,8 +15,8 @@ Interview the user, then write `PLAN.md` with every decision and its reason.
 - Skip questions that don't apply to this project.
 
 ## In the chain
-If `STATUS.md` exists, this skill is stage 5 of zero-to-prod (see `~/.claude/skills/zero-to-prod/CONVENTIONS.md`).
-- Read `IDEA.md`, `PRODUCT_BRIEF.md`, `VALIDATION.md`, and `REQUIREMENTS.md` if they exist. Do not ask again what they answer.
+If `STATUS.md` exists, this skill is stage 5 of z2p (see `~/.claude/skills/z2p/CONVENTIONS.md`).
+- Read `IDEA.md`, `PRODUCT_BRIEF.md`, and `REQUIREMENTS.md` if they exist. Do not ask again what they answer.
 - If `REQUIREMENTS.md` exists, list the MVP features by requirement ID (`R1`, `R2`, ...) instead of asking for them again. Use its non-functional requirements (`N1`, ...) to choose the stack.
 - Always ask about hosting and the database engine (or "no database").
 - Keep Structure to one line per main entity and page. The detail goes in `DESIGN.md`.

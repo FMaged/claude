@@ -1,11 +1,11 @@
 ---
 name: z2p-requirements
-description: Use as zero-to-prod stage 4, after validation, to write what the product must do and how well (e.g. "write the requirements", "what are the acceptance criteria"). Writes REQUIREMENTS.md with roles, requirements and testable acceptance criteria, non-functional requirements, and constraints.
+description: Use as z2p stage 4, after the brief, to write what the product must do and how well (e.g. "write the requirements", "what are the acceptance criteria"). Writes REQUIREMENTS.md with roles, requirements and testable acceptance criteria, non-functional requirements, and constraints.
 ---
 
 # Z2P Requirements (stage 4)
 
-Turn the brief and the validation into `REQUIREMENTS.md`: the contract that design, tasks, tests, and the release are checked against. Read `~/.claude/skills/zero-to-prod/CONVENTIONS.md` first.
+Turn the brief into `REQUIREMENTS.md`: the contract that design, tasks, tests, and the release are checked against. Read `~/.claude/skills/z2p/CONVENTIONS.md` first.
 
 ## Rules
 - Say **what** and **how well**, never **with what**. No stack, no architecture. That is stage 5.
@@ -15,7 +15,7 @@ Turn the brief and the validation into `REQUIREMENTS.md`: the contract that desi
 
 ## Steps
 
-1. **Read `PRODUCT_BRIEF.md`** (users, MVP scope, success signs) and `VALIDATION.md` (what was learned, what changed). If `REQUIREMENTS.md` exists, update it.
+1. **Read `PRODUCT_BRIEF.md`** (users, MVP scope, success signs). If `REQUIREMENTS.md` exists, update it.
 2. **Users and roles.** One row per role with what they need.
 3. **Functional requirements.** One heading each:
    - ID (`R1`, ...), priority (`Must` for the MVP, or `Later`).
@@ -65,4 +65,4 @@ Acceptance:
 ```
 
 ## Hand-off
-If `STATUS.md` exists, end with "Run `/clear`, then `zero-to-prod` for the next stage." Otherwise end with: "Next, use the project-planner skill."
+If `STATUS.md` exists, end with "Run `/clear`, then `z2p` for the next stage." Otherwise end with: "Next, use the project-planner skill."
