@@ -68,10 +68,10 @@ The single biggest source of SQL that is wrong rather than slow.
 - An implicit cast across types (a `text` column compared against a number) disables the
   index as surely as a function does.
 - `LIKE '%foo'` with a leading wildcard cannot use a btree index. A trigram index can.
-- `OR` across two different columns often uses neither index; `UNION ALL` of two indexed
-  queries does.
-- The leading column of a composite index has to be the one you filter on. An index on
-  `(a, b)` does nothing for a query filtering only `b`.
+- `OR` across two columns: look at the plan first; Postgres can combine the two indexes. If
+  it does not, `UNION` the two branches, or `UNION ALL` only when no row can match both.
+- The leading column of a composite index has to be the one you filter on. For a btree before
+  skip scan (Postgres 18), an index on `(a, b)` does nothing for a query filtering only `b`.
 - Filter before joining, and filter the big table first.
 
 ## 6. Writes
