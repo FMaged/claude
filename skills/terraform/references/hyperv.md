@@ -272,6 +272,8 @@ resource "hyperv_iso_image" "seed" {
 
   lifecycle {
     replace_triggered_by = [terraform_data.image] # see "Which image a VM uses"
+    # Read once at first boot; a rebuild under a running VM changes nothing in the guest.
+    ignore_changes = [source_zip_file_path_hash]
   }
 }
 ```
@@ -289,8 +291,13 @@ resource "hyperv_iso_image" "seed" {
   `%WINDIR%\Panther` before removable media, so the image must not carry its own answer
   file there, or the ISO is ignored. If the image has Cloudbase-Init, it can read the
   same `CIDATA` ISO as Linux instead.
-- The seed is read once, at first boot. Changing it later does not reconfigure the
-  guest; that is Ansible's job.
+- **The seed is read once, at first boot.** It is built from module-wide `locals`, so
+  one edit to the cloud-config or the answer file changes the seed of every VM. Without
+  `ignore_changes`, the provider deletes and rebuilds the ISO of every running VM: that
+  changes nothing in the guest, and the delete will probably fail while the ISO sits in
+  the DVD drive. With it, a seed edit reaches new VMs and VMs whose image changes;
+  running VMs keep the seed they booted from, and Ansible owns everything after first
+  boot. Neither case has been tried on a host yet.
 - `archive_file` writes the zip at plan time. In CI the apply job needs it too, so pass
   `.seed/` from the plan job to the apply job as an artifact with `plan.cache`. Plan
   twice in a row once: the second plan must show no change to the ISO.
