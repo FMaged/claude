@@ -20,9 +20,11 @@ that code written for the wrong one fails to build or fails silently. When the A
 is new, the installed types are the truth, not memory:
 `node_modules/svelte/types/index.d.ts`, `node_modules/@sveltejs/kit/types/index.d.ts`.
 
-Runes mode is per file in Svelte 5: a file that uses a rune is in runes mode, and legacy
-syntax in it (`export let`, `$:`, `on:click`, `<slot>`) is a compile error. Projects often
-force it on with `compilerOptions.runes`. Write runes in new code. Do not mix the two styles
+Runes mode is per file in Svelte 5: a file that uses a rune is in runes mode. In it,
+`export let` and `$:` are compile errors; `on:click` and `<slot>` still compile with a
+deprecation warning (an error only where the project fails on warnings), but `on:click` and
+`onclick` in the same file is an error. Projects often force runes mode on with
+`compilerOptions.runes`. Write runes in new code. Do not mix the two styles
 in one file; migrate a legacy file whole (`npx sv migrate svelte-5`) and then read the
 result, because the migration leaves `run()` from `svelte/legacy` wherever it gave up.
 
