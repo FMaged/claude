@@ -1,0 +1,4 @@
+---
+profile: production
+# The collections come from requirements.yml, installed before the lint runs.
+offline: true

@@ -1,0 +1,47 @@
+---
+# Downloaded for real under --check too: win_package reads the MSI's product code from
+# the file to tell whether it is installed. The files only land in this cache.
+- name: Create the installer cache
+  ansible.windows.win_file:
+    path: "{{ iis_host_installer_dir }}"
+    state: directory
+  check_mode: false
+
+- name: Download Web Deploy
+  ansible.windows.win_get_url:
+    url: "{{ iis_host_webdeploy_url }}"
+    dest: '{{ iis_host_installer_dir }}\webdeploy.msi'
+    checksum: "{{ iis_host_webdeploy_sha256 }}"
+    checksum_algorithm: sha256
+  check_mode: false
+
+- name: Download the ASP.NET Core Hosting Bundle
+  ansible.windows.win_get_url:
+    url: "{{ iis_host_hosting_bundle_url }}"
+    dest: '{{ iis_host_installer_dir }}\dotnet-hosting-{{ iis_host_aspnetcore_version }}-win.exe'
+    checksum: "{{ iis_host_hosting_bundle_sha256 }}"
+    checksum_algorithm: sha256
+  check_mode: false
+
+# ALL includes the IIS deployment handler, which installs only when the Web Management
+# Service is already there.
+- name: Install Web Deploy
+  ansible.windows.win_package:
+    path: '{{ iis_host_installer_dir }}\webdeploy.msi'
+    arguments: ADDLOCAL=ALL
+    state: present
+  register: iis_host_webdeploy_result
+
+# Installed before IIS, the bundle would not register the ASP.NET Core Module with it.
+- name: Install the ASP.NET Core Hosting Bundle
+  ansible.windows.win_package:
+    path: '{{ iis_host_installer_dir }}\dotnet-hosting-{{ iis_host_aspnetcore_version }}-win.exe'
+    arguments: /install /quiet /norestart
+    product_id: "{{ iis_host_hosting_bundle_product_id }}"
+    state: present
+  register: iis_host_bundle_result
+  notify: Restart IIS
+
+- name: Restart to finish the installers
+  ansible.windows.win_reboot:
+  when: iis_host_webdeploy_result.reboot_required or iis_host_bundle_result.reboot_required

@@ -485,7 +485,7 @@
 
 ## Stage 8: Configuration (Ansible)
 
-### [ ] T8.1: Write the `ansible` skill
+### [x] T8.1: Write the `ansible` skill
 **What:** `skills/ansible/SKILL.md` for playbooks and roles that configure Windows and Linux VMs (D19, D24).
 **Why:** The hosts need IIS and Web Deploy, nginx and systemd, or Docker before any app can land. Only the review half exists.
 **How:**
@@ -495,13 +495,13 @@
 - Linux: nginx site, systemd unit for Kestrel, Docker engine; the same role shape as `~/elab/ansible`.
 - Runs from the `docker` runner tag with `pywinrm` and Kerberos in the image.
 - Worked example: a role that prepares an IIS host; `ansible-lint` and `ansible-playbook --syntax-check` (installed here). Evals, lint, commit.
-**Notes:** _(added after implementation if anything came up)_
+**Notes:** Done 2026-11-16. Added the writer and IIS worked example, pinned collections, trigger prompts, and lint/syntax checks in local lint and CI. Validation uses the Hosting Bundle's uninstall registry key because the shared runtime directory alone does not prove that IIS's ASP.NET Core Module is installed. The example's installer URLs, checksums, product key, and firewall-rule display name are intentional placeholders and fail preflight until replaced. The check-mode validation reads no live host; Windows execution still needs a domain-connected runner and approved artifact metadata.
 
-### [ ] T8.2: Teach `ansible-review` about Windows hosts
+### [x] T8.2: Teach `ansible-review` about Windows hosts
 **What:** Add the Windows checks to `skills/ansible-review/SKILL.md`.
 **Why:** The review was written for Linux hosts. WinRM, `win_` modules, and reboots have their own ways to fail.
 **How:** Add: `become` without `runas` on Windows; `win_reboot` missing after a feature install; NTLM or basic transport outside a lab; `win_shell` where a `win_` module exists; Kerberos ticket handling in CI. Keep the existing sections. Commit.
-**Notes:** _(added after implementation if anything came up)_
+**Notes:** Done 2026-11-16. Added Kerberos ticket handling, `runas`, feature reboots, module preference, second-hop, and WMSvc firewall checks. Confirmed by read-only review of the example and Ansible lint/syntax checks; no Windows host was available for execution.
 
 ## Stage 9: App pipeline (GitLab CI, .NET, Angular, Docker)
 

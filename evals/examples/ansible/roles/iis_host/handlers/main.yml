@@ -1,0 +1,19 @@
+---
+# Stopping WAS stops W3SVC; starting W3SVC brings WAS back and loads the new module.
+- name: Stop IIS services
+  ansible.windows.win_service:
+    name: WAS
+    state: stopped
+    force_dependent_services: true
+  listen: Restart IIS
+
+- name: Start the World Wide Web Publishing Service
+  ansible.windows.win_service:
+    name: W3SVC
+    state: started
+  listen: Restart IIS
+
+- name: Restart the Web Management Service
+  ansible.windows.win_service:
+    name: WMSVC
+    state: restarted

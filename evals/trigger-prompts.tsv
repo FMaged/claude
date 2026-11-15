@@ -42,6 +42,10 @@ ansible-review	1	review this playbook, is it idempotent?
 ansible-review	1	check my Ansible role for anything that could lock me out of the server
 ansible-review	0	write an ansible playbook that installs nginx
 ansible-review	0	explain what a Jinja template is
+ansible	1	write an Ansible role that prepares Windows Server for IIS and Web Deploy
+ansible	1	set up an Ansible playbook to configure nginx and a systemd service on Linux
+ansible	0	review this Ansible playbook for security problems
+ansible	0	write a Terraform module for a Hyper-V VM
 code-comments	1	add comments to this function
 code-comments	1	are the comments in this file any good?
 code-comments	0	write a commit message for this change

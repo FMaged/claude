@@ -1,0 +1,11 @@
+---
+- name: Prepare the app hosts for Web Deploy
+  hosts: app
+  gather_facts: false
+  pre_tasks:
+    # A new VM joins the domain during its first boot, and Kerberos works only after that.
+    - name: Wait until WinRM answers
+      ansible.builtin.wait_for_connection:
+        timeout: 900
+  roles:
+    - iis_host

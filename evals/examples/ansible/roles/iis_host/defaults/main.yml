@@ -1,0 +1,9 @@
+---
+iis_host_features:
+  - Web-Server
+  - Web-Mgmt-Service
+iis_host_installer_dir: C:\ProgramData\Ansible\installers
+iis_host_sites_root: C:\inetpub\sites
+iis_host_sites: []
+# Match the built-in rule's display name on the golden image, including its language.
+iis_host_wmsvc_firewall_rule: Web Management Service (HTTP Traffic-In)

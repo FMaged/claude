@@ -1,0 +1,42 @@
+---
+# The default site holds *:80, which an app site needs.
+- name: Remove the Default Web Site
+  microsoft.iis.website:
+    name: Default Web Site
+    state: absent
+
+- name: Create each site's folder
+  ansible.windows.win_file:
+    path: '{{ iis_host_sites_root }}\{{ item.name }}'
+    state: directory
+  loop: "{{ iis_host_sites }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Create each site's application pool
+  microsoft.iis.web_app_pool:
+    name: "{{ item.name }}"
+    state: started
+    attributes:
+      # No Managed Code: ASP.NET Core does not load the .NET Framework.
+      managedRuntimeVersion: ""
+  loop: "{{ iis_host_sites }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+# The module compares bindings as ip:port:hostname text, and IIS stores "*" for every
+# address: without ip "*" the binding never matches, so every run adds it again.
+- name: Create each site
+  microsoft.iis.website:
+    name: "{{ item.name }}"
+    physical_path: '{{ iis_host_sites_root }}\{{ item.name }}'
+    application_pool: "{{ item.name }}"
+    state: started
+    bindings:
+      set:
+        - ip: "*"
+          port: "{{ item.port }}"
+          hostname: "{{ item.hostname | default('') }}"
+  loop: "{{ iis_host_sites }}"
+  loop_control:
+    label: "{{ item.name }}"

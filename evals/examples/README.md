@@ -10,6 +10,7 @@ its skill: a fix to a snippet in the skill is a fix here too.
 | `packer/` | `packer` | `packer fmt -check -recursive`, then `packer init` and `packer validate` in each image folder | Passed 2026-11-15 with Packer 1.16.2 |
 | `powershell/` | `powershell` | `evals/check-powershell.ps1`: PSScriptAnalyzer on every example script (the Packer provisioner scripts too), then the Pester tests | Passed 2026-11-15 with PowerShell 7.7, PSScriptAnalyzer 1.25.0, Pester 6.2.0 |
 | `hyperv-deploy/` | `hyperv-deploy` | `evals/check-powershell.ps1`: PSScriptAnalyzer on the two scripts, the module, and the data file, then 24 Pester tests with the Hyper-V and Storage cmdlets mocked | Passed 2026-11-15 with PowerShell 7.7, PSScriptAnalyzer 1.25.0, Pester 6.2.0 |
+| `ansible/` | `ansible` | `ansible-lint`, then `ansible-playbook -i inventory/staging playbooks/app.yml --syntax-check` | Validated locally with ansible-core 2.19.11 and ansible-lint 25.6.1; requires approved installer URLs, SHA-256 checksums, and the Hosting Bundle uninstall key before a host run |
 | `bash/` | `bash` | `shellcheck` on both scripts, then `test-fetch-tool.sh`, which runs `fetch-tool.sh` 11 times against local archives and makes 17 checks (each mode, a second run, bad input, a wrong checksum, a zip) | Passed 2026-11-15 with Bash 5.2 and ShellCheck 0.10.0 |
 
 `evals/lint.sh` runs these checks when the tool is installed and skips them otherwise.

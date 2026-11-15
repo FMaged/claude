@@ -1,0 +1,10 @@
+---
+- name: Install IIS and the Web Management Service
+  ansible.windows.win_feature:
+    name: "{{ iis_host_features }}"
+    state: present
+  register: iis_host_feature_result
+
+- name: Restart to finish the feature install
+  ansible.windows.win_reboot:
+  when: iis_host_feature_result.reboot_required

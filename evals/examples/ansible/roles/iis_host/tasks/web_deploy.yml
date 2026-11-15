@@ -1,0 +1,35 @@
+---
+# A separate allow rule would leave the feature's broader built-in rule enabled.
+- name: Restrict the Web Management Service to the CI runners
+  community.windows.win_firewall_rule:
+    name: "{{ iis_host_wmsvc_firewall_rule }}"
+    direction: in
+    action: allow
+    protocol: tcp
+    localport: "8172"
+    remoteip: "{{ iis_host_deploy_from | join(',') }}"
+    profiles: domain
+    enabled: true
+    state: present
+
+- name: Let the Web Management Service accept remote deploys
+  ansible.windows.win_regedit:
+    path: HKLM:\SOFTWARE\Microsoft\WebManagement\Server
+    name: EnableRemoteManagement
+    data: 1
+    type: dword
+  notify: Restart the Web Management Service
+
+- name: Start the Web Management Service now and at boot
+  ansible.windows.win_service:
+    name: WMSVC
+    start_mode: auto
+    state: started
+
+# Web Deploy also installs its own agent service, on port 80. Deploys go through
+# the Web Management Service only.
+- name: Stop and disable the Web Deployment Agent Service
+  ansible.windows.win_service:
+    name: MsDepSvc
+    start_mode: disabled
+    state: stopped

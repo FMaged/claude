@@ -1,0 +1,17 @@
+---
+- name: Validate the host inputs before making changes
+  ansible.builtin.import_tasks: validate.yml
+
+# The order matters: Web Deploy and the Hosting Bundle each install into IIS, so IIS and
+# the Web Management Service must be complete before either installer runs.
+- name: Install the Windows features
+  ansible.builtin.import_tasks: features.yml
+
+- name: Install Web Deploy and the Hosting Bundle
+  ansible.builtin.import_tasks: installers.yml
+
+- name: Open Web Deploy to the CI runners
+  ansible.builtin.import_tasks: web_deploy.yml
+
+- name: Create the sites
+  ansible.builtin.import_tasks: sites.yml

@@ -149,6 +149,19 @@ else
   echo "note: pwsh not installed, PowerShell examples not checked"
 fi
 
+# Ansible's local temporary files must be writable; use the existing task-specific cache.
+if command -v ansible-lint >/dev/null && command -v ansible-playbook >/dev/null; then
+  (
+    cd evals/examples/ansible || exit 1
+    export ANSIBLE_LOCAL_TEMP="${TMPDIR:-/tmp}/ansible-local"
+    mkdir -p "$ANSIBLE_LOCAL_TEMP"
+    ansible-lint || exit 1
+    ansible-playbook -i inventory/staging playbooks/app.yml --syntax-check
+  ) || problem "Ansible example"
+else
+  echo "note: ansible-lint or ansible-playbook not installed, Ansible example not validated"
+fi
+
 # Shell scripts.
 if command -v shellcheck >/dev/null; then
   shellcheck install.sh evals/*.sh evals/examples/bash/*.sh || problem "shellcheck"

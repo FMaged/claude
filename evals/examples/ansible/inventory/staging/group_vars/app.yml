@@ -1,0 +1,19 @@
+---
+# Installers come from the internal artifact server: the hosts may not reach the internet,
+# and the checksum pins the exact file. Placeholders in this example.
+iis_host_webdeploy_url: https://artifacts.example.internal/microsoft/webdeploy/4.0/WebDeploy_amd64_en-US.msi
+iis_host_webdeploy_sha256: "0000000000000000000000000000000000000000000000000000000000000000"
+iis_host_aspnetcore_version: "10.0.0"
+iis_host_hosting_bundle_url: https://artifacts.example.internal/microsoft/dotnet/10.0.0/dotnet-hosting-10.0.0-win.exe
+iis_host_hosting_bundle_sha256: "0000000000000000000000000000000000000000000000000000000000000000"
+# The bundle's uninstall registry key from a reference installation of this exact EXE.
+iis_host_hosting_bundle_product_id: '{00000000-0000-0000-0000-000000000000}'
+
+# The CI runners' subnet: only they reach Web Deploy.
+iis_host_deploy_from:
+  - 10.20.30.0/24
+
+iis_host_sites:
+  - name: orders
+    port: 80
+    hostname: orders.staging.example.internal

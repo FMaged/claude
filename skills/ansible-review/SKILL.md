@@ -59,6 +59,18 @@ This is the one that costs an afternoon. Check any task touching SSH, the firewa
 - Staged rollouts: check the wait condition is a real one (the service answering, the route being there), not `pause` with a guessed number of seconds.
 - Does it still work against a host that is already configured, and against a fresh one?
 
+## 7. Windows hosts
+
+- `ansible_connection: winrm` uses Kerberos with a domain account for normal environments. NTLM is lab-only; Basic is not acceptable.
+- Inventory names are DNS names that match the host's Kerberos service principal, not IP addresses.
+- CI either obtains a ticket through the WinRM connection's managed `kinit` mode or obtains one explicitly before Ansible runs. Check the ticket cache location, lifetime, renewal, and that secrets do not appear in command arguments or logs.
+- Windows privilege escalation uses `become_method: runas`. The WinRM administrator token usually needs no `become`; flag blanket escalation and check any task that requires a new logon.
+- A Windows feature result's `reboot_required` is acted on immediately with `ansible.windows.win_reboot` before dependent tasks continue.
+- Prefer `ansible.windows` modules over `win_shell` or `win_powershell`. For scripts, check `$Ansible.Changed`, check-mode handling, idempotency, and secret exposure.
+- A changed IIS feature or runtime install is followed by the required reboot or service restart before IIS sites use it.
+- Web Deploy through WMSvc uses port 8172. Check that the existing built-in firewall allow rule is restricted to approved deployment sources; an additional narrow allow rule does not restrict a broader existing rule.
+- Kerberos over WinRM has no second hop by default. Flag package or file-share access from the Windows host that relies on forwarded credentials; prefer a checksummed HTTPS download.
+
 ## Commands
 
 ```

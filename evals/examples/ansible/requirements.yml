@@ -1,0 +1,8 @@
+---
+collections:
+  - name: ansible.windows
+    version: 3.2.0
+  - name: community.windows
+    version: 3.0.1
+  - name: microsoft.iis
+    version: 1.0.3

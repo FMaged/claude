@@ -1,0 +1,22 @@
+---
+- name: Require the IIS features and deployment sources
+  ansible.builtin.assert:
+    that:
+      - "'Web-Server' in iis_host_features"
+      - "'Web-Mgmt-Service' in iis_host_features"
+      - iis_host_deploy_from | length > 0
+      - iis_host_wmsvc_firewall_rule | length > 0
+    fail_msg: Keep both IIS features and supply the CI runner addresses and the built-in WMSvc firewall rule name.
+
+- name: Require real installer metadata
+  ansible.builtin.assert:
+    that:
+      - iis_host_webdeploy_url is match('^https://')
+      - iis_host_hosting_bundle_url is match('^https://')
+      - iis_host_webdeploy_sha256 is match('^[0-9a-fA-F]{64}$')
+      - iis_host_hosting_bundle_sha256 is match('^[0-9a-fA-F]{64}$')
+      - iis_host_webdeploy_sha256 != '0' * 64
+      - iis_host_hosting_bundle_sha256 != '0' * 64
+      - iis_host_hosting_bundle_product_id | length > 0
+      - iis_host_hosting_bundle_product_id != '{00000000-0000-0000-0000-000000000000}'
+    fail_msg: Replace the example URLs, checksums, and Hosting Bundle uninstall key with metadata for your approved installers.

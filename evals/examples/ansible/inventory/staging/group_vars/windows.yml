@@ -1,0 +1,14 @@
+---
+# Domain-joined hosts, over the WinRM listener Windows Server ships with: HTTP on 5985,
+# where Kerberos encrypts every message. NTLM only in a lab.
+ansible_connection: winrm
+ansible_port: 5985
+ansible_winrm_transport: kerberos
+ansible_winrm_kinit_mode: managed
+ansible_winrm_message_encryption: always
+# user@REALM with the realm in capitals. Ansible gets the ticket itself with kinit.
+ansible_user: "{{ lookup('ansible.builtin.env', 'WINRM_USER', default=undef()) }}"
+ansible_password: "{{ lookup('ansible.builtin.env', 'WINRM_PASSWORD', default=undef()) }}"
+# Otherwise become on Windows would try sudo to root.
+ansible_become_method: runas
+ansible_become_user: SYSTEM
