@@ -118,3 +118,7 @@ packer	1	write a packer template that builds a Windows Server 2025 golden image 
 packer	1	why does packer wait for SSH forever when it builds my Ubuntu image on Hyper-V?
 packer	0	write a terraform module that creates a Hyper-V VM from our golden VHDX
 packer	0	what does this bash script do? for f in *.log; do gzip "$f"; done
+powershell	1	write a powershell script that gives a Hyper-V VM a virtual TPM and is safe to run twice
+powershell	1	write a PowerShell function that creates a local user, supports -WhatIf, and stops at the first error
+powershell	0	write a python script that renames my photos by the date they were taken
+powershell	0	write a terraform module that creates a Hyper-V VM from our golden VHDX

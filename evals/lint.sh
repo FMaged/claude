@@ -143,6 +143,12 @@ else
   echo "note: packer not installed, examples not validated"
 fi
 
+if command -v pwsh >/dev/null; then
+  pwsh -NoProfile -NonInteractive -File evals/check-powershell.ps1 || problem "PowerShell examples"
+else
+  echo "note: pwsh not installed, PowerShell examples not checked"
+fi
+
 # Shell scripts.
 if command -v shellcheck >/dev/null; then
   shellcheck install.sh evals/*.sh || problem "shellcheck"
