@@ -39,16 +39,26 @@ none in the code:
 | `HYPERV_USER`, `HYPERV_PASSWORD` | the account that runs the scripts | `Administrator` |
 | `HYPERV_KERBEROS_REALM`, `HYPERV_KERBEROS_SERVICE_PRINCIPAL_NAME`, `KRB5_CONFIG`, `KRB5CCNAME` | Kerberos instead of NTLM | — |
 | `HYPERV_CACERT_PATH` | CA that signed the host's WinRM certificate | — |
-| `HYPERV_SCRIPT_PATH` | where scripts are copied on the host | `C:/Temp/terraform_%RAND%.cmd` |
+| `HYPERV_SCRIPT_PATH` | read, but not used by the 1.2.1 script runner | `C:/Temp/terraform_%RAND%.cmd` |
 | `HYPERV_TIMEOUT` | connection timeout | `30s` |
 
 - HTTPS on 5986 with a certificate the runner trusts (`HYPERV_CACERT_PATH`). Never
   `HYPERV_INSECURE=true` outside a lab, and never WinRM over plain HTTP.
 - Kerberos in a domain (set `HYPERV_USE_NTLM=false` and the Kerberos variables, with a
   `krb5.conf` in the runner image). NTLM over HTTPS is acceptable in a lab.
-- A dedicated service account in the host's `Hyper-V Administrators` group, not a domain
-  admin. It also needs rights on the folders that hold images and VM disks.
-- The folder of `HYPERV_SCRIPT_PATH` must exist on the host, or every call fails.
+- A dedicated service account, not a domain admin. The provider runs every script as a
+  scheduled task registered with the account's name and password, so the account
+  likely needs all of these. They come from reading the provider's source; write down
+  what the account really needed once you have tried it on the host:
+  - the host's `Hyper-V Administrators` group, for the Hyper-V cmdlets;
+  - remote access over WinRM (the host's `Remote Management Users` group);
+  - the right to log on as a batch job, for the scheduled task. The task needs the
+    password, so set `HYPERV_PASSWORD` even with Kerberos and a ticket cache;
+  - write access to the folders that hold images, VM disks, and seeds.
+- Scripts are uploaded to the account's `%TEMP%` on the host and deleted after a
+  successful call. When a call fails, the wrapper that holds the account's password in
+  clear text stays there. Keep that profile readable by the account and administrators
+  only, and clean `%TEMP%` after a failed apply.
 - One provider block reaches one host. More hosts are provider aliases
   (`provider "hyperv" { alias = "hv02" }`), passed to the module with `providers = {}`.
   Every alias reads the same `HYPERV_*` variables, so each aliased block sets its own
