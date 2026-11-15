@@ -81,18 +81,24 @@ link_item() {
   fi
 }
 
+# A skill folder without its manifest is not installed, so its old link goes too.
 prune_links() {
-  local directory=$1 dest link_target
+  local directory=$1 manifest=${2:-} dest link_target reason
   for dest in "$directory"/*; do
     [ -L "$dest" ] || continue
     link_target=$(readlink "$dest")
     case "$link_target" in
       "$repo"/*)
         if [ ! -e "$link_target" ]; then
-          echo "remove: $dest (target is gone)"
-          act rm "$dest"
-          removed=$((removed + 1))
+          reason="target is gone"
+        elif [ -n "$manifest" ] && [ ! -f "$link_target/$manifest" ]; then
+          reason="no $manifest"
+        else
+          continue
         fi
+        echo "remove: $dest ($reason)"
+        act rm "$dest"
+        removed=$((removed + 1))
         ;;
     esac
   done
@@ -122,7 +128,7 @@ for client in claude codex; do
     done
     prune_links "$root/agents"
   fi
-  prune_links "$root/skills"
+  prune_links "$root/skills" SKILL.md
 done
 
 echo "Summary: linked $linked, already OK $ok, conflicts $conflicts, removed $removed, skipped $skipped"

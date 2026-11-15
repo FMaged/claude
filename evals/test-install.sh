@@ -61,6 +61,9 @@ HOME="$tmp/home2" "$tmp/repo2/install.sh" >/dev/null
 rm -rf "$tmp/repo2/skills/git-branch"
 summary=$(HOME="$tmp/home2" "$tmp/repo2/install.sh" | tail -1)
 check "$summary" "Summary: linked 0, already OK $((total - 2)), conflicts 0, removed 2, skipped 0" "a deleted skill has its links removed (R4)"
+rm "$tmp/repo2/skills/git-commit/SKILL.md"
+summary=$(HOME="$tmp/home2" "$tmp/repo2/install.sh" | tail -1)
+check "$summary" "Summary: linked 0, already OK $((total - 4)), conflicts 0, removed 2, skipped 0" "a skill without SKILL.md has its links removed"
 
 HOME="$tmp/home3" "$repo/install.sh" --target codex >/dev/null
 check "$(find "$tmp/home3" -maxdepth 1 -name .claude | wc -l | tr -d ' ')" "0" "--target codex does not touch ~/.claude"
