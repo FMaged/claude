@@ -133,7 +133,8 @@ before you rely on it.
 
 Keep data off the OS disk. The OS disk is rebuilt from the image; a disk that holds state
 is a separate `hyperv_vhd` (with `size` and `vhd_type = "Dynamic"`, no `source`) and has
-`lifecycle { prevent_destroy = true }`.
+`lifecycle { prevent_destroy = true }`. Name it `<name>-data.vhdx` in the VM's folder;
+the rough edge on deleting a disk says why the name matters.
 
 ## The machine
 
@@ -327,6 +328,13 @@ the next plan shows it as drift and reverts it. Keep the two sets of settings se
   adaptors, DVD or disk drives, the provider shuts a running VM down
   (`Stop-VM -Force`) and starts it again. A plan that shows `~ update in-place` on a
   production VM is a reboot: apply it in a maintenance window, one VM at a time.
+- **Destroying a disk deletes every file in its folder whose name starts with the
+  disk's name.** The provider's delete removes `web01*` when it destroys `web01.vhdx`,
+  so `web01-data.vhdx` goes with it, and `web1.vhdx` takes `web10.vhdx`.
+  `prevent_destroy` on the other disk does not help: Terraform never planned to touch
+  it. Give each VM its own folder, and never let one disk's base name be the start of
+  another's in that folder. The layout here (`<name>\<name>-os.vhdx` and
+  `<name>\<name>-data.vhdx`) is safe for that reason.
 - **`hyperv_vhd` does not replace a disk when its image changes.** It reports an
   in-place update and leaves the old disk. See "Which image a VM uses".
 - The provider is maintained by a small team; pin it exactly and read the changelog
