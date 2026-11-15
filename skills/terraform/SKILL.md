@@ -49,6 +49,10 @@ infra/
   in the variable descriptions, so a local run knows what to export.
 - No workspaces for environments. Separate root modules make the environment visible in
   the path and in the state name, and a typo cannot apply staging values to prod.
+- `.gitignore` covers what Terraform writes next to the code: `.terraform/`,
+  `plan.cache` (it holds secrets in clear text), `*.tfstate` and `*.tfstate.*`, the
+  `.seed/` folder, and the generated inventory (section 6). Commit
+  `.terraform.lock.hcl`.
 
 ## 2. Versions and the lock file
 
