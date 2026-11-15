@@ -154,6 +154,7 @@ the rough edge on deleting a disk says why the name matters.
 ```hcl
 resource "hyperv_machine_instance" "this" {
   name                   = var.name
+  path                   = var.vm_root # Hyper-V adds <name>\, so the config sits next to the disks
   generation             = 2
   processor_count        = var.cpus
   static_memory          = true
@@ -212,6 +213,8 @@ resource "hyperv_machine_instance" "this" {
 }
 ```
 
+- **`path`** keeps the VM's configuration files under `vm_root` with its disks, instead
+  of the host's default folder. Set it from the start: a change replaces the VM.
 - **Generation 2** always: UEFI, secure boot, SCSI boot disk. Generation 1 only for an
   OS that cannot boot UEFI.
 - **Secure boot template**: `MicrosoftWindows` for Windows, `MicrosoftUEFICertificateAuthority`
