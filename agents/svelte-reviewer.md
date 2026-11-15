@@ -1,6 +1,6 @@
 ---
 name: svelte-reviewer
-description: Reviews Svelte components and SvelteKit routes, loads, actions, hooks, and config by following the svelte-review skill. Read-only. Run only when the user names it or from the scheduled night run — do not delegate to it on your own.
+description: Reviews Svelte components and SvelteKit routes, loads, actions, hooks, and config by following the svelte-review skill. Read-only. Run only when the user names it — do not delegate to it on your own.
 tools: Read, Grep, Glob
 skills:
   - svelte-review

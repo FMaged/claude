@@ -1,6 +1,6 @@
 ---
 name: network-reviewer
-description: Reviews network designs and config — addressing, routing, firewall rules, NAT by following the network-review skill. Read-only. Run only when the user names it or from the scheduled night run — do not delegate to it on your own.
+description: Reviews network designs and config — addressing, routing, firewall rules, NAT by following the network-review skill. Read-only. Run only when the user names it — do not delegate to it on your own.
 tools: Read, Grep, Glob
 skills:
   - network-review

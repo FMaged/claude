@@ -1,6 +1,6 @@
 ---
 name: docker-reviewer
-description: Reviews Dockerfiles, compose files, and entrypoint scripts by following the docker-review skill. Read-only. Run only when the user names it or from the scheduled night run — do not delegate to it on your own.
+description: Reviews Dockerfiles, compose files, and entrypoint scripts by following the docker-review skill. Read-only. Run only when the user names it — do not delegate to it on your own.
 tools: Read, Grep, Glob
 skills:
   - docker-review

@@ -1,6 +1,6 @@
 ---
 name: sql-reviewer
-description: Reviews SQL queries, views, functions, and SQL embedded in application code by following the sql-review skill. Read-only. Run only when the user names it or from the scheduled night run — do not delegate to it on your own.
+description: Reviews SQL queries, views, functions, and SQL embedded in application code by following the sql-review skill. Read-only. Run only when the user names it — do not delegate to it on your own.
 tools: Read, Grep, Glob
 skills:
   - sql-review

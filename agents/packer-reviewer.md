@@ -1,6 +1,6 @@
 ---
 name: packer-reviewer
-description: Reviews Packer templates and image builds by following the packer-review skill. Read-only. Run only when the user names it or from the scheduled night run — do not delegate to it on your own.
+description: Reviews Packer templates and image builds by following the packer-review skill. Read-only. Run only when the user names it — do not delegate to it on your own.
 tools: Read, Grep, Glob
 skills:
   - packer-review
