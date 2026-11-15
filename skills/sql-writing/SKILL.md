@@ -128,9 +128,14 @@ The single biggest source of SQL that is wrong rather than slow.
 ## Before calling it done
 
 ```
-EXPLAIN (ANALYZE, BUFFERS) <the query>     -- estimated vs actual rows, seq scans, bad nested loops
-BEGIN; <the write>; -- check counts -- ROLLBACK;
 SELECT count(*) FROM … WHERE <the same WHERE>;   -- before any UPDATE or DELETE
+EXPLAIN (ANALYZE, BUFFERS) <the SELECT>    -- estimated vs actual rows, seq scans, bad nested loops
+
+-- ANALYZE runs the statement, so analyze a write only in a transaction that rolls back
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) <the write>;
+SELECT count(*) FROM …;                    -- what the write changed
+ROLLBACK;
 ```
 
 A plan where the estimate and the actual row count differ by orders of magnitude means the
