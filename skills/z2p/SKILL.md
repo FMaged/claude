@@ -28,7 +28,7 @@ Pick the first stage that is not `done` or `skipped`. A `stale` stage comes firs
 - **Stage 3:** run it even if `VALIDATION.md` already has a `Decision:` line; after a `Change` the old file still has one. The decision is read in After the stage.
 - **A `waiting` stage:** ask whether the evidence has arrived. If not, say what it is waiting for and stop.
 - **Stage 5:** ask "Fast or coach mode?". Coach mode means project-planner's coach mode.
-- If the stage's skill is not installed, say so and offer to skip the stage.
+- If the stage's skill is not installed, say so. Offer to skip only stage 1, which is optional. For any other stage, say what to install and stop.
 
 Set the stage to `doing`, then run its skill from the stage table.
 
