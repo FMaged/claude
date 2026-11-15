@@ -376,7 +376,7 @@
 **What:** Two prompts that should fire and two that should not, for each of the 18 skills that had none. The runner skips skills turned off in `~/.claude/settings.json`.
 **Why:** N5 applied only to the z2p skills.
 **How:** Append to `evals/trigger-prompts.tsv`; run `evals/run-trigger-evals.sh`.
-**Notes:** _(results below once the run finishes)_
+**Notes:** Run on 2026-11-15 with haiku: 88 ok, 20 skipped (the five skills turned off in `skillOverrides`, see T6.6), 4 failed. All four failures were a positive prompt where no skill fired; no prompt fired the wrong skill. `validate my idea` passed on a rerun. Still missing on a rerun, all in an empty folder with no file to look at: `are the comments in this file any good?` (code-comments), `should members and staff be one table or two?` (schema-design), `add an upsert for the settings table` (sql-writing). Likely the harness, not the descriptions: haiku asks for the file instead of calling a skill. Check with a real file before changing those descriptions.
 
 ### [x] T6.5: Bring the docs up to date
 **What:** `PLAN.md` structure and stack mention Codex and the checks (D6 has a Changed line). `REQUIREMENTS.md` closes two open questions and points N1 to N5 at the scripts. `README.md` lists the checks and the manual graphify install. Agents no longer mention a night run. `product-brief` gets trigger phrases like the other skills. The shared settings pin the model that is used today.
