@@ -122,3 +122,7 @@ powershell	1	write a powershell script that gives a Hyper-V VM a virtual TPM and
 powershell	1	write a PowerShell function that creates a local user, supports -WhatIf, and stops at the first error
 powershell	0	write a python script that renames my photos by the date they were taken
 powershell	0	write a terraform module that creates a Hyper-V VM from our golden VHDX
+hyperv-deploy	1	create three lab VMs on our Hyper-V host from the golden image with powershell, without terraform
+hyperv-deploy	1	should this short-lived Hyper-V test VM be managed by terraform or by a powershell deploy script?
+hyperv-deploy	0	write a terraform module that creates a Hyper-V VM from our golden VHDX
+hyperv-deploy	0	write a packer template that builds a Windows Server image

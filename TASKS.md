@@ -441,7 +441,7 @@
 **How:**
 - Use the service account you plan to keep. Write down the rights it really needed and correct the list in the reference.
 - Plan with a missing image and with a wrong-case switch name: both plans must fail.
-- Apply one Linux and one Windows VM. Plan again: no changes.
+- Apply one Linux and one Windows VM. Plan again: no changes. The Windows VM must finish first boot without stopping at the Administrator password page; the example's seed sets no `AdministratorPassword` (found in T7.8).
 - Change one VM's image: the plan must show the disk, the seed ISO, and the VM as `must be replaced`, and the new VM must boot from the new image.
 - Edit the cloud-config: the plan must show no change to running VMs.
 - Destroy one VM and check that no other VM's files were deleted.
@@ -468,7 +468,7 @@
 - Worked example in `evals/examples/bash/`: a script with `--dry-run` and a `trap`, clean under `shellcheck` and run once in each mode. Add `evals/examples/bash/*.sh` to the lint's shellcheck. Point `packer` at `bash` for Linux provisioner scripts. Evals, lint, commit.
 **Notes:** _(added after implementation if anything came up)_
 
-### [ ] T7.8: Write the `hyperv-deploy` skill
+### [x] T7.8: Write the `hyperv-deploy` skill
 **What:** `skills/hyperv-deploy/SKILL.md` for creating and changing Hyper-V VMs with PowerShell, without Terraform (D18, changed 2026-11-15).
 **Why:** Some VMs do not need Terraform, or should not have it: a one-off or lab VM, a host the pipeline cannot reach, a VM that must exist before the pipeline does. A script written by hand has no plan and no state, so the skill gives it what Terraform would have: a preview, safe re-runs, and one owner per VM.
 **How:**
@@ -481,7 +481,7 @@
 - Runs on the host, or through `Invoke-Command -ComputerName` with a `PSCredential`; credentials never in the data file.
 - Removal is its own switch with `ConfirmImpact = 'High'` and deletes only the VM and its own folder.
 - Worked example in `evals/examples/hyperv-deploy/`: a script and a data file for one Windows and one Linux VM, clean under `Invoke-ScriptAnalyzer`, and Pester tests with the Hyper-V cmdlets mocked (they do not exist on Linux) that check `-WhatIf` calls no `New-`, `Set-`, or `Remove-` cmdlet and that a second run changes nothing. Evals, lint, commit.
-**Notes:** _(added after implementation if anything came up)_
+**Notes:** Done 2026-11-15, before T7.4 as planned. The worked example in `evals/examples/hyperv-deploy/` has `Deploy-HyperVVM.ps1`, `Remove-HyperVVM.ps1`, a module with the logic that changes nothing (config checks, drift, first-boot files), and `envs/lab.psd1` with one Windows and one Linux VM. PSScriptAnalyzer 1.25.0 reports nothing; 24 Pester tests pass under Pester 6.2.0, also under the lint's strict mode. Trigger evals 4 of 4, and the `powershell` and `terraform` evals still pass 4 of 4. Changes from the plan: (1) removal is its own script, not a switch, because `ConfirmImpact` belongs to the whole script and the deploy must not ask before every change. (2) No seed ISO: Windows Server ships no ISO tool, so Windows gets `Unattend.xml` written into the mounted OS disk's `C:\Windows\Panther` (and its partition grown while mounted), and Linux gets a small FAT32 VHDX labelled `CIDATA`, which cloud-init's NoCloud source accepts. (3) The data file rejects unknown keys, which Terraform cannot. (4) Image, disk kind, disk size, and turning the TPM off are refused in place; the notes record the first three. Pester 6 lessons are in the skill's section 8. Found on the way: the Terraform example's Windows seed sets no `AdministratorPassword`, so its first boot may stop at the password page (added to T7.5); and the TPM example in `evals/examples/powershell/` calls `Stop-VM` without `-Force`, which prompts on a locked VM and fails an unattended run, to be fixed next. Nothing ran on a Hyper-V host.
 
 ## Stage 8: Configuration (Ansible)
 
