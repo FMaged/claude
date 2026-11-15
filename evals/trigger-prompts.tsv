@@ -38,3 +38,75 @@ rust-clean-architecture	1	Add a use case to my Rust workspace that deactivates a
 rust-clean-architecture	1	In my Rust app with a domain crate and adapter crates, where should a new Slack notifier go, and how do I add its config?
 rust-clean-architecture	0	write a rust function that reverses a string
 rust-clean-architecture	0	review my Dockerfile for a rust service
+ansible-review	1	review this playbook, is it idempotent?
+ansible-review	1	check my Ansible role for anything that could lock me out of the server
+ansible-review	0	write an ansible playbook that installs nginx
+ansible-review	0	explain what a Jinja template is
+code-comments	1	add comments to this function
+code-comments	1	are the comments in this file any good?
+code-comments	0	write a commit message for this change
+code-comments	0	remove all the console.log calls from this file
+docker-review	1	review my Dockerfile
+docker-review	1	why is this docker image so big?
+docker-review	0	write a docker-compose file for postgres and redis
+docker-review	0	how do I install docker on debian?
+git-branch	1	make a branch for this work
+git-branch	1	what should I call the branch for the login fix?
+git-branch	0	commit this
+git-branch	0	list all the branches merged into main
+git-commit	1	commit this
+git-commit	1	write a commit message for these changes
+git-commit	0	make a new branch for this feature
+git-commit	0	what does git rebase do?
+network-review	1	review my network topology, the routes and the firewall rules
+network-review	1	check these nftables rules against the flows in the design
+network-review	0	write a bash script that pings every host in a subnet
+network-review	0	what is the difference between TCP and UDP?
+packer-review	1	review my packer template
+packer-review	1	why is this packer image not reproducible?
+packer-review	0	write a packer template that builds an ubuntu image
+packer-review	0	what is the difference between packer and terraform?
+plan-to-tasks	1	convert the plan to tasks
+plan-to-tasks	1	turn PLAN.md into TASKS.md
+plan-to-tasks	0	next task
+plan-to-tasks	0	plan a new project with me
+product-brief	1	write a product brief for my idea: a tool that reminds plant owners to water
+product-brief	1	write PRODUCT_BRIEF.md for a meal planning app
+product-brief	0	write the requirements for my app with acceptance criteria
+product-brief	0	write a brief summary of this article
+project-planner	1	let's plan a new project: a recipe app
+project-planner	1	I want to build a todo app, plan it with me
+project-planner	0	convert the plan to tasks
+project-planner	0	plan my week
+schema-design	1	what tables do I need for a library app with books and loans?
+schema-design	1	should members and staff be one table or two?
+schema-design	0	write the migration that creates the users table
+schema-design	0	review this CREATE TABLE statement
+sql-review	1	review this query, it returns duplicates: SELECT o.id FROM orders o JOIN items i ON i.order_id = o.id
+sql-review	1	is this UPDATE safe to run on production?
+sql-review	0	write a query that lists the top 10 customers by revenue
+sql-review	0	design the schema for my shop
+sql-writing	1	write a query that lists each customer with their last order
+sql-writing	1	add an upsert for the settings table
+sql-writing	0	review this SQL, why is it slow?
+sql-writing	0	what tables do I need for an inventory app?
+svelte	1	add a Svelte component that shows a list of todos
+svelte	1	why doesn't this $state update in my component?
+svelte	0	review my +page.server.ts
+svelte	0	add a React component for the header
+svelte-review	1	review this Svelte component
+svelte-review	1	check my load function in +page.server.ts
+svelte-review	0	add a page to my SvelteKit app
+svelte-review	0	review this Vue component
+task-runner	1	next task
+task-runner	1	implement T1.2
+task-runner	0	convert the plan to tasks
+task-runner	0	what is the next step in this recipe?
+terraform-review	1	review my terraform
+terraform-review	1	is this terraform plan safe to apply?
+terraform-review	0	write a terraform module for an S3 bucket
+terraform-review	0	how do I install terraform?
+web-security-review	1	is this app secure?
+web-security-review	1	can a user see someone else's data through this endpoint?
+web-security-review	0	add a login page to my app
+web-security-review	0	review this Dockerfile for security
