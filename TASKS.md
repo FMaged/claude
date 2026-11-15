@@ -448,11 +448,11 @@
 - Fix the reference and the example where the host disagrees. Commit.
 **Notes:** _(added after implementation if anything came up)_
 
-### [ ] T7.6: Teach `packer-review` about Windows images
+### [x] T7.6: Teach `packer-review` about Windows images
 **What:** Add the Windows image checks to `skills/packer-review/SKILL.md`.
 **Why:** The review was written for Linux images. A Windows golden image fails in its own ways, and a bad image is cloned into every VM. T8.2 does the same for `ansible-review`.
 **How:** Add: sysprep `/generalize /oobe` missing or not the last provisioner; an answer file left in `%WINDIR%\Panther` (the seed ISO's `Autounattend.xml` is then ignored); the build's WinRM listener, firewall rule, or build account left enabled; a Windows Update step without a `windows-restart` after it; the Administrator password from a literal instead of a `PKR_VAR_` variable; on Linux images, the Hyper-V daemons missing. Keep the existing sections. Commit.
-**Notes:** _(added after implementation if anything came up)_
+**Notes:** Done 2026-11-15. New sections 2 (Windows images) and 3 (Linux images on Hyper-V); the old sections are kept and renumbered 4 to 7. Besides the list in How, the Windows section also checks the things the `packer` skill does to get them right: sysprep started with `Start-Process -Wait` and checked through `ImageState`, sysprep not in `shutdown_command`, no `sysprep /unattend:`, `winrm_use_ntlm`, a password `validation` that rejects `<`, `>`, and `&`, and provisioner scripts written for Windows PowerShell 5.1, which it hands to `powershell-review`. The Linux section adds a locked build user and the Ubuntu installer files that stop cloud-init from configuring a clone's network, and `ansible-local` instead of `ansible`. The Commands section has three checks to run on a VM made from a Windows image. The Windows example in `evals/examples/packer/` passes every new check. Trigger evals not run: the skill is turned off in Claude Code and runs through `packer-reviewer` (T6.6).
 
 ### [ ] T7.7: Write the `bash` skill
 **What:** `skills/bash/SKILL.md` for Bash scripts in any project (D29).
