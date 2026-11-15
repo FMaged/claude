@@ -370,8 +370,10 @@ the next plan shows it as drift and reverts it. Keep the two sets of settings se
   `<name>\<name>-data.vhdx`) is safe for that reason.
 - **`hyperv_vhd` does not replace a disk when its image changes.** It reports an
   in-place update and leaves the old disk. See "Which image a VM uses".
-- The provider is maintained by a small team; pin it exactly and read the changelog
-  before raising the pin.
+- **Plan for no fixes.** The provider has had no release since 1.2.1 (February 2024),
+  and the bugs here are still on its `master`. Pin it exactly, work around each bug in
+  the module with a comment, and read the changelog before raising the pin if a new
+  release ever comes.
 - `terraform validate` cannot catch a wrong path on the host, a missing switch, or a
   missing image. Look them up so the plan fails instead of the apply. Neither lookup
   fails on its own, so each needs a postcondition.
