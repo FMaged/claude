@@ -12,7 +12,7 @@ parameter is in it.
 
 ```hcl
 terraform {
-  required_version = ">= 1.10.0"
+  required_version = ">= 1.4.0" # terraform_data; an ephemeral variable needs 1.10 (OpenTofu 1.11)
   required_providers {
     hyperv = {
       source  = "taliesins/hyperv"

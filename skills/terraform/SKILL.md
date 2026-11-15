@@ -21,10 +21,19 @@ project that already has its own backend, pipeline, or tfvars convention, that o
 
 Run `terraform version` (or `tofu version`) and read `versions.tf` and
 `.terraform.lock.hcl` first. Write for the version the project pins. Features named
-here and their minimum version: `optional()` attributes with defaults (1.3),
-`terraform_data` (1.4), `removed` blocks (1.7), ephemeral variables and resources
-(1.10), write-only arguments (1.11). On an older version, say what is missing instead
-of writing code that will not parse.
+here and the first version that has them:
+
+| Feature | Terraform | OpenTofu |
+|---|---|---|
+| `optional()` attributes with defaults | 1.3 | every version |
+| `terraform_data` | 1.4 | every version |
+| `removed` with `lifecycle { destroy = false }` | 1.7 | 1.10 (1.7 to 1.9: `removed` with no `lifecycle`, never destroys) |
+| ephemeral variables and resources | 1.10 | 1.11 |
+| write-only arguments | 1.11 | 1.11 |
+
+Set `required_version` to the oldest version that has everything the code uses, not
+higher. On an older version, say what is missing instead of writing code that will not
+parse.
 
 ## 1. Layout: one root module per environment, one module per thing
 
@@ -112,8 +121,8 @@ variable "vms" {
 - An `object` with `optional()` attributes, not a `map(any)`: a typo in an attribute name
   is an error instead of a silently ignored key.
 - A secret is `sensitive = true`. If it is used only in a `provider` block or a
-  write-only argument, also `ephemeral = true` (1.10+), and it never reaches the plan
-  file or the state.
+  write-only argument, also `ephemeral = true` (see section 0), and it never reaches the
+  plan file or the state.
 - No default for anything that differs per environment. A missing value should stop the
   plan, not quietly pick staging's value.
 - No variable for something that never changes. A constant is a `local`.
@@ -149,7 +158,7 @@ module "vm" {
   ```
 
 - To stop managing something without destroying it, use a `removed` block with
-  `lifecycle { destroy = false }` (1.7+), not `terraform state rm` by hand.
+  `lifecycle { destroy = false }` (see section 0), not `terraform state rm` by hand.
 
 ## 5. Resources
 
