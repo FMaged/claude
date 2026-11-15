@@ -400,6 +400,39 @@
 - Add 2 + 2 prompts to `evals/trigger-prompts.tsv`, run `evals/lint.sh` and the evals for the skill, commit.
 **Notes:** Skill, reference, and evals done 2026-11-15; trigger evals 4 of 4. The reference was checked against the provider 1.2.1 docs and source, which changed four things from the plan: (1) the provider *can* set nested virtualization (`vm_processor.expose_virtualization_extensions`), so T7.3 should not list it as a PowerShell-only gap; (2) almost any in-place change to `hyperv_machine_instance` (even `notes`, adaptors, DVD drives) shuts the VM down with `Stop-VM -Force` and starts it again, so the skill says every in-place update is a reboot; (3) the `hyperv_vhd` data source does not fail on a missing file, and its `exists` is inverted in 1.2.1, so image lookups need a postcondition on `self.path != ""`; (4) `hyperv_iso_image` volume names are upper case only, so the cloud-init seed is `CIDATA`. Windows first boot uses `Autounattend.xml` on a seed ISO; Setup reads `%WINDIR%\Panther` first, so T7.2 must make sure the Packer image leaves no answer file there. Changed `terraform-review`: a committed `terraform.tfvars` with non-secret environment values is now fine (only secrets and personal values are flagged), because the skill keeps each environment's values in its root module's `terraform.tfvars`. The worked example (one `hyperv-vm` module, a `staging` root module) is written; `terraform validate` has not run yet, because downloading and running the Terraform binary was blocked on this PC. After the 2026-11-15 review the example moved to `evals/examples/terraform/` and follows the fixed reference; `evals/lint.sh` validates it once `terraform` is installed. Tick this task when that passes.
 
+### [ ] T7.2: Write the `packer` skill
+**What:** `skills/packer/SKILL.md` for building Hyper-V golden images (D18).
+**Why:** The VMs clone an image; a bad image is cloned many times. `packer-review` exists, the writing side does not.
+**How:**
+- HCL2 only, `required_plugins` pinned, variables for secrets from `PKR_VAR_` environment variables, image names with date and git sha.
+- Windows: `hyperv-iso` builder, `autounattend.xml` that enables WinRM for the build only, PowerShell provisioners, Windows Update step, sysprep with generalize as the last provisioner.
+- Linux: autoinstall or preseed, cloud-init left enabled and cleaned for first boot, shell and `ansible` provisioners. Install the Hyper-V daemons (`hyperv-daemons` on Debian and RHEL, `linux-cloud-tools-virtual` on Ubuntu), or Terraform's `wait_for_ips` waits until it times out.
+- Windows first boot reads `Autounattend.xml` from the seed ISO that Terraform attaches (`terraform/references/hyperv.md`). Setup reads `%WINDIR%\Panther` first, so the image must leave no answer file there, or the seed is ignored. Remove the build's answer file after sysprep, and say so in the skill.
+- Build runs on the `hyperv` runner tag from GitLab CI; output goes to the image store Terraform reads (D21).
+- Worked example in `evals/examples/packer/`: a Windows Server template; run `packer validate`. Evals, lint, commit.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T7.3: Write the `powershell` skill
+**What:** `skills/powershell/SKILL.md` for scripts and modules on Windows hosts and the Hyper-V host (D18).
+**Why:** PowerShell fills the gaps Packer and Terraform leave, and it is the one tool here with no skill at all.
+**How:**
+- `#Requires -Version 7`, `Set-StrictMode -Version Latest`, `$ErrorActionPreference = 'Stop'`, `try`/`catch` only where the script can do something about it.
+- Functions with `[CmdletBinding(SupportsShouldProcess)]`, typed parameters with validation attributes, `-WhatIf` that really does nothing.
+- Idempotent: `Get-` before `New-`, exit code 0 when nothing changed. Objects on the pipeline, `Write-Host` only for people. Credentials as `PSCredential` from CI variables or SecretManagement, never plain text.
+- Remoting with `Invoke-Command`; the Hyper-V module for what the Terraform provider cannot do, as listed at the end of `terraform/references/hyperv.md`: the virtual TPM (`Set-VMKeyProtector`, `Enable-VMTPM`), trunk VLANs, `Copy-VMFile`, cluster roles and replication. Firmware, nested virtualisation, and integration services are in the provider, so a script must not set them: the next plan would revert it. Such a script runs as its own pipeline step after the apply.
+- Modules with a manifest, Pester tests, PSScriptAnalyzer clean.
+- Worked example in `evals/examples/powershell/`: a script that gives a VM a virtual TPM (key protector, then `Enable-VMTPM`), idempotent and honest under `-WhatIf`, checked with `Invoke-ScriptAnalyzer` under `pwsh` (install `pwsh` on this PC once). Evals, lint, commit.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T7.4: Write `powershell-review` and the `powershell-reviewer` agent
+**What:** `skills/powershell-review/SKILL.md` and `agents/powershell-reviewer.md` (D17).
+**Why:** Scripts that touch the Hyper-V host and production VMs need an unattended check.
+**How:**
+- Review sections like `ansible-review`: what fails silently (no `Stop`, `-ErrorAction SilentlyContinue`, unchecked `$LASTEXITCODE`); what is not idempotent or lies under `-WhatIf`; what leaks secrets (plain-text passwords, `ConvertTo-SecureString -AsPlainText` from a literal, secrets in logs); what breaks under StrictMode or remoting; unpinned module versions; a Commands section (`Invoke-ScriptAnalyzer`, `Invoke-Pester`); "How to report".
+- Agent copied from `agents/sql-reviewer.md` with the names changed.
+- Evals for the review skill, lint, commit.
+**Notes:** _(added after implementation if anything came up)_
+
 ### [ ] T7.5: Try the Hyper-V reference on a host
 **What:** Apply the worked example in `evals/examples/terraform/` once against a Hyper-V host and record what the provider really does.
 **Why:** Every Hyper-V statement in `references/hyperv.md` comes from reading the provider's source. Several fixes from the 2026-11-15 review (the image check, image replacement, differencing disks, the switch lookup, seed changes, the service account) change behaviour that was never run.
@@ -413,36 +446,10 @@
 - Fix the reference and the example where the host disagrees. Commit.
 **Notes:** _(added after implementation if anything came up)_
 
-### [ ] T7.2: Write the `packer` skill
-**What:** `skills/packer/SKILL.md` for building Hyper-V golden images (D18).
-**Why:** The VMs clone an image; a bad image is cloned many times. `packer-review` exists, the writing side does not.
-**How:**
-- HCL2 only, `required_plugins` pinned, variables for secrets from `PKR_VAR_` environment variables, image names with date and git sha.
-- Windows: `hyperv-iso` builder, `autounattend.xml` that enables WinRM for the build only, PowerShell provisioners, Windows Update step, sysprep with generalize as the last provisioner.
-- Linux: autoinstall or preseed, cloud-init left enabled and cleaned for first boot, shell and `ansible` provisioners.
-- Build runs on the `hyperv` runner tag from GitLab CI; output goes to the image store Terraform reads (D21).
-- Worked example: a Windows Server template; run `packer validate`. Evals, lint, commit.
-**Notes:** _(added after implementation if anything came up)_
-
-### [ ] T7.3: Write the `powershell` skill
-**What:** `skills/powershell/SKILL.md` for scripts and modules on Windows hosts and the Hyper-V host (D18).
-**Why:** PowerShell fills the gaps Packer and Terraform leave, and it is the one tool here with no skill at all.
-**How:**
-- `#Requires -Version 7`, `Set-StrictMode -Version Latest`, `$ErrorActionPreference = 'Stop'`, `try`/`catch` only where the script can do something about it.
-- Functions with `[CmdletBinding(SupportsShouldProcess)]`, typed parameters with validation attributes, `-WhatIf` that really does nothing.
-- Idempotent: `Get-` before `New-`, exit code 0 when nothing changed. Objects on the pipeline, `Write-Host` only for people. Credentials as `PSCredential` from CI variables or SecretManagement, never plain text.
-- Remoting with `Invoke-Command`; the Hyper-V module for what Terraform cannot do (`Set-VMFirmware`, `Set-VMProcessor -ExposeVirtualizationExtensions`, integration services).
-- Modules with a manifest, Pester tests, PSScriptAnalyzer clean.
-- Worked example: a script that enables nested virtualisation on a VM, checked with `Invoke-ScriptAnalyzer` under `pwsh` (install `pwsh` on this PC once). Evals, lint, commit.
-**Notes:** _(added after implementation if anything came up)_
-
-### [ ] T7.4: Write `powershell-review` and the `powershell-reviewer` agent
-**What:** `skills/powershell-review/SKILL.md` and `agents/powershell-reviewer.md` (D17).
-**Why:** Scripts that touch the Hyper-V host and production VMs need an unattended check.
-**How:**
-- Review sections like `ansible-review`: what fails silently (no `Stop`, `-ErrorAction SilentlyContinue`, unchecked `$LASTEXITCODE`); what is not idempotent or lies under `-WhatIf`; what leaks secrets (plain-text passwords, `ConvertTo-SecureString -AsPlainText` from a literal, secrets in logs); what breaks under StrictMode or remoting; unpinned module versions; a Commands section (`Invoke-ScriptAnalyzer`, `Invoke-Pester`); "How to report".
-- Agent copied from `agents/sql-reviewer.md` with the names changed.
-- Evals for the review skill, lint, commit.
+### [ ] T7.6: Teach `packer-review` about Windows images
+**What:** Add the Windows image checks to `skills/packer-review/SKILL.md`.
+**Why:** The review was written for Linux images. A Windows golden image fails in its own ways, and a bad image is cloned into every VM. T8.2 does the same for `ansible-review`.
+**How:** Add: sysprep `/generalize /oobe` missing or not the last provisioner; an answer file left in `%WINDIR%\Panther` (the seed ISO's `Autounattend.xml` is then ignored); the build's WinRM listener, firewall rule, or build account left enabled; a Windows Update step without a `windows-restart` after it; the Administrator password from a literal instead of a `PKR_VAR_` variable; on Linux images, the Hyper-V daemons missing. Keep the existing sections. Commit.
 **Notes:** _(added after implementation if anything came up)_
 
 ## Stage 8: Configuration (Ansible)
