@@ -10,7 +10,7 @@ asked.
 
 This is the reading pass for the whole app or the part you were pointed at. For the SQL
 itself use `sql-review`; for the image and compose file, `docker-review`; for frontend code
-quality beyond security, `frontend-code-review`. If the project has its own invariants skill,
+quality beyond security, the matching frontend review skill, such as `svelte-review`. If the project has its own invariants skill,
 use it as well.
 
 ## 0. Map the attack surface first
