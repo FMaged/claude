@@ -83,6 +83,18 @@ for ref in $refs; do
   esac
 done
 
+# A skill named in "use `x` for/when/if" must be in the repo, or be one of these outside
+# skills (claude.ai synced), which the text must call optional.
+external='incident-triage|observability'
+# shellcheck disable=SC2016 # the backticks are literal text to match
+named=$(grep -rhoE '(use|Use|run|Run) `[a-z0-9]+(-[a-z0-9]+)*` (for|when|if)' skills agents .claude |
+  grep -oE '`[^`]+`' | tr -d '`' | sort -u)
+for ref in $named; do
+  echo "$ref" | grep -qE "^($external)$" && continue
+  [ -d "skills/$ref" ] || [ -d ".claude/skills/$ref" ] || [ -f "agents/$ref.md" ] ||
+    problem "'$ref' is named as a skill but is neither in the repo nor in the external list"
+done
+
 # No machine-specific paths, no secrets (requirement N1).
 # PLAN.md, REQUIREMENTS.md, and TASKS.md may name the path they forbid.
 # 31bf3856ad364e35 is Microsoft's public key token, in every unattend file.

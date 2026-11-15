@@ -18,7 +18,7 @@ Makes production problems visible and turns them into the next round of work. Re
 2. **Uptime check.** Add a check on the live URL, or for a product with no URL, on the thing users get (a registry page, a download link). It runs often enough for the availability requirement.
 3. **Alert.** Send alerts to a place the user reads, like e-mail or a chat message. Send one test alert and ask the user to confirm it arrived. Write where alerts go (not the secret) in `BACKLOG.md`.
 4. **Error tracking.** Check that the tracker from the walking skeleton still works. Cause one test error and see it arrive.
-5. **Look deeper where it fits.** Use `observability` for metrics, logs, and traces. Use `incident-triage` when something is already broken.
+5. **Look deeper where it fits.** If they are installed (they are claude.ai skills, not part of this repo): use `observability` for metrics, logs, and traces; use `incident-triage` when something is already broken.
 6. **Write `BACKLOG.md`.** Each item has a source (error, user feedback, idea), a rough size (S, M, L), and a value (low, medium, high). Start it with open errors and the Later items from `PLAN.md` and `REQUIREMENTS.md`.
 7. **Pick.** Ask the user which items to do next. Say where each goes:
    - Adds a requirement: stage 4.
