@@ -12,8 +12,8 @@ identity, and ready for the first boot that Terraform's seed ISO drives.
 
 The VMs are made from the image with Terraform (`terraform/references/hyperv.md`, D18).
 For a review of finished templates, run the `packer-reviewer` agent (in Codex, the
-`packer-review` skill). For the PowerShell scripts the build runs, `powershell`. For
-comments, `code-comments`.
+`packer-review` skill). For the PowerShell scripts the build runs, `powershell`; for
+the Bash ones, `bash`. For comments, `code-comments`.
 
 ## 0. Check what is installed
 
@@ -340,7 +340,8 @@ shutdown_command = "sudo sh -c 'rm -f /etc/sudoers.d/packer; usermod --lock --ex
 
 - `shell` with `execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"`,
   and scripts that start with `#!/bin/bash` and `set -euo pipefail`, so the first
-  failure fails the build.
+  failure fails the build. The `bash` skill has the rest: quoting, where `-e` does not
+  stop, retries, and no prompts.
 - The `ansible` provisioner runs Ansible on the machine running Packer, and that is the
   Windows Hyper-V host, where Ansible does not run. Use `ansible-local` (same
   `github.com/hashicorp/ansible` plugin), which runs the playbook inside the guest, and

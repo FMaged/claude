@@ -151,9 +151,15 @@ fi
 
 # Shell scripts.
 if command -v shellcheck >/dev/null; then
-  shellcheck install.sh evals/*.sh || problem "shellcheck"
+  shellcheck install.sh evals/*.sh evals/examples/bash/*.sh || problem "shellcheck"
 else
   echo "note: shellcheck not installed, skipped"
+fi
+
+# The Bash example's test needs no network: it serves its archives as file:// URLs.
+if out=$(evals/examples/bash/test-fetch-tool.sh 2>&1); then :; else
+  echo "$out" | grep -v '^ok '
+  problem "Bash example"
 fi
 
 echo "lint failures: $fail"

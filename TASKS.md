@@ -454,7 +454,7 @@
 **How:** Add: sysprep `/generalize /oobe` missing or not the last provisioner; an answer file left in `%WINDIR%\Panther` (the seed ISO's `Autounattend.xml` is then ignored); the build's WinRM listener, firewall rule, or build account left enabled; a Windows Update step without a `windows-restart` after it; the Administrator password from a literal instead of a `PKR_VAR_` variable; on Linux images, the Hyper-V daemons missing. Keep the existing sections. Commit.
 **Notes:** Done 2026-11-15. New sections 2 (Windows images) and 3 (Linux images on Hyper-V); the old sections are kept and renumbered 4 to 7. Besides the list in How, the Windows section also checks the things the `packer` skill does to get them right: sysprep started with `Start-Process -Wait` and checked through `ImageState`, sysprep not in `shutdown_command`, no `sysprep /unattend:`, `winrm_use_ntlm`, a password `validation` that rejects `<`, `>`, and `&`, and provisioner scripts written for Windows PowerShell 5.1, which it hands to `powershell-review`. The Linux section adds a locked build user and the Ubuntu installer files that stop cloud-init from configuring a clone's network, and `ansible-local` instead of `ansible`. The Commands section has three checks to run on a VM made from a Windows image. The Windows example in `evals/examples/packer/` passes every new check. Trigger evals not run: the skill is turned off in Claude Code and runs through `packer-reviewer` (T6.6).
 
-### [ ] T7.7: Write the `bash` skill
+### [x] T7.7: Write the `bash` skill
 **What:** `skills/bash/SKILL.md` for Bash scripts in any project (D29).
 **Why:** `install.sh`, the eval scripts, CI job scripts, and every Linux provisioner are Bash, and no skill says how to write them.
 **How:**
@@ -466,7 +466,7 @@
 - Scripts that run unattended (CI jobs, Packer and cloud-init provisioners): no prompts (`DEBIAN_FRONTEND=noninteractive`), retries around network calls, output a log can be read from.
 - When not to use Bash: real data structures, JSON beyond one `jq` call, or a script past about 200 lines; then Python.
 - Worked example in `evals/examples/bash/`: a script with `--dry-run` and a `trap`, clean under `shellcheck` and run once in each mode. Add `evals/examples/bash/*.sh` to the lint's shellcheck. Point `packer` at `bash` for Linux provisioner scripts. Evals, lint, commit.
-**Notes:** _(added after implementation if anything came up)_
+**Notes:** Done 2026-11-15. The worked example is `evals/examples/bash/fetch-tool.sh`, which installs one pinned tool from a `.zip`, a `.tar.gz`, or a bare file after checking its SHA-256, with `--dry-run`, a `trap` for its temporary folder, an install by rename, and a stamp file so a second run does nothing. `test-fetch-tool.sh` runs it 11 times against local `file://` archives and makes 17 checks (usage errors exit 2, `--dry-run` creates nothing, the install runs, a second run keeps the same file, a wrong checksum or a missing file exits 1 and installs nothing, no temporary files are left, a zip works). `evals/lint.sh` now runs shellcheck on both and runs the test, which needs no network. ShellCheck 0.10.0 reports nothing. The test found a real gap: under `set -e` a failed command ends the script with its own exit code (curl's 37, `tar`'s 2, which means wrong usage), so the example catches the failures it reports with `|| die`, and the skill says so in section 3. Every strict-mode hole in section 1 was checked in Bash 5.2, as was the `EXIT` trap running on TERM, INT, and HUP. `zip` is not installed here, so the test builds its zip with Python's `zipfile`. Bash 3.2 was not run: there is no Mac here. The example avoids Bash 4 features, and CI's macOS job runs the test, though maybe with a newer Bash from the PATH. `packer` now points at `bash` for Linux provisioner scripts. Found on the way: the repo has no `.gitattributes`, so a Windows checkout may give the scripts CRLF line endings; added to T10.5. Trigger evals 4 of 4, and `packer` still 4 of 4.
 
 ### [x] T7.8: Write the `hyperv-deploy` skill
 **What:** `skills/hyperv-deploy/SKILL.md` for creating and changing Hyper-V VMs with PowerShell, without Terraform (D18, changed 2026-11-15).
@@ -617,6 +617,7 @@
 **How:**
 - When `uname -s` starts with `MINGW` or `MSYS`, export `MSYS=winsymlinks:nativestrict`. Then make one test link in a temp folder. If that fails, print "turn on Developer Mode or run Git Bash as administrator" and exit 2 before anything is changed.
 - `.github/workflows/check.yml`: add `windows-latest` to the matrix. On Windows run only `evals/test-install.sh` with `shell: bash`; the lint stays on Linux and macOS.
+- Add `.gitattributes` with `*.sh text eol=lf` (found in T7.7): the repo has none, and Git for Windows with `core.autocrlf=true` checks the scripts out with CRLF, which fails with `$'\r': command not found`.
 - This cannot be tested on this PC. Push a branch and read the Windows run. If `readlink` returns another path form than `pwd -P`, fix the comparison in `link_item` and `prune_links`.
 **Notes:** _(added after implementation if anything came up)_
 

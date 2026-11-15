@@ -10,7 +10,8 @@ its skill: a fix to a snippet in the skill is a fix here too.
 | `packer/` | `packer` | `packer fmt -check -recursive`, then `packer init` and `packer validate` in each image folder | Passed 2026-11-15 with Packer 1.16.2 |
 | `powershell/` | `powershell` | `evals/check-powershell.ps1`: PSScriptAnalyzer on every example script (the Packer provisioner scripts too), then the Pester tests | Passed 2026-11-15 with PowerShell 7.7, PSScriptAnalyzer 1.25.0, Pester 6.2.0 |
 | `hyperv-deploy/` | `hyperv-deploy` | `evals/check-powershell.ps1`: PSScriptAnalyzer on the two scripts, the module, and the data file, then 24 Pester tests with the Hyper-V and Storage cmdlets mocked | Passed 2026-11-15 with PowerShell 7.7, PSScriptAnalyzer 1.25.0, Pester 6.2.0 |
+| `bash/` | `bash` | `shellcheck` on both scripts, then `test-fetch-tool.sh`, which runs `fetch-tool.sh` 11 times against local archives and makes 17 checks (each mode, a second run, bad input, a wrong checksum, a zip) | Passed 2026-11-15 with Bash 5.2 and ShellCheck 0.10.0 |
 
 `evals/lint.sh` runs these checks when the tool is installed and skips them otherwise.
-CI installs Terraform 1.17.2, Packer 1.16.2, PSScriptAnalyzer, and Pester, so they always run there.
+CI installs Terraform 1.17.2, Packer 1.16.2, PSScriptAnalyzer, Pester, and ShellCheck (on Linux), so they always run there. The Bash test needs only curl, tar, unzip, and python3, which both runners have.
 Nothing here is applied or built: a Hyper-V apply or image build needs a host (see T7.5).

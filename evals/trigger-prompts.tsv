@@ -131,3 +131,7 @@ powershell-review	1	review this PowerShell before I run it on the Hyper-V host: 
 powershell-review	1	check my PowerShell deploy script: does -WhatIf really change nothing, and is a second run a no-op?
 powershell-review	0	write a powershell script that gives a Hyper-V VM a virtual TPM and is safe to run twice
 powershell-review	0	how do I install PowerShell 7 on Debian?
+bash	1	write a bash script that backs up a directory to a tarball, keeps the last 7, and has a --dry-run option
+bash	1	my bash script with set -euo pipefail stops halfway through with no error message, why?
+bash	0	write a PowerShell function that creates a local user, supports -WhatIf, and stops at the first error
+bash	0	write a python script that renames my photos by the date they were taken
