@@ -2,6 +2,9 @@
 # Runs each prompt in trigger-prompts.tsv with `claude -p` and checks which skill fires.
 # Usage: evals/run-trigger-evals.sh [skill-name]
 set -u
+command -v claude >/dev/null || { echo "claude is not on PATH" >&2; exit 2; }
+# Stock macOS has no timeout; coreutils installs it as gtimeout.
+to=$(command -v timeout || command -v gtimeout) || { echo "timeout not found (on macOS: brew install coreutils)" >&2; exit 2; }
 here=$(cd "$(dirname "$0")" && pwd)
 repo=$(dirname "$here")
 work=$(mktemp -d)
@@ -15,7 +18,7 @@ while IFS=$'\t' read -r skill expect prompt; do
   case " $off " in *" $skill "*) printf 'skip %-18s turned off in ~/.claude/settings.json\n' "$skill"; continue ;; esac
   dir=$work
   [ "$skill" = setup-claude-code ] && dir=$repo
-  fired=$(cd "$dir" && timeout 180 claude -p "$prompt" --model haiku --max-turns 1 \
+  fired=$(cd "$dir" && "$to" 180 claude -p "$prompt" --model haiku --max-turns 1 \
     --output-format stream-json --verbose 2>/dev/null |
     grep -o '"name":"Skill","input":{"skill":"[^"]*"' | sed 's/.*"skill":"//;s/"$//' | head -1)
   if [ "$expect" = 1 ] && [ "$fired" = "$skill" ]; then r=ok
@@ -25,3 +28,4 @@ while IFS=$'\t' read -r skill expect prompt; do
 done < "$here/trigger-prompts.tsv"
 rmdir "$work" 2>/dev/null
 echo "failures: $fail"
+[ "$fail" = 0 ]
