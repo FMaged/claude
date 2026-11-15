@@ -5,7 +5,7 @@ description: Use as z2p stage 9, when the build is done, to check everything onc
 
 # Z2P Release (stage 9)
 
-The final proof before real users arrive. The release goes over the pipeline that the walking skeleton already built. Read `~/.claude/skills/z2p/CONVENTIONS.md` first.
+The final proof before real users arrive. The release goes over the pipeline that the walking skeleton already built. Read `CONVENTIONS.md` in the `z2p` skill folder first.
 
 ## Rules
 - Check, do not assume. Every line in `RELEASE.md` comes from something you ran or read.

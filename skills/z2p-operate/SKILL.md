@@ -5,7 +5,7 @@ description: Use as z2p stage 10, after the release, to watch the live product a
 
 # Z2P Operate (stage 10)
 
-Makes production problems visible and turns them into the next round of work. Read `~/.claude/skills/z2p/CONVENTIONS.md` first.
+Makes production problems visible and turns them into the next round of work. Read `CONVENTIONS.md` in the `z2p` skill folder first.
 
 ## Rules
 - Use free or already-chosen tools first (`N7` in a project's `REQUIREMENTS.md` may set a cost limit).

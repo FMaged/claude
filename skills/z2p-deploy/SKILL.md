@@ -5,7 +5,7 @@ description: Use as the helper for the deploy tasks of a z2p project, like the w
 
 # Z2P Deploy (helper)
 
-Puts the product live the same safe way every time. It runs inside the Stage 1 tasks of `TASKS.md` (the walking skeleton, D8) and again at release. It is not a numbered stage and writes no gate file of its own. Read `~/.claude/skills/z2p/CONVENTIONS.md` first.
+Puts the product live the same safe way every time. It runs inside the Stage 1 tasks of `TASKS.md` (the walking skeleton, D8) and again at release. It is not a numbered stage and writes no gate file of its own. Read `CONVENTIONS.md` in the `z2p` skill folder first.
 
 ## Rules
 - Use the host chosen in `PLAN.md`. If it does not fit, stop and ask to change `PLAN.md` first.
@@ -19,9 +19,9 @@ Puts the product live the same safe way every time. It runs inside the Stage 1 t
 1. **Read.** The hosting in `PLAN.md`, the architecture, database, and cross-cutting sections of `DESIGN.md`, and the non-functional requirements (`N`) about availability, cost, and backup. If `RELEASE.md` exists, update it.
 2. **Host.** Deploy the smallest working version (a hello-world page, endpoint, or command) to the chosen host.
    - No URL (CLI, library, app): deploy to where users get it, such as a package registry, an app store, or a download. Then install it from there and run it.
-   - A container only if the host needs one. Then use `container-builds`, and run `docker-review` on the Dockerfile.
+   - A container only if the host needs one. Write the smallest Dockerfile that works (pinned base image, non-root user, one process), and run `docker-review` on it.
 3. **Secrets.** Keep them in the host's secret store or CI secrets. Commit a `.env.example` with names only. Check that `.env` is in `.gitignore` and that no secret is in the git history.
-4. **CI.** Use `ci-pipelines`. The pipeline runs the tests and then deploys from `main`. A failing test stops the deploy.
+4. **CI.** Use the host's or the git forge's own pipeline (for example GitHub Actions). The pipeline runs the tests and then deploys from `main`. A failing test stops the deploy.
 5. **Database.** Skip if `DESIGN.md` says "no stored data". Otherwise create the database in production, keep its credentials as secrets, and run migrations from the pipeline before the new version starts. Never run them by hand.
 6. **Error tracking.** Add one error tracker. Cause a test error in production and check that it shows up.
 7. **Rollback.** Try one: deploy a second version, roll back to the first, and check that the first is live again. If there is a database, say how a migration is undone or why it need not be.

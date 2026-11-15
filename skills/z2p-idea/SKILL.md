@@ -5,7 +5,7 @@ description: Use as z2p stage 1, when the user has no idea yet or wants help fin
 
 # Z2P Idea (stage 1)
 
-Help the user find one problem worth solving, and write `IDEA.md`. Read `~/.claude/skills/z2p/CONVENTIONS.md` first. This stage is optional: a user who already has an idea skips it.
+Help the user find one problem worth solving, and write `IDEA.md`. Read `CONVENTIONS.md` in the `z2p` skill folder first. This stage is optional: a user who already has an idea skips it.
 
 ## Rules
 - Problem first. No features, no tech.

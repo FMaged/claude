@@ -5,7 +5,7 @@ description: Use as z2p stage 3, after the product brief, to test its risky assu
 
 # Z2P Validate (stage 3)
 
-Test the brief's risky assumptions with the cheapest real evidence, and make the go/no-go call. This stage owns the decision; the brief's verdict was only a first opinion. Read `~/.claude/skills/z2p/CONVENTIONS.md` first.
+Test the brief's risky assumptions with the cheapest real evidence, and make the go/no-go call. This stage owns the decision; the brief's verdict was only a first opinion. Read `CONVENTIONS.md` in the `z2p` skill folder first.
 
 ## Rules
 - Decide what counts as go and what counts as stop **before** the test runs. Write it down first.

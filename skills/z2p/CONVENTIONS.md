@@ -1,6 +1,6 @@
 # z2p conventions
 
-The rules every stage of the chain follows. The orchestrator (`z2p`) and every stage skill read this file. Stage skills in other projects read it at `~/.claude/skills/z2p/CONVENTIONS.md`.
+The rules every stage of the chain follows. The orchestrator (`z2p`) and every stage skill read this file. Stage skills find it in the `z2p` folder of the skills directory they were loaded from (`~/.claude/skills/z2p/` for Claude Code, `~/.agents/skills/z2p/` for Codex).
 
 ## Stages
 
@@ -9,6 +9,7 @@ The rules every stage of the chain follows. The orchestrator (`z2p`) and every s
 | 0 Start | `z2p` | `STATUS.md`, `CLAUDE.md` | Git repo, `STATUS.md`, and `CLAUDE.md` exist | no |
 | 1 Idea (optional) | `z2p-idea` | `IDEA.md` | One problem and one target user named, or stage skipped because the user brought an idea | no |
 | 2 Brief | `product-brief` | `PRODUCT_BRIEF.md` | All sections filled; `Riskiest assumption:` line is filled | no |
+| 3 Validate | `z2p-validate` | `VALIDATION.md` | Every risky assumption has a verdict (`held`, `failed`, or `untested`); a `Decision: Go`, `Change`, or `Stop` line with a reason; `Confirmed: <date>` in the date line | **yes** |
 | 4 Requirements | `z2p-requirements` | `REQUIREMENTS.md` | Every MVP item in the brief has at least one requirement; every Must requirement has acceptance criteria; every non-functional topic is answered or marked "not needed"; `Confirmed: <date>` in the status line | **yes** |
 | 5 Plan | `project-planner` | `PLAN.md` | MVP lists requirement IDs; a Later section exists; stack names a database engine (or "no database") and hosting; main entities named; every decision has Choice, Why, Alternatives; `Confirmed: <date>` under the title | **yes** |
 | 6 Design | `z2p-design` (+ `schema-design`) | `DESIGN.md` | Every Must requirement is in a flow; every flow step maps to an interface; every entity from `PLAN.md` is modelled; every table has a grain and a primary key (or "no stored data"); architecture says where each part runs; a permissions table exists if there are users; `Confirmed: <date>` under the title | **yes** |
@@ -42,6 +43,7 @@ Cycle: 1
 
 ## Going back
 
+- **Stage 3 decides:** `Decision: Stop` ends the project; keep the brief and the validation and mark the later stages `skipped` with the note "stopped at validation". `Decision: Change` reopens stage 2 with the note saying what to change. `Decision: Go` passes the gate.
 - **Reopening a stage:** set it to `doing`. Every later stage that is `done` becomes `stale`. Before moving on, the orchestrator re-checks the gate of each stale stage. A passing gate returns it to `done`. A failing gate returns it to `todo`.
 - **Stage 10 backlog:** picked items go to stage 7. An item that adds a requirement goes to stage 4 instead. An item that changes the plan goes to stage 5. Cycle goes up by 1.
 

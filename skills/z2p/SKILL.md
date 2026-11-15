@@ -25,6 +25,7 @@ You are the only thing that writes `STATUS.md`. Stage skills never do.
 Pick the first stage that is not `done` or `skipped`. A `stale` stage comes first: re-check its gate before moving on.
 
 - **Stage 1:** ask "Do you already have an idea?". If yes, mark it `skipped`.
+- **Stage 3:** if `VALIDATION.md` ends in `Decision: Change` or `Decision: Stop`, follow Going back in `CONVENTIONS.md` instead of moving on.
 - **A `waiting` stage:** ask whether the evidence has arrived. If not, say what it is waiting for and stop.
 - **Stage 5:** ask "Fast or coach mode?". Coach mode means project-planner's coach mode.
 - If the stage's skill is not installed, say so and offer to skip the stage.
@@ -34,7 +35,7 @@ Set the stage to `doing`, then run its skill from the stage table.
 ## 3. After the stage
 
 1. Check the gate by reading the files, as `CONVENTIONS.md` lists it.
-2. At gates 4, 5, 6, and 9, also ask the user for a yes.
+2. At gates 3, 4, 5, 6, and 9, also ask the user for a yes.
 3. Write `STATUS.md`: state, gate result, date, note.
    - Gate passes: `done`.
    - Gate fails: keep `doing` and tell the user what is missing.

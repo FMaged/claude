@@ -5,7 +5,7 @@ description: Use as z2p stage 4, after the brief, to write what the product must
 
 # Z2P Requirements (stage 4)
 
-Turn the brief into `REQUIREMENTS.md`: the contract that design, tasks, tests, and the release are checked against. Read `~/.claude/skills/z2p/CONVENTIONS.md` first.
+Turn the brief into `REQUIREMENTS.md`: the contract that design, tasks, tests, and the release are checked against. Read `CONVENTIONS.md` in the `z2p` skill folder first.
 
 ## Rules
 - Say **what** and **how well**, never **with what**. No stack, no architecture. That is stage 5.
