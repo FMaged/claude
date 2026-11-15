@@ -175,7 +175,7 @@ resource "hyperv_machine_instance" "this" {
 
   network_adaptors {
     name                = "lan"
-    switch_name         = var.switch_name
+    switch_name         = data.hyperv_network_switch.this.name
     vlan_access         = var.vlan_id != null
     vlan_id             = var.vlan_id
     dynamic_mac_address = var.mac == null
@@ -211,8 +211,8 @@ resource "hyperv_machine_instance" "this" {
   pools, the .NET GC). Dynamic memory (`dynamic_memory = true` with minimum and maximum)
   for light utility VMs only.
 - **Switches and VLANs.** The virtual switch belongs to the host and is created once, not
-  by each environment. Look it up with `data "hyperv_network_switch"` so a typo fails the
-  plan. `vlan_access` and `vlan_id` give an access port; the provider has no trunk mode.
+  by each environment. Look it up with `data "hyperv_network_switch"` and a
+  postcondition (see the end of this file) so a typo fails the plan. `vlan_access` and `vlan_id` give an access port; the provider has no trunk mode.
 - **Static MAC** only when a DHCP reservation or a licence is tied to it. Write it as 12
   hex digits and take it from a locally administered range (first byte `02`), so it
   cannot collide with the host's dynamic pool (`00155D…`). Validate it in the variable:
@@ -332,10 +332,13 @@ the next plan shows it as drift and reverts it. Keep the two sets of settings se
 - The provider is maintained by a small team; pin it exactly and read the changelog
   before raising the pin.
 - `terraform validate` cannot catch a wrong path on the host, a missing switch, or a
-  missing image. Look them up so the plan fails instead of the apply. The `hyperv_vhd`
-  data source does not fail on a missing file, and in 1.2.1 its `exists` is the wrong
-  way round (`true` when the file is missing). Test `path` instead: the read copies the
-  path the host reports and leaves it empty when there is no file.
+  missing image. Look them up so the plan fails instead of the apply. Neither lookup
+  fails on its own, so each needs a postcondition.
+
+  The `hyperv_vhd` data source does not fail on a missing file, and in 1.2.1 its
+  `exists` is the wrong way round (`true` when the file is missing). Test `path`
+  instead: the read copies the path the host reports and leaves it empty when there is
+  no file.
 
   ```hcl
   data "hyperv_vhd" "image" {
@@ -345,6 +348,23 @@ the next plan shows it as drift and reverts it. Keep the two sets of settings se
         # Not self.exists: it is inverted in provider 1.2.1.
         condition     = self.path != ""
         error_message = "Image ${var.image} is not in ${var.image_store} on the host."
+      }
+    }
+  }
+  ```
+
+  The `hyperv_network_switch` data source returns without an error when the switch is
+  not there, and hands back the name from the config; the apply then fails when it
+  attaches the adaptor. It sets the id only when it finds the switch, and the name
+  comparison is case sensitive (`lan` does not find `LAN`).
+
+  ```hcl
+  data "hyperv_network_switch" "this" {
+    name = var.switch_name
+    lifecycle {
+      postcondition {
+        condition     = self.id == var.switch_name
+        error_message = "Switch ${var.switch_name} is not on the host. The name is case sensitive."
       }
     }
   }
