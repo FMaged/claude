@@ -28,14 +28,15 @@ for agent in agents/*.md; do
   base=$(basename "$agent" .md)
   name=$(frontmatter_field "$agent" name)
   [ "$name" = "$base" ] || problem "$agent: name '$name' is not the file name '$base'"
-  for s in $(sed -n '1,/^---$/!d;p' "$agent" | sed -n '/^skills:/,/^[a-z]/{s/^ *- *//p;}'); do
+  while read -r s; do
     [ -d "skills/$s" ] || problem "$agent preloads skill '$s', which does not exist"
-  done
+  done < <(sed -n '1,/^---$/!d;p' "$agent" | sed -n '/^skills:/,/^[a-z]/{s/^ *- *//p;}')
 done
 
 # Cross-references: a backticked name that looks like a skill or agent must exist.
 # Covers "use `x`", "run `x`", "`x` skill", every `*-review`/`*-reviewer`, and every `z2p*`.
 known='hand-off|no-ref|in-memory|one-click|unsafe-inline|adapter-static'
+# shellcheck disable=SC2016 # the backticks are literal text to match
 refs=$(grep -rhoE '(^|[^`])`[a-z0-9]+(-[a-z0-9]+)+`( skill)?|(use|Use|run|runs|with|see) `[a-z0-9]+(-[a-z0-9]+)+`' skills agents .claude |
   grep -oE '`[a-z0-9]+(-[a-z0-9]+)+`' | tr -d '`' | sort -u)
 for ref in $refs; do

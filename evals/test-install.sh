@@ -20,7 +20,7 @@ check "$summary" "Summary: linked $total, already OK 0, conflicts 0, removed 0" 
 check "$(readlink "$HOME/.claude/skills/z2p")" "$repo/skills/z2p" "claude skill link points into the repo"
 check "$(readlink "$HOME/.agents/skills/z2p")" "$repo/skills/z2p" "codex skill link points into the repo"
 check "$(readlink "$HOME/.claude/agents/sql-reviewer.md")" "$repo/agents/sql-reviewer.md" "agent link points into the repo"
-check "$(ls "$HOME/.agents" | tr '\n' ' ')" "skills " "codex gets no agents"
+check "$(cd "$HOME/.agents" && echo *)" "skills" "codex gets no agents"
 
 summary=$("$repo/install.sh" | tail -1)
 check "$summary" "Summary: linked 0, already OK $total, conflicts 0, removed 0" "second run changes nothing (R2)"
@@ -49,8 +49,8 @@ summary=$(HOME="$tmp/home2" "$tmp/repo2/install.sh" | tail -1)
 check "$summary" "Summary: linked 0, already OK $((total - 2)), conflicts 0, removed 2" "a deleted skill has its links removed (R4)"
 
 HOME="$tmp/home3" "$repo/install.sh" --target codex >/dev/null
-check "$(ls -d "$tmp/home3"/.* 2>/dev/null | grep -c '/\.claude$')" "0" "--target codex does not touch ~/.claude"
-check "$(ls "$tmp/home3/.agents/skills" | wc -l | tr -d ' ')" "$skills" "--target codex links every skill"
+check "$(find "$tmp/home3" -maxdepth 1 -name .claude | wc -l | tr -d ' ')" "0" "--target codex does not touch ~/.claude"
+check "$(find "$tmp/home3/.agents/skills" -mindepth 1 -maxdepth 1 | wc -l | tr -d ' ')" "$skills" "--target codex links every skill"
 
 "$repo/install.sh" --target nope >/dev/null 2>&1; check "$?" "2" "an unknown target is rejected"
 "$repo/install.sh" --what >/dev/null 2>&1; check "$?" "2" "an unknown option is rejected"
