@@ -43,8 +43,10 @@ async fn connect_to_postgres(
         async move {
             cancellation_token.cancelled().await;
             info!("Closing Postgres connection.");
-            if timeout(Duration::from_secs(10), postgres.close()).await.is_err() {
-                warn!("Timed out while waiting for Postgres connection to close.");
+            match timeout(Duration::from_secs(10), postgres.close()).await {
+                Ok(Ok(())) => {}
+                Ok(Err(error)) => warn!(%error, "Failed to close Postgres connection."),
+                Err(_) => warn!("Timed out while waiting for Postgres connection to close."),
             }
         }
     });
