@@ -1,6 +1,6 @@
 ---
 name: git-commit
-description: Use when the user wants to commit changes or write a commit message (e.g. "commit this", "make a commit", "write a commit message"). Writes short one-line messages, at most 72 characters, like "fix: Compare guest e-mail addresses without case."
+description: 'Use when the user wants to commit changes or write a commit message (e.g. "commit this", "make a commit", "write a commit message"). Writes short one-line messages, at most 72 characters, like "fix: Compare guest e-mail addresses without case."'
 ---
 
 # Git Commit
