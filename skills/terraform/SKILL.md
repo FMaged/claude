@@ -112,9 +112,9 @@ variable "vms" {
   validation {
     condition = alltrue([
       for vm in values(var.vms) :
-      can(regex("^[a-z][a-z0-9_]*$", vm.role)) && !contains(["windows", "linux"], vm.role)
+      can(regex("^[a-z][a-z0-9_]*$", vm.role)) && !contains(["windows", "linux", "all", "ungrouped"], vm.role)
     ])
-    error_message = "role is an Ansible group name: lowercase letters, digits, and _, and not windows or linux."
+    error_message = "role is an Ansible group name: lowercase letters, digits, and _, and not windows, linux, all, or ungrouped."
   }
 }
 ```

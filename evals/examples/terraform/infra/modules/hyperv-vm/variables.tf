@@ -23,8 +23,8 @@ variable "role" {
   type        = string
 
   validation {
-    condition     = can(regex("^[a-z][a-z0-9_]*$", var.role)) && !contains(["windows", "linux"], var.role)
-    error_message = "role is an Ansible group name: lowercase letters, digits, and _, and not windows or linux."
+    condition     = can(regex("^[a-z][a-z0-9_]*$", var.role)) && !contains(["windows", "linux", "all", "ungrouped"], var.role)
+    error_message = "role is an Ansible group name: lowercase letters, digits, and _, and not windows, linux, all, or ungrouped."
   }
 }
 
