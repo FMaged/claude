@@ -1,6 +1,6 @@
 ---
 name: powershell
-description: Use when writing or changing PowerShell — a script, a function, or a module — for Windows servers, the Hyper-V host, CI jobs, or Packer provisioners — strict mode and error handling, -WhatIf and ShouldProcess, changes that are safe to run twice, parameters and validation, credentials, remoting, the Hyper-V module for what Terraform cannot set (a virtual TPM, trunk VLANs), module manifests, Pester tests, and PSScriptAnalyzer (e.g. "write a powershell script that…", "add -WhatIf to this function", "make this script safe to run twice", "give the VM a virtual TPM", "write Pester tests for this script", "why does my script keep going after an error"). For creating whole Hyper-V VMs without Terraform, use hyperv-deploy instead.
+description: Use when writing or changing PowerShell — a script, a function, or a module — for Windows servers, the Hyper-V host, CI jobs, or Packer provisioners — strict mode and error handling, -WhatIf and ShouldProcess, changes that are safe to run twice, parameters and validation, credentials, remoting, the Hyper-V module for what Terraform cannot set (a virtual TPM, trunk VLANs), module manifests, Pester tests, and PSScriptAnalyzer (e.g. "write a powershell script that…", "add -WhatIf to this function", "make this script safe to run twice", "give the VM a virtual TPM", "write Pester tests for this script", "why does my script keep going after an error"). For creating whole Hyper-V VMs without Terraform, use hyperv-deploy instead; for reviewing finished PowerShell, use powershell-review.
 ---
 
 # PowerShell
@@ -11,7 +11,9 @@ a second run. Most PowerShell trouble is a script that kept going after a failur
 `-WhatIf` that still changed something, or a step that worked once and broke the rerun.
 
 Creating and changing whole Hyper-V VMs without Terraform is the `hyperv-deploy` skill.
-For comments, `code-comments`.
+For a review of finished scripts, the `powershell-review` skill, or the
+`powershell-reviewer` agent for a check that runs unattended. For comments,
+`code-comments`.
 
 ## 0. Which PowerShell runs the script
 
@@ -266,4 +268,5 @@ pwsh -NoProfile -NonInteractive -File <script> <args> -WhatIf
 
 Run it once with `-WhatIf` against the real host and read every `What if:` line; then for
 real; then a second time, which must report nothing changed. `-NonInteractive` makes a
-prompt fail instead of hanging a CI job.
+prompt fail instead of hanging a CI job. Then run the `powershell-reviewer` agent on the
+script (in Codex, the `powershell-review` skill).

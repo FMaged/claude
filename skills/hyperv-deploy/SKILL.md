@@ -12,8 +12,9 @@ owners of one VM undo each other's changes.
 
 This is the PowerShell path of D18; `terraform` with `references/hyperv.md` is the other,
 and the image comes from `packer`. For PowerShell in general (strict mode,
-`ShouldProcess`, credentials, Pester), `powershell`. The worked example is
-`evals/examples/hyperv-deploy/` in the skills repo.
+`ShouldProcess`, credentials, Pester), `powershell`; for a review of a finished deploy
+script, `powershell-review`. The worked example is `evals/examples/hyperv-deploy/` in
+the skills repo.
 
 ## 0. Terraform or a script
 
@@ -242,4 +243,6 @@ Invoke-Pester -Path . -Output Detailed
 
 On the host, read every `What if:` line before the real run. Then check one new VM's
 first boot: a Windows VM took the computer name and did not stop at the password page; a
-Linux VM shows `cloud-init status --long` as `done` and has its hostname.
+Linux VM shows `cloud-init status --long` as `done` and has its hostname. Then run the
+`powershell-reviewer` agent on the scripts and the module (in Codex, the
+`powershell-review` skill).

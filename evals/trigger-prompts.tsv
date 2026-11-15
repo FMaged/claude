@@ -126,3 +126,8 @@ hyperv-deploy	1	create three lab VMs on our Hyper-V host from the golden image w
 hyperv-deploy	1	should this short-lived Hyper-V test VM be managed by terraform or by a powershell deploy script?
 hyperv-deploy	0	write a terraform module that creates a Hyper-V VM from our golden VHDX
 hyperv-deploy	0	write a packer template that builds a Windows Server image
+powershell	0	review this PowerShell module for anything that leaks a secret
+powershell-review	1	review this PowerShell before I run it on the Hyper-V host: Get-VM -Name $Name -ErrorAction SilentlyContinue | Stop-VM -TurnOff
+powershell-review	1	check my PowerShell deploy script: does -WhatIf really change nothing, and is a second run a no-op?
+powershell-review	0	write a powershell script that gives a Hyper-V VM a virtual TPM and is safe to run twice
+powershell-review	0	how do I install PowerShell 7 on Debian?
