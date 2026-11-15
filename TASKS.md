@@ -77,7 +77,7 @@
 - Ask the user to remove `product-brief` from their claude.ai skills. After the next sync, check that only one `product-brief` appears.
 **Notes:** Skills were identical to the repo; the 8 agents differed only by the T1.2 edit. Backed up all 25 to `~/.claude/backups/install-20261028-211631/` and linked. A fresh session loaded everything and `sql-reviewer` ran with its skill. Still open: `product-brief` appears twice (`product-brief` and `anthropic-skills:product-brief`) until the user removes it from claude.ai skills.
 
-### [ ] T1.7: Test the setup on a clean home and a second PC, then commit
+### [x] T1.7: Test the setup on a clean home and a second PC, then commit
 **What:** Prove that clone → "set up for Claude Code" works from nothing.
 **Why:** This is the goal of the repo. It must not depend on anything only this PC has.
 **How:**
@@ -85,7 +85,16 @@
 - On a second PC, or a new user account on this one: clone, open `claude`, say "set up for Claude Code", restart, and check the skills, agents, and plugins.
 - Check R1 to R7 and N1 to N4 in `REQUIREMENTS.md`. Note any that fail in this task's Notes.
 - Commit with the `git-commit` skill and push.
-**Notes:** Clean-home part passed: 26 linked, re-run 26 already OK, a real folder was reported and left alone (exit 1), `--backup` moved it, a skill deleted from a repo copy had its link removed. Install took 0.13 s (N4), uses only bash and standard tools (N3, Linux only so far), and no `/home/` paths or secrets are in the repo (N1). Not done yet: the full flow (clone, say "set up for Claude Code", restart, settings merge R6, plugins R1) on a second PC or new user, a macOS run, and the push.
+**Notes:** Clean-home part passed: 26 linked, re-run 26 already OK, a real folder was reported and left alone (exit 1), `--backup` moved it, a skill deleted from a repo copy had its link removed. Install took 0.13 s (N4), uses only bash and standard tools (N3, Linux only so far), and no `/home/` paths or secrets are in the repo (N1). Not done yet: the full flow (clone, say "set up for Claude Code", restart, settings merge R6, plugins R1) on a second PC or new user, a macOS run, and the push. 2026-11-15: the clean-home part is now `evals/test-install.sh`, run by CI on Linux and macOS (N2, N3). The second-PC flow moved to T1.8.
+
+### [ ] T1.8: Run the full setup flow on a second PC
+**What:** Clone, say "set up for Claude Code", restart, and check skills, agents, plugins, and the settings merge.
+**Why:** It is the only part of R1 and R6 that no script covers.
+**How:**
+- On a second PC, or a new user account on this one: clone, open `claude`, say "set up for Claude Code", restart.
+- Check that every skill and agent appears, the plugins installed, and `~/.claude/settings.json` kept its own keys (R6).
+- Note anything that failed in this task's Notes.
+**Notes:** _(added after implementation if anything came up)_
 
 ## Stage 2: Chain foundation (orchestrator plus the 4 existing skills, end to end)
 
@@ -341,4 +350,40 @@
 - Fix the affected skills. Add a "Changed:" line to any `PLAN.md` decision that changed, and update `REQUIREMENTS.md` if a requirement changed.
 - On the second PC: run `git pull`, re-run the setup, and check that the new skills appear.
 - Commit with the `git-commit` skill.
+**Notes:** _(added after implementation if anything came up)_
+
+## Stage 6: Hardening (chain fix, checks, evals, docs)
+
+### [x] T6.1: Put the validate stage into the z2p conventions
+**What:** Add the stage 3 row to the stage table in `CONVENTIONS.md`, the Stop and Change rules under Going back, and the stage 3 yes to the orchestrator.
+**Why:** The orchestrator runs each stage's skill from that table. Without the row, `z2p` went from Brief straight to Requirements.
+**How:** Edit `skills/z2p/CONVENTIONS.md` and `skills/z2p/SKILL.md`. Replace the hardcoded `~/.claude/skills/z2p/CONVENTIONS.md` path in every stage skill with "`CONVENTIONS.md` in the `z2p` skill folder", so Codex finds it too.
+**Notes:** Done 2026-11-15.
+
+### [x] T6.2: Drop references to skills that do not exist
+**What:** Replace `container-builds`, `ci-pipelines`, `frontend-code-review`, and "the migration skill" with what the repo has.
+**Why:** Those names are anthropic-skills plugin skills that are turned off on this PC, so Claude found nothing when a skill named them.
+**How:** `z2p-deploy` describes the Dockerfile and pipeline itself and runs `docker-review`; `schema-design` hands the migration to `task-runner` and `sql-review`; `web-security-review` names `svelte-review`.
+**Notes:** Done 2026-11-15.
+
+### [x] T6.3: Add a lint, an install test, and CI
+**What:** `evals/lint.sh` (frontmatter, agent skills, cross-references, `/home/` paths, secrets, eval coverage, settings JSON, shellcheck), `evals/test-install.sh` (R2, R3, R4 on an empty home), and `.github/workflows/check.yml` running both on Linux and macOS.
+**Why:** Until now only a human could find a broken reference or a regression in `install.sh`. The macOS runner also covers the macOS half of N2.
+**How:** Plain bash, no dependencies beyond python3 for the JSON check. Lint fails if a skill has no trigger eval.
+**Notes:** Done 2026-11-15. shellcheck is not installed on this PC, so only CI runs it.
+
+### [x] T6.4: Add trigger evals for every remaining skill
+**What:** Two prompts that should fire and two that should not, for each of the 18 skills that had none. The runner skips skills turned off in `~/.claude/settings.json`.
+**Why:** N5 applied only to the z2p skills.
+**How:** Append to `evals/trigger-prompts.tsv`; run `evals/run-trigger-evals.sh`.
+**Notes:** _(results below once the run finishes)_
+
+### [x] T6.5: Bring the docs up to date
+**What:** `PLAN.md` structure and stack mention Codex and the checks (D6 has a Changed line). `REQUIREMENTS.md` closes two open questions and points N1 to N5 at the scripts. `README.md` lists the checks and the manual graphify install. Agents no longer mention a night run. `product-brief` gets trigger phrases like the other skills. The shared settings pin the model that is used today.
+**Why:** The docs still described the Claude-only installer and left questions open that were long answered.
+**Notes:** Done 2026-11-15.
+
+### [ ] T6.6: Decide what to do with the five review skills turned off on this PC
+**What:** `~/.claude/settings.json` has `skillOverrides` that turn off `ansible-review`, `network-review`, `packer-review`, `terraform-review`, and `svelte-review`. The agents still preload them. Decide whether that is wanted, and if so record it in the README or move the override into `settings/settings.json` so every PC matches.
+**Why:** The repo cannot reproduce the setup if part of it lives only in the local settings file. The trigger evals for those five skills are skipped here.
 **Notes:** _(added after implementation if anything came up)_

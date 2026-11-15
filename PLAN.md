@@ -10,7 +10,7 @@ What the repo must do, and how to check it, is in `REQUIREMENTS.md`.
 ## MVP Features
 **Part A: portable setup**
 - Every skill and agent lives in this repo. Nothing is edited in `~/.claude` directly.
-- `install.sh` links the repo's skills and agents into `~/.claude`. It is safe to re-run, has a `--dry-run`, and never overwrites a real folder.
+- `install.sh` links the repo's skills into `~/.claude/skills` and `~/.agents/skills` (Codex), and the agents into `~/.claude/agents`. It is safe to re-run, has a `--dry-run`, and never overwrites a real folder.
 - A project skill, `setup-claude-code`, runs the whole setup when Claude is opened in this repo. It checks prerequisites, handles conflicts, runs `install.sh`, and merges the shared settings.
 - The agents work on any PC. There are no hardcoded `/home/deb` paths.
 - `README.md` explains how to set up, how to update, and what stays manual.
@@ -31,7 +31,7 @@ What the repo must do, and how to check it, is in `REQUIREMENTS.md`.
 - Building a `.skill` zip from the repo to upload skills to claude.ai
 - Global `~/.claude/CLAUDE.md`, hooks, status line, keybindings (none exist yet)
 - MCP servers (`pdfcraft`, `the-watcher`): they use a local binary, localhost, and secrets. README lists them as manual steps.
-- The "scheduled night run" that the agents mention. Nothing is scheduled on this PC yet.
+- A scheduled night run of the reviewer agents. Nothing is scheduled on this PC yet.
 - A migration skill. `schema-design` hands off to one, but it does not exist yet. Until then, `task-runner` writes migrations and `sql-review` checks them.
 - Automatic scheduling of stage 10 (operate) runs
 
@@ -40,7 +40,8 @@ What the repo must do, and how to check it, is in `REQUIREMENTS.md`.
 |------|--------|
 | Format | Claude Code skills (`SKILL.md`) and subagents (`agents/*.md`) |
 | Source of truth | This git repo |
-| Install | `install.sh` symlinks each folder into `~/.claude/skills/` and `~/.claude/agents/` |
+| Install | `install.sh` symlinks each skill folder into `~/.claude/skills/` and `~/.agents/skills/` (Codex), and each agent into `~/.claude/agents/` |
+| Checks | `evals/lint.sh` and `evals/test-install.sh`, run by GitHub Actions on Linux and macOS; `evals/run-trigger-evals.sh` by hand |
 | Setup entry point | Project skill `.claude/skills/setup-claude-code/` |
 | Shared settings | `settings/settings.json`, merged into `~/.claude/settings.json` |
 | Platforms | Linux and macOS |
@@ -54,7 +55,9 @@ What the repo must do, and how to check it, is in `REQUIREMENTS.md`.
   CLAUDE.md                  what this repo is; "set up" → setup skill; editing rules
   REQUIREMENTS.md            what this repo must do, and how to check it
   PLAN.md, TASKS.md          this plan
-  install.sh                 links skills/ and agents/ into ~/.claude
+  install.sh                 links skills/ into ~/.claude and ~/.agents (Codex), agents/ into ~/.claude
+  evals/                     lint, install test, trigger evals
+  .github/workflows/         CI: lint and install test on Linux and macOS
   .claude/skills/
     setup-claude-code/       project-only skill: runs the whole setup
   settings/settings.json     plugins, marketplaces, model, theme (no secrets)
@@ -175,6 +178,7 @@ How later stages use them:
 - **Why:** Copies drift. The installed `git-commit` had already moved ahead of the repo copy, and 3 skills and 8 agents were never in the repo at all. With links, editing a skill edits the repo, and `git pull` updates every PC.
 - **Alternatives:** Copy files on install; template repo per project; per-project copies.
 - **Changed:** The plan used to keep global skills plus per-project copies, which made several copies to maintain.
+- **Changed (2026-11-04):** Codex reads the same skill folders through `~/.agents/skills`, so `install.sh` links them for both clients. Agents stay Claude-only.
 
 ### D7: Exit gate per stage
 - **Choice:** One gate table in `CONVENTIONS.md`. Each gate can be checked by reading files. The go/no-go, requirements, plan, design, and release gates (3, 4, 5, 6, 9) also need a yes from the user. A gate can send the project back (see "Going back").

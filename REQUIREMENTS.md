@@ -118,11 +118,11 @@ Acceptance:
 ## Non-functional requirements
 | ID | Topic | Requirement | How we check it |
 |----|-------|-------------|-----------------|
-| N1 | Security | No secrets, tokens, or machine-specific paths in the repo | Search for `/home/`, `token`, `secret`, `password`, `api_key` before each commit |
-| N2 | Platforms | Works on Linux and macOS; Windows through WSL | Clean-home test in T1.7; one macOS run when a Mac is available |
-| N3 | Dependencies | `install.sh` needs only bash, git, and standard tools found on both Linux and macOS | Read the script; run it on both |
+| N1 | Security | No secrets, tokens, or machine-specific paths in the repo | `evals/lint.sh` searches for `/home/` paths and secret-like values; CI runs it |
+| N2 | Platforms | Works on Linux and macOS; Windows through WSL | `evals/test-install.sh`, run by CI on Linux and macOS |
+| N3 | Dependencies | `install.sh` needs only bash, git, and standard tools found on both Linux and macOS | Read the script; `evals/test-install.sh` runs it on both in CI |
 | N4 | Speed | Setup on a new PC takes under 10 minutes, not counting the Claude Code install | Time it in T1.7 |
-| N5 | Triggering | New skills fire on their own prompts, and not on unrelated ones | T5.1 |
+| N5 | Triggering | New skills fire on their own prompts, and not on unrelated ones | `evals/run-trigger-evals.sh` (T5.1, T6.4) |
 | N6 | Style | Skills are short, in plain English, and match the existing ones | Read each new skill against an existing one |
 | N7 | Cost | The chain itself needs no paid service. A project may still choose paid hosting. | Read the skills |
 | N8 | Data retention and backup | The repo is the backup. Every change is committed and pushed to the remote. | `git status` is clean and pushed after each stage of `TASKS.md` |
@@ -138,6 +138,6 @@ Acceptance:
 See "Later / Out of Scope" in `PLAN.md`.
 
 ## Open questions
-- Is "coach" the right name (my reading of "cockme")?
+- ~~Is "coach" the right name?~~ Answered: yes. `project-planner` and `z2p` both call it coach mode.
 - Which second PC or user account will T1.7 use?
-- Can agent frontmatter preload a skill? T1.2 checks this.
+- ~~Can agent frontmatter preload a skill?~~ Answered: yes. Every agent in `agents/` lists its skill under `skills:`, and the agents load (T1.2).

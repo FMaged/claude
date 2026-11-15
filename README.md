@@ -40,6 +40,14 @@ Only directories containing `SKILL.md` are installed as skills. Codex supports t
 
 The installer does not translate settings, register Claude agent definitions with Codex, or copy `CLAUDE.md`. Codex configuration belongs in `~/.codex/config.toml`, and global instructions in `~/.codex/AGENTS.md`. Some shared skills still refer to Claude-specific paths or tools; linking makes them discoverable but does not convert those instructions.
 
+## Checks
+```bash
+evals/lint.sh                 # frontmatter, references, paths, secrets, eval coverage
+evals/test-install.sh         # install.sh against an empty home
+evals/run-trigger-evals.sh    # which skill fires for each prompt (needs a logged-in claude)
+```
+GitHub Actions runs the first two on Linux and macOS. The trigger evals run by hand, one skill at a time if you pass its name.
+
 ## Update
 - `git pull`. Edited skills update right away, because they are links.
 - Run the setup again when a skill or agent was added, or when you moved the repo folder. It is safe to repeat.
@@ -48,6 +56,8 @@ The installer does not translate settings, register Claude agent definitions wit
 - Log in to claude.ai so synced skills arrive. Remove the claude.ai copy of `product-brief`.
 - Install `rust-analyzer` if you use the rust-analyzer plugin.
 - Add MCP servers by hand. The repo holds none, because they use local binaries and secrets.
+- Install graphify by hand if you use `/graphify`. It is a separate tool, not in this repo.
+- Skills turned off with `skillOverrides` in `~/.claude/settings.json` stay off. The repo does not manage that file.
 
 ## Platforms
 Linux and macOS. On Windows, use WSL. Native Windows needs Developer Mode for symlinks and is not supported.
