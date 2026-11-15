@@ -14,10 +14,45 @@ frontmatter_field() {
   sed -n '1,/^---$/!d;p' "$1" | sed -n "s/^$2: *\"\{0,1\}\(.*[^\"]\)\"\{0,1\} *$/\1/p" | head -1
 }
 
+# Frontmatter: opens on line 1 and closes within 30 lines.
+for file in skills/*/SKILL.md .claude/skills/*/SKILL.md agents/*.md; do
+  if [ "$(head -1 "$file")" != "---" ]; then
+    problem "$file has no frontmatter"
+  elif ! sed -n '2,30p' "$file" | grep -qx -- '---'; then
+    problem "$file: frontmatter has no closing --- in the first 30 lines"
+  fi
+done
+
+# Frontmatter is valid YAML with string name and description, when PyYAML is installed.
+if python3 -I -c 'import yaml' 2>/dev/null; then
+  while IFS= read -r line; do
+    problem "$line"
+  done < <(python3 -I - skills/*/SKILL.md .claude/skills/*/SKILL.md agents/*.md <<'PY'
+import sys, yaml
+for path in sys.argv[1:]:
+    lines = open(path, encoding="utf-8").read().split("\n")
+    if lines[0] != "---" or "---" not in lines[1:30]:
+        continue  # reported above
+    try:
+        data = yaml.safe_load("\n".join(lines[1:lines.index("---", 1)]))
+    except yaml.YAMLError as e:
+        print(f"{path}: frontmatter is not valid YAML: {str(e).splitlines()[0]}")
+        continue
+    if not isinstance(data, dict):
+        print(f"{path}: frontmatter is not a mapping")
+        continue
+    for key in ("name", "description"):
+        if not isinstance(data.get(key), str) or not data[key].strip():
+            print(f"{path}: {key} is missing or not a string")
+PY
+  )
+else
+  echo "note: PyYAML not installed, frontmatter YAML not parsed"
+fi
+
 # Skills: name matches the folder, and the description is present.
 for skill in skills/*/SKILL.md .claude/skills/*/SKILL.md; do
   dir=$(basename "$(dirname "$skill")")
-  [ "$(head -1 "$skill")" = "---" ] || problem "$skill has no frontmatter"
   name=$(frontmatter_field "$skill" name)
   [ "$name" = "$dir" ] || problem "$skill: name '$name' is not the folder name '$dir'"
   [ -n "$(frontmatter_field "$skill" description)" ] || problem "$skill has no description"
@@ -29,7 +64,7 @@ for agent in agents/*.md; do
   name=$(frontmatter_field "$agent" name)
   [ "$name" = "$base" ] || problem "$agent: name '$name' is not the file name '$base'"
   while read -r s; do
-    [ -d "skills/$s" ] || problem "$agent preloads skill '$s', which does not exist"
+    [ -f "skills/$s/SKILL.md" ] || problem "$agent preloads skill '$s', which does not exist"
   done < <(sed -n '1,/^---$/!d;p' "$agent" | sed -n '/^skills:/,/^[a-z]/{s/^ *- *//p;}')
 done
 
