@@ -8,8 +8,8 @@ description: Use when designing a database schema or modelling new data, before 
 Decide what a row *is* before deciding what columns it has. Most schema pain is a table whose
 grain was never stated, so rows at two different grains ended up in it.
 
-This skill stops at the design. Writing the migration that creates it is the migration skill's
-job; the queries that read it are `sql-writing`.
+This skill stops at the design. The migration that creates it is written with the build task
+(`task-runner`) and checked with `sql-review`; the queries that read it are `sql-writing`.
 
 ## 1. Before any table
 
