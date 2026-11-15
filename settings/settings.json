@@ -1,5 +1,5 @@
 {
-  "model": "fable[1m]",
+  "model": "opus",
   "theme": "dark",
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,
