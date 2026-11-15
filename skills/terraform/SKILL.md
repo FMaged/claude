@@ -119,8 +119,10 @@ variable "vms" {
 }
 ```
 
-- An `object` with `optional()` attributes, not a `map(any)`: a typo in an attribute name
-  is an error instead of a silently ignored key.
+- An `object` with `optional()` attributes, not a `map(any)`. It catches a wrong type and a
+  missing required attribute. It drops an attribute it does not know, so a typo in an
+  optional one (`cpu = 8`) silently takes the default. A `validation` cannot see it either,
+  because it runs on the converted value. Read the planned values after editing the map.
 - A secret is `sensitive = true`. If it is used only in a `provider` block or a
   write-only argument, also `ephemeral = true` (see section 0), and it never reaches the
   plan file or the state.
