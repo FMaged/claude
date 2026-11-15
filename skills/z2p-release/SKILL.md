@@ -10,7 +10,7 @@ The final proof before real users arrive. The release goes over the pipeline tha
 ## Rules
 - Check, do not assume. Every line in `RELEASE.md` comes from something you ran or read.
 - A failed Must requirement blocks the release, unless the user moves it to Later in `REQUIREMENTS.md`.
-- Never release without the user's yes.
+- Never release without the user's yes. The yes covers the release itself (opening the MVP to real users), not the deploy of `main` that the walking skeleton already automated. Ask before any other production action.
 - Plain English. Short sentences.
 
 ## Steps
@@ -21,7 +21,7 @@ The final proof before real users arrive. The release goes over the pipeline tha
 4. **Reviews.** Detect the file types and run each matching review, the same way as `task-runner` step 7: the reviewer agent for Terraform, Packer, Ansible, network config, and Svelte, the review skill for everything else, and the review skill for every type in Codex. Always run `web-security-review` against the permissions in `DESIGN.md`, and `sql-review` against its database section (skip the second if there is no stored data).
 5. **Findings.** List them by severity in `RELEASE.md`. Each high finding is either fixed (say how), or accepted by the user with a reason. Do not accept one on the user's behalf.
 6. **Backups.** If there is data, set up backups and restore one into a scratch database or folder. Write the date and the result. Skip with "no stored data" otherwise.
-7. **Deploy.** Deploy the MVP through the pipeline. Check that it works where users get it, and that the Rollback steps are still current. If they are not, use `z2p-deploy` to redo and try them.
+7. **Deploy.** Check that the pipeline deployed the current `main` and that it works where users get it. If the project does not deploy `main` on its own, ask before deploying. If the Rollback steps are no longer current, stop and ask before using `z2p-deploy` to redo and try them.
 8. **Release notes.** Write short notes for users in `RELEASE.md`: what is in, what is not (Later), known problems.
 9. **Gate check.** Tests and CI green; every Must requirement checked; matching reviews run; no open high finding; MVP live and working; rollback tried; backup restored once if there is data. Fix what fails.
 10. **Ask the user** for the go-ahead. On yes, add `Release: approved <date>` under the title. On no, list what blocks and stop.
