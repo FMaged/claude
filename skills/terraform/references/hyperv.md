@@ -311,8 +311,9 @@ resource "hyperv_iso_image" "seed" {
 - `archive_file` writes the zip at plan time. In CI the apply job needs it too, so pass
   `.seed/` from the plan job to the apply job as an artifact with `plan.cache`. Plan
   twice in a row once: the second plan must show no change to the ISO.
-- **Secrets on the ISO are clear text**, on the host and in the state. Put only what is
-  safe there: an SSH public key, a password hash, a local admin password that Ansible
+- **Secrets on the ISO are clear text**: in the ISO on the host, in the zip the provider
+  uploads to the account's `%TEMP%` and keeps there while the ISO exists, in the
+  `.seed/` CI artifact, and in the state. Put only what is safe there: an SSH public key, a password hash, a local admin password that Ansible
   changes on its first run, or an offline domain-join blob from `djoin /provision`
   (it joins only that one computer). Never a reusable domain or service password.
 - `archive_file` comes from `hashicorp/archive`. Pin it like any provider, and add the

@@ -301,7 +301,8 @@ terraform apply -input=false plan.cache            # main only, the plan from th
   between, apply refuses the stale plan; run the pipeline again.
 - Staging applies on merge. Prod applies from a manual job with `resource_group` so two
   applies never run at once.
-- The plan file holds secrets in clear text. Give the artifact a short `expire_in`.
+- The plan file holds secrets in clear text. Give the artifact a short `expire_in`, and
+  let only the people who may apply download it.
 - Never `-auto-approve` without a saved plan. `apply plan.cache` needs no approval
   because the plan was the approval.
 - The jobs run on the `docker` runner tag and reach the Hyper-V host over WinRM. The
