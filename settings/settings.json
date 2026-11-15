@@ -12,5 +12,16 @@
         "repo": "pbakaus/impeccable"
       }
     }
+  },
+  "skillOverrides": {
+    "ansible-review": "off",
+    "network-review": "off",
+    "packer-review": "off",
+    "svelte-review": "off",
+    "terraform-review": "off",
+    "anthropic-skills:ci-pipelines": "off",
+    "anthropic-skills:container-builds": "off",
+    "anthropic-skills:powershell": "off",
+    "anthropic-skills:terraform-iac": "off"
   }
 }

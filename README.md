@@ -57,7 +57,7 @@ GitHub Actions runs the first two on Linux and macOS. The trigger evals run by h
 - Install `rust-analyzer` if you use the rust-analyzer plugin.
 - Add MCP servers by hand. The repo holds none, because they use local binaries and secrets.
 - Install graphify by hand if you use `/graphify`. It is a separate tool, not in this repo.
-- Skills turned off with `skillOverrides` in `~/.claude/settings.json` stay off. The repo does not manage that file.
+- `settings/settings.json` turns off five review skills (`ansible-review`, `network-review`, `packer-review`, `svelte-review`, `terraform-review`), which run only through their reviewer agents, and the four built-in skills the repo's skills replace (D17). Any other `skillOverrides` in `~/.claude/settings.json` stay as they are.
 
 ## Platforms
 Linux and macOS. On Windows, use WSL. Native Windows needs Developer Mode for symlinks and is not supported.

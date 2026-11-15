@@ -13,7 +13,7 @@ Run from the repo root. Do the steps in order and stop to ask where a step says 
 4. **Install.** Run `./install.sh`, adding `--backup` if the user chose to back up any conflict. If they skipped some conflicts, say those stay unlinked.
 5. **Settings.**
    - Copy `~/.claude/settings.json` to `~/.claude/settings.json.bak` (create the file as `{}` if it does not exist).
-   - Merge `settings/settings.json` into it. Add keys that are missing. In nested objects (`enabledPlugins`, `extraKnownMarketplaces`) add the missing entries.
+   - Merge `settings/settings.json` into it. Add keys that are missing. In nested objects (`enabledPlugins`, `extraKnownMarketplaces`, `skillOverrides`) add the missing entries.
    - If a key already has a different value, show both and ask before changing it.
    - Never drop the user's other keys.
 6. **Restart.** Ask the user to restart Claude Code so the plugins install and the skills load. After the restart, check that the skills and agents appear. If a plugin did not install, look up the current plugin install command and run it.

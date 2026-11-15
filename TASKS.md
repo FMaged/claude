@@ -383,10 +383,10 @@
 **Why:** The docs still described the Claude-only installer and left questions open that were long answered.
 **Notes:** Done 2026-11-15.
 
-### [ ] T6.6: Decide what to do with the five review skills turned off on this PC
-**What:** `~/.claude/settings.json` has `skillOverrides` that turn off `ansible-review`, `network-review`, `packer-review`, `terraform-review`, and `svelte-review`. The agents still preload them. Decide whether that is wanted, and if so record it in the README or move the override into `settings/settings.json` so every PC matches.
-**Why:** The repo cannot reproduce the setup if part of it lives only in the local settings file. The trigger evals for those five skills are skipped here.
-**Notes:** _(added after implementation if anything came up)_
+### [x] T6.6: Decide what to do with the five review skills turned off on this PC
+**What:** `~/.claude/settings.json` has `skillOverrides` that turn off `ansible-review`, `network-review`, `packer-review`, `terraform-review`, and `svelte-review`. The agents still preload them. The same file turns off the built-in `terraform-iac`, `powershell`, `ci-pipelines`, and `container-builds`, which D17 relies on. Decide whether that is wanted, and if so record it in the README or move the overrides into `settings/settings.json` so every PC matches.
+**Why:** The repo cannot reproduce the setup if part of it lives only in the local settings file. The trigger evals for those five skills are skipped here, and a second PC would get the built-in Terraform skill competing with `terraform`.
+**Notes:** Done 2026-11-15. Wanted: the five review skills run only through their reviewer agents, so the chain names the agents. All nine overrides moved into `settings/settings.json`; `setup-claude-code` merges `skillOverrides` like the other nested objects. The trigger evals of the five stay skipped on every PC; Codex still sees the skills, because `skillOverrides` is a Claude Code setting. The other built-in overrides on this PC stay local.
 
 ## Stage 7: VM skills (Terraform, Packer, PowerShell for Hyper-V)
 
