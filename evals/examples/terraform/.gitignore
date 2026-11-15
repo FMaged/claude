@@ -3,4 +3,4 @@ plan.cache
 *.tfstate
 *.tfstate.*
 **/.seed/
-ansible/inventory/*.yml
+ansible/inventory/*/hosts.yml

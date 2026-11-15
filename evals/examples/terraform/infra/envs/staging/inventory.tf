@@ -23,7 +23,7 @@ locals {
 
 # Generated: Ansible reads this and never keeps its own list of hosts.
 resource "local_file" "ansible_inventory" {
-  filename        = "${path.module}/../../../ansible/inventory/${basename(abspath(path.module))}.yml"
+  filename        = "${path.module}/../../../ansible/inventory/${basename(abspath(path.module))}/hosts.yml"
   file_permission = "0644"
   content         = yamlencode(local.inventory)
 }

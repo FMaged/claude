@@ -12,7 +12,8 @@ two applies racing on one state.
 
 For Hyper-V VMs, read `references/hyperv.md` before writing a VM resource. For a review of
 finished code or a plan, run the `terraform-reviewer` agent (in Codex, the
-`terraform-review` skill). For comments, `code-comments`.
+`terraform-review` skill). For the playbooks that read the inventory, `ansible`. For
+comments, `code-comments`.
 
 Sections 6 to 8 (the Ansible inventory, GitLab state, the `ci-templates` pipeline) and the
 committed `terraform.tfvars` are the default for a new project on the work stack. In a
@@ -208,7 +209,8 @@ output "role" {
 
 The root module puts each host in two groups: its OS, for the connection settings
 (`group_vars/windows.yml` sets WinRM), and its role, for what it runs
-(`group_vars/web.yml`).
+(`group_vars/web.yml`). The file is `ansible/inventory/<env>/hosts.yml`, next to that
+environment's own `group_vars/` (the `ansible` skill, section 1).
 
 ```hcl
 # envs/staging/inventory.tf
@@ -235,7 +237,7 @@ locals {
 }
 
 resource "local_file" "ansible_inventory" {
-  filename        = "${path.module}/../../../ansible/inventory/${basename(abspath(path.module))}.yml"
+  filename        = "${path.module}/../../../ansible/inventory/${basename(abspath(path.module))}/hosts.yml"
   file_permission = "0644"
   content         = yamlencode(local.inventory)
 }
@@ -247,8 +249,8 @@ resource "local_file" "ansible_inventory" {
 - Windows hosts reached over WinRM with Kerberos need `ansible_host` to be the FQDN:
   Kerberos tickets are issued for names, not addresses.
 - No secret in the inventory. Connection secrets reach Ansible as CI variables.
-- The inventory file is generated: say so in `.gitignore` or in a header, and never edit
-  it by hand.
+- The inventory file is generated: ignore it in `.gitignore`
+  (`ansible/inventory/*/hosts.yml`), and never edit it by hand.
 - In CI the file does not exist in a fresh clone, so every plan shows `local_file` as
   created. That is expected. The apply job passes the file to the Ansible job as an
   artifact.
