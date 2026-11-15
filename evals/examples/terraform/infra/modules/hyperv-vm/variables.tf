@@ -33,7 +33,7 @@ variable "image" {
   type        = string
 
   validation {
-    condition     = can(regex("\\.vhdx$", var.image))
+    condition     = can(regex("^[A-Za-z0-9._-]+\\.vhdx$", var.image))
     error_message = "image must be a .vhdx file name, without a folder."
   }
 }
@@ -64,8 +64,8 @@ variable "cpus" {
   default     = 2
 
   validation {
-    condition     = var.cpus >= 1 && var.cpus <= 16
-    error_message = "cpus must be between 1 and 16."
+    condition     = var.cpus >= 1 && var.cpus <= 16 && floor(var.cpus) == var.cpus
+    error_message = "cpus must be a whole number between 1 and 16."
   }
 }
 
@@ -84,6 +84,11 @@ variable "os_disk_gb" {
   description = "Size the OS disk is grown to after the copy. At least the image size."
   type        = number
   default     = 60
+
+  validation {
+    condition     = var.os_disk_gb >= 1
+    error_message = "os_disk_gb must be at least 1."
+  }
 }
 
 variable "vlan_id" {
@@ -92,8 +97,8 @@ variable "vlan_id" {
   default     = null
 
   validation {
-    condition     = var.vlan_id == null || (var.vlan_id >= 1 && var.vlan_id <= 4094)
-    error_message = "vlan_id must be between 1 and 4094."
+    condition     = var.vlan_id == null || (var.vlan_id >= 1 && var.vlan_id <= 4094 && floor(var.vlan_id) == var.vlan_id)
+    error_message = "vlan_id must be a whole number between 1 and 4094."
   }
 }
 

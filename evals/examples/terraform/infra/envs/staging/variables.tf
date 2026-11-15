@@ -21,6 +21,11 @@ variable "vms" {
   }
 
   validation {
+    condition     = alltrue([for vm in values(var.vms) : can(regex("^[A-Za-z0-9._-]+\\.vhdx$", vm.image))])
+    error_message = "image must be a .vhdx file name, without a folder."
+  }
+
+  validation {
     condition = alltrue([
       for vm in values(var.vms) :
       can(regex("^[a-z][a-z0-9_]*$", vm.role)) && !contains(["windows", "linux", "all", "ungrouped"], vm.role)
