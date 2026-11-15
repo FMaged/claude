@@ -1,6 +1,6 @@
 ---
-name: "product-brief"
-description: "Write a short product brief (PRODUCT_BRIEF.md) for a new idea: problem, users, first version, success, risks. Use before any planning or code, or to decide if an idea is worth building."
+name: product-brief
+description: Use when the user wants a product brief for a new idea, before any planning or code (e.g. "write a product brief", "write PRODUCT_BRIEF.md", "is this idea worth building?", "describe the problem and the users"). Writes PRODUCT_BRIEF.md with the problem, users, first version, success measures, and risks. In a z2p project this is stage 2.
 ---
 
 # Product brief
