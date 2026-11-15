@@ -21,8 +21,7 @@ The most useful thing you can say. Check these first:
 
 ## 2. Secrets and state
 
-- Credentials, tokens, passwords, or private keys written in `.tf` or in a committed `.tfvars`.
-- A committed `.tfvars` that holds a secret or a personal value (a home path, someone's token). Non-secret environment values in a committed `terraform.tfvars` are fine.
+- Credentials, tokens, passwords, or private keys written in `.tf`, or a secret or personal value (a home path, someone's token) in a committed `.tfvars`. Non-secret environment values in a committed `terraform.tfvars` are fine.
 - Outputs that expose a secret without `sensitive = true`.
 - State: remote with locking for anything shared, and remember state holds secrets in clear text, so check it is not committed or world-readable.
 - `local_file` writing a secret, or writing with default permissions when it needs `file_permission = "0600"`.
@@ -57,7 +56,7 @@ When Terraform generates config for another tool (an inventory, a flows file, a 
 ```
 terraform fmt -check -recursive
 terraform validate
-terraform plan -out=tf.plan && terraform show tf.plan
+terraform plan -out=plan.cache && terraform show plan.cache
 ```
 
 Skip style the formatter already fixes. Run `fmt -check` and say "formatting is off, run `terraform fmt`" in one line instead of listing it.
