@@ -114,3 +114,7 @@ terraform	1	write a terraform module that creates a Hyper-V VM from our golden V
 terraform	1	set up the GitLab state backend for my terraform root module
 terraform	0	review my terraform plan before I apply it
 terraform	0	write a packer template that builds a Windows Server image
+packer	1	write a packer template that builds a Windows Server 2025 golden image on Hyper-V
+packer	1	why does packer wait for SSH forever when it builds my Ubuntu image on Hyper-V?
+packer	0	write a terraform module that creates a Hyper-V VM from our golden VHDX
+packer	0	what does this bash script do? for f in *.log; do gzip "$f"; done

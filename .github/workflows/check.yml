@@ -14,5 +14,10 @@ jobs:
         with:
           terraform_version: 1.17.2
           terraform_wrapper: false
+      - uses: hashicorp/setup-packer@v3
+        with:
+          version: 1.16.2
       - run: evals/lint.sh
+        env:
+          PACKER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: evals/test-install.sh

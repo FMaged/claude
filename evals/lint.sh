@@ -132,6 +132,17 @@ else
   echo "note: terraform not installed, examples not validated"
 fi
 
+if command -v packer >/dev/null; then
+  packer fmt -check -recursive evals/examples/packer || problem "packer fmt in evals/examples/packer"
+  for image in evals/examples/packer/*/; do
+    { packer init "$image" >/dev/null &&
+      PKR_VAR_build_password=lint-only PKR_VAR_git_sha=0000000 packer validate "$image" >/dev/null; } ||
+      problem "packer validate in $image"
+  done
+else
+  echo "note: packer not installed, examples not validated"
+fi
+
 # Shell scripts.
 if command -v shellcheck >/dev/null; then
   shellcheck install.sh evals/*.sh || problem "shellcheck"
