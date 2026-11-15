@@ -370,7 +370,7 @@
 **What:** `evals/lint.sh` (frontmatter, agent skills, cross-references, `/home/` paths, secrets, eval coverage, settings JSON, shellcheck), `evals/test-install.sh` (R2, R3, R4 on an empty home), and `.github/workflows/check.yml` running both on Linux and macOS.
 **Why:** Until now only a human could find a broken reference or a regression in `install.sh`. The macOS runner also covers the macOS half of N2.
 **How:** Plain bash, no dependencies beyond python3 for the JSON check. Lint fails if a skill has no trigger eval.
-**Notes:** Done 2026-11-15. shellcheck is not installed on this PC, so only CI runs it.
+**Notes:** Done 2026-11-15. shellcheck was not installed on this PC at first, so only CI ran it.
 
 ### [x] T6.4: Add trigger evals for every remaining skill
 **What:** Two prompts that should fire and two that should not, for each of the 18 skills that had none. The runner skips skills turned off in `~/.claude/settings.json`.
