@@ -1,6 +1,6 @@
 ---
 name: setup-claude-code
-description: Use when the user says "set up for Claude Code", "install my setup", or "set up this PC" in this repo. Links the repo's skills and agents into ~/.claude, merges the shared settings, and lists the manual steps.
+description: Use when the user says "set up for Claude Code", "install my setup", or "set up this PC" in this repo. Links the repo's skills into ~/.claude and ~/.agents (for Codex) and its agents into ~/.claude, merges the shared settings, and lists the manual steps.
 ---
 
 # Set up Claude Code
@@ -10,7 +10,7 @@ Run from the repo root. Do the steps in order and stop to ask where a step says 
 1. **Prerequisites.** Check `git` and `bash` exist. Warn (do not stop) if `rust-analyzer` is missing: the rust-analyzer plugin needs it.
 2. **Dry run.** Run `./install.sh --dry-run` and show the summary line.
 3. **Conflicts.** For each `conflict:` line, show the difference between the existing file or folder and the repo one (`diff -r`). Ask whether to back it up and link, or skip it. Do not decide for the user.
-4. **Install.** Run `./install.sh`, adding `--backup` if the user chose to back up any conflict. If they skipped some conflicts, say those stay unlinked.
+4. **Install.** Run `./install.sh`, adding `--backup` if the user chose to back up any conflict. It links the skills into `~/.claude/skills` and `~/.agents/skills` and the agents into `~/.claude/agents`; add `--target claude` or `--target codex` only if the user wants one client. If they skipped some conflicts, say those stay unlinked.
 5. **Settings.**
    - Copy `~/.claude/settings.json` to `~/.claude/settings.json.bak` (create the file as `{}` if it does not exist).
    - Merge `settings/settings.json` into it. Add keys that are missing. In nested objects (`enabledPlugins`, `extraKnownMarketplaces`, `skillOverrides`) add the missing entries.
@@ -20,3 +20,5 @@ Run from the repo root. Do the steps in order and stop to ask where a step says 
 7. **Manual steps.** Tell the user what is left for them:
    - Log in to claude.ai so synced skills arrive. Remove the claude.ai copy of `product-brief`, since the repo has its own.
    - Add MCP servers by hand if wanted. The repo holds none.
+   - Install graphify by hand if they use `/graphify`. It is a separate tool.
+   - The shared settings turned off five review skills, which run only through their reviewer agents, and four built-in skills the repo replaces. Any other `skillOverrides` they had stay as they were.
