@@ -1,6 +1,6 @@
 ---
 name: terraform-reviewer
-description: Reviews Terraform or OpenTofu code and plans by following the terraform-review skill. Read-only. Run only when the user names it — do not delegate to it on your own.
+description: Reviews Terraform or OpenTofu code and plans by following the terraform-review skill. Read-only. Run only when the user or a skill's steps name it — do not delegate to it on your own.
 tools: Read, Grep, Glob
 skills:
   - terraform-review

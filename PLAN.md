@@ -219,6 +219,7 @@ How later stages use them:
 - **Choice:** `task-runner` writes or updates tests with each task. When the last task of a `TASKS.md` stage is done, it runs the review skills that match the files changed in that stage. Stage 9 is the full final review, not the first one.
 - **Why:** A finding is cheap to fix right after the code is written.
 - **Alternatives:** All testing and review in one stage at the end.
+- **Changed:** The Terraform, Packer, Ansible, network, and Svelte reviews now run through their reviewer agents, because those five review skills are turned off in Claude Code (T6.6). The other reviews still run as skills, and Codex, which has no agents, runs every review as a skill.
 
 ### D11: Clone, then "set up for Claude Code"
 - **Choice:** A project skill in `.claude/skills/setup-claude-code/` runs the setup. It only exists while Claude is opened in this repo. The skill does the parts that need judgement: prerequisites, conflicts, settings merge, checks. `install.sh` does the links, so they work the same way every time.

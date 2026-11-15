@@ -1,6 +1,6 @@
 ---
 name: web-security-reviewer
-description: Reviews a web application's routes, auth, sessions, uploads, and proxy config by following the web-security-review skill. Read-only. Run only when the user names it — do not delegate to it on your own.
+description: Reviews a web application's routes, auth, sessions, uploads, and proxy config by following the web-security-review skill. Read-only. Run only when the user or a skill's steps name it — do not delegate to it on your own.
 tools: Read, Grep, Glob
 skills:
   - web-security-review

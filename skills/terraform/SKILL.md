@@ -1,6 +1,6 @@
 ---
 name: terraform
-description: Use when writing or changing Terraform or OpenTofu code — a module, a root module per environment, variables and validation, outputs, for_each, the provider and version pins, the lock file, the GitLab state backend, or VMs on Hyper-V with the taliesins/hyperv provider (e.g. "write a terraform module for a VM", "add a variable", "set up the terraform state in GitLab", "create Hyper-V VMs with terraform", "feed the ansible inventory from terraform", "why does terraform want to recreate everything"). For reviewing Terraform code or a plan, use terraform-review instead.
+description: Use when writing or changing Terraform or OpenTofu code — a module, a root module per environment, variables and validation, outputs, for_each, the provider and version pins, the lock file, the GitLab state backend, or VMs on Hyper-V with the taliesins/hyperv provider (e.g. "write a terraform module for a VM", "add a variable", "set up the terraform state in GitLab", "create Hyper-V VMs with terraform", "feed the ansible inventory from terraform", "why does terraform want to recreate everything"). For reviewing Terraform code or a plan, use the terraform-reviewer agent instead.
 ---
 
 # Terraform
@@ -11,7 +11,8 @@ someone — a resource replaced because a list shifted, a value that lives outsi
 two applies racing on one state.
 
 For Hyper-V VMs, read `references/hyperv.md` before writing a VM resource. For a review of
-finished code or a plan, use `terraform-review`. For comments, `code-comments`.
+finished code or a plan, run the `terraform-reviewer` agent (in Codex, the
+`terraform-review` skill). For comments, `code-comments`.
 
 Sections 6 to 8 (the Ansible inventory, GitLab state, the `ci-templates` pipeline) and the
 committed `terraform.tfvars` are the default for a new project on the work stack. In a
@@ -330,5 +331,5 @@ terraform plan -out=plan.cache && terraform show plan.cache
 
 Read the plan line by line. Every `must be replaced` needs a reason you can say out loud,
 and `0 to destroy` is the answer you expect for most changes. On Hyper-V, every
-`~ update in-place` of a `hyperv_machine_instance` is a reboot. Then run
-`terraform-review` on the change.
+`~ update in-place` of a `hyperv_machine_instance` is a reboot. Then run the
+`terraform-reviewer` agent on the change.

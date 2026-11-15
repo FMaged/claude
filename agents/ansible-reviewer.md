@@ -1,6 +1,6 @@
 ---
 name: ansible-reviewer
-description: Reviews Ansible playbooks, roles, inventory, and Jinja templates by following the ansible-review skill. Read-only. Run only when the user names it — do not delegate to it on your own.
+description: Reviews Ansible playbooks, roles, inventory, and Jinja templates by following the ansible-review skill. Read-only. Run only when the user or a skill's steps name it — do not delegate to it on your own.
 tools: Read, Grep, Glob
 skills:
   - ansible-review

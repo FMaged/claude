@@ -25,7 +25,7 @@ Puts the product live the same safe way every time. It runs inside the Stage 1 t
 5. **Database.** Skip if `DESIGN.md` says "no stored data". Otherwise create the database in production, keep its credentials as secrets, and run migrations from the pipeline before the new version starts. Never run them by hand.
 6. **Error tracking.** Add one error tracker. Cause a test error in production and check that it shows up.
 7. **Rollback.** Try one: deploy a second version, roll back to the first, and check that the first is live again. If there is a database, say how a migration is undone or why it need not be.
-8. **Infra review.** Run the reviewer that matches the files present: `terraform-reviewer`, `ansible-reviewer`, `packer-reviewer`, `network-reviewer`, `docker-reviewer`. Fix high findings now.
+8. **Infra review.** Run the reviewer agent that matches the files present: `terraform-reviewer`, `ansible-reviewer`, `packer-reviewer`, `network-reviewer`, `docker-reviewer`. In Codex, which has no agents, run the matching review skill. Fix high findings now.
 9. **Write `RELEASE.md`.** Fill the `## Deploy` and `## Rollback` sections from the template below. Keep every other section as is.
 10. **Check.** The live version works where users get it, CI is green, the test error arrived, and the rollback was tried. Fix what fails.
 

@@ -1,6 +1,6 @@
 ---
 name: svelte
-description: Use when writing or changing Svelte or SvelteKit code — a component, runes ($state, $derived, $effect, $props), snippets, a +page or +layout, a load function, a form action, a remote function, a hook, an endpoint, shared state, a test, or the SvelteKit/Vite config (e.g. "add a component", "make this reactive", "why doesn't this update", "add a page", "load data for this route", "move this to runes", "wire up this chart"). Svelte 5 with runes and SvelteKit 3, with what differs in SvelteKit 2 called out. For reviewing Svelte code, use svelte-review instead.
+description: Use when writing or changing Svelte or SvelteKit code — a component, runes ($state, $derived, $effect, $props), snippets, a +page or +layout, a load function, a form action, a remote function, a hook, an endpoint, shared state, a test, or the SvelteKit/Vite config (e.g. "add a component", "make this reactive", "why doesn't this update", "add a page", "load data for this route", "move this to runes", "wire up this chart"). Svelte 5 with runes and SvelteKit 3, with what differs in SvelteKit 2 called out. For reviewing Svelte code, use the svelte-reviewer agent instead.
 ---
 
 # Svelte
