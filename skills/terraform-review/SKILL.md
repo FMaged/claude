@@ -12,7 +12,9 @@ Review `.tf`, `.tfvars`, and plan output. Report problems. Do not rewrite the co
 The most useful thing you can say. Check these first:
 
 - **Replacements.** Run a plan and look for `must be replaced` and `forces replacement`. Name every resource that gets destroyed and say what is lost with it (a disk, an IP, data, state on the machine).
-- **Destroy risk.** Anything stateful (volume, database, disk) without `lifecycle { prevent_destroy = true }`.
+- **Destroy risk.** Anything stateful (volume, database, disk) without `lifecycle { prevent_destroy = true }`. Not a disk rebuilt from an image on purpose (an OS disk), as long as the data lives on a disk of its own.
+- **In-place updates that restart.** Every `~ update in-place` of a `hyperv_machine_instance` stops and starts the VM, even for `notes`. Name each VM and say it is a reboot.
+- **Image changes that do nothing.** A `hyperv_vhd` whose `source` or `parent_path` changes plans as an in-place update and keeps the old disk. The disk, the seed ISO, and the VM need `replace_triggered_by` on the image.
 - **Downtime.** A resource that others depend on being replaced without `create_before_destroy`.
 - **`-auto-approve`** in a path that touches anything real. Fine in a throwaway lab, never in shared or production infrastructure.
 - **Count reindexing.** `count` over a list means inserting or removing an item shifts every index after it and recreates those resources. Use `for_each` keyed by a stable name instead.
@@ -28,7 +30,7 @@ The most useful thing you can say. Check these first:
 ## 3. Pinning
 
 - `required_version` set.
-- Every provider pinned in `required_providers` (`=` or `~>`, never open).
+- Every provider pinned in a root module's `required_providers` (`=` or `~>`). A reusable module may give a minimum (`>=`) so the root decides; no constraint at all is still a finding.
 - `.terraform.lock.hcl` committed.
 - Module `source` pinned to a tag or commit, not a branch.
 
