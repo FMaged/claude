@@ -110,7 +110,7 @@ python3 -I -m json.tool settings/settings.json >/dev/null || problem "settings/s
 if command -v terraform >/dev/null; then
   terraform fmt -check -recursive evals/examples/terraform || problem "terraform fmt in evals/examples/terraform"
   for root in evals/examples/terraform/infra/envs/*/; do
-    (cd "$root" && terraform init -backend=false -input=false >/dev/null && terraform validate) ||
+    (cd "$root" && terraform init -backend=false -input=false -lockfile=readonly >/dev/null && terraform validate) ||
       problem "terraform validate in $root"
   done
 else
