@@ -307,7 +307,8 @@ terraform apply -input=false plan.cache            # main only, the plan from th
   because the plan was the approval.
 - The jobs run on the `docker` runner tag and reach the Hyper-V host over WinRM. The
   provider credentials are CI variables (`HYPERV_USER`, `HYPERV_PASSWORD`, and so on),
-  never `provider` arguments.
+  never `provider` arguments. The one exception is the alias for a second host
+  (`references/hyperv.md`).
 
 ## 9. Style
 

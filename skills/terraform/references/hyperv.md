@@ -59,10 +59,13 @@ none in the code:
   successful call. When a call fails, the wrapper that holds the account's password in
   clear text stays there. Keep that profile readable by the account and administrators
   only, and clean `%TEMP%` after a failed apply.
-- One provider block reaches one host. More hosts are provider aliases
-  (`provider "hyperv" { alias = "hv02" }`), passed to the module with `providers = {}`.
-  Every alias reads the same `HYPERV_*` variables, so each aliased block sets its own
-  `host` from a variable, and its password from an `ephemeral` variable if it differs.
+- One provider block reaches one host, and a module's provider cannot change per
+  `for_each` key. VMs on a second host are a second `module` block (`module "vm_hv02"`
+  with its own map) that gets `providers = { hyperv = hyperv.hv02 }`.
+- Every alias reads the same `HYPERV_*` variables, so the aliased block has to set
+  `host` as an argument, from a variable, and its user and password too if they differ
+  (the password from an `ephemeral` variable). It is the one exception to "no provider
+  arguments" in the SKILL.
 
 ## A VM from the golden image
 
