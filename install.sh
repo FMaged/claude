@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
 # Links shared skills into Claude and Codex; agent definitions stay with Claude.
-# Usage: ./install.sh [--target claude|codex|all] [--dry-run] [--backup]
+# Usage: ./install.sh [--target claude|codex|all] [--dry-run] [--backup] [--skip NAME]...
 set -euo pipefail
 
 dry=0
 backup=0
 target=all
+skip=()
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --dry-run) dry=1 ;;
     --backup) backup=1 ;;
+    --skip)
+      [ "$#" -ge 2 ] || { echo "--skip requires a skill or agent name" >&2; exit 2; }
+      skip+=("$2")
+      shift
+      ;;
     --target)
       [ "$#" -ge 2 ] || { echo "--target requires claude, codex, or all" >&2; exit 2; }
       target=$2
@@ -25,10 +31,20 @@ case "$target" in
 esac
 
 repo=$(cd "$(dirname "$0")" && pwd -P)
-linked=0 ok=0 conflicts=0 removed=0
+linked=0 ok=0 conflicts=0 removed=0 skipped=0
 
 act() {
   if [ "$dry" = 1 ]; then echo "would: $*"; else "$@"; fi
+}
+
+# An agent can be named with or without its .md.
+skipped_by_user() {
+  local base name
+  base=$(basename "$1")
+  for name in "${skip[@]+"${skip[@]}"}"; do
+    if [ "$name" = "$base" ] || [ "$name.md" = "$base" ]; then return 0; fi
+  done
+  return 1
 }
 
 link_item() {
@@ -36,7 +52,10 @@ link_item() {
   if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ]; then
     ok=$((ok + 1))
   elif [ -e "$dest" ] || [ -L "$dest" ]; then
-    if [ "$backup" = 1 ]; then
+    if skipped_by_user "$dest"; then
+      echo "skip: $dest"
+      skipped=$((skipped + 1))
+    elif [ "$backup" = 1 ]; then
       if [ -z "$backup_dir" ]; then
         if [ "$dry" = 1 ]; then
           backup_dir="$root/backups/install-DRY-RUN"
@@ -106,5 +125,5 @@ for client in claude codex; do
   prune_links "$root/skills"
 done
 
-echo "Summary: linked $linked, already OK $ok, conflicts $conflicts, removed $removed"
+echo "Summary: linked $linked, already OK $ok, conflicts $conflicts, removed $removed, skipped $skipped"
 [ "$conflicts" = 0 ]

@@ -10,7 +10,7 @@ Run from the repo root. Do the steps in order and stop to ask where a step says 
 1. **Prerequisites.** Check `git` and `bash` exist. Warn (do not stop) if `rust-analyzer` is missing: the rust-analyzer plugin needs it.
 2. **Dry run.** Run `./install.sh --dry-run` and show the summary line.
 3. **Conflicts.** For each `conflict:` line, show the difference between the existing file or folder and the repo one (`diff -r`). Ask whether to back it up and link, or skip it. Do not decide for the user.
-4. **Install.** Run `./install.sh`, adding `--backup` if the user chose to back up any conflict. It links the skills into `~/.claude/skills` and `~/.agents/skills` and the agents into `~/.claude/agents`; add `--target claude` or `--target codex` only if the user wants one client. If they skipped some conflicts, say those stay unlinked.
+4. **Install.** Run `./install.sh`. If the user chose to back up any conflict, add `--backup`, and add one `--skip <name>` for each conflict they chose to keep (the last part of its `conflict:` path, such as `product-brief`); without `--skip`, `--backup` replaces every conflict. It links the skills into `~/.claude/skills` and `~/.agents/skills` and the agents into `~/.claude/agents`; add `--target claude` or `--target codex` only if the user wants one client. If they skipped some conflicts, say those stay unlinked.
 5. **Settings.**
    - Copy `~/.claude/settings.json` to `~/.claude/settings.json.bak` (create the file as `{}` if it does not exist).
    - Merge `settings/settings.json` into it. Add keys that are missing. In nested objects (`enabledPlugins`, `extraKnownMarketplaces`, `skillOverrides`) add the missing entries.

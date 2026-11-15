@@ -33,6 +33,7 @@ Options can be combined:
 - `--target claude|codex|all`: choose which clients to update; defaults to `all`.
 - `--dry-run`: print planned actions without writing anything.
 - `--backup`: move conflicts into a unique installation directory under `~/.claude/backups/` or `~/.agents/backups/`, then create the links. Backups separate skills from agents.
+- `--skip NAME`: leave the conflict with this name alone and do not count it as a conflict; repeat it for each one. Use it with `--backup` to replace only some conflicts. An agent can be named with or without `.md`.
 
 Without `--backup`, conflicting files are preserved and the installer exits nonzero after processing the other entries. Filesystem errors stop the run immediately. Repeated runs preserve correct links. Cleanup removes only broken links into this repository in the selected clients' skill/agent directories.
 
