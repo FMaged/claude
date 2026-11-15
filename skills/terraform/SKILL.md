@@ -90,6 +90,14 @@ variable "vms" {
     condition     = alltrue([for vm in values(var.vms) : contains(["windows", "linux"], vm.os)])
     error_message = "os must be \"windows\" or \"linux\"."
   }
+
+  validation {
+    condition = alltrue([
+      for vm in values(var.vms) :
+      can(regex("^[a-z][a-z0-9_]*$", vm.role)) && !contains(["windows", "linux"], vm.role)
+    ])
+    error_message = "role is an Ansible group name: lowercase letters, digits, and _, and not windows or linux."
+  }
 }
 ```
 
@@ -153,20 +161,50 @@ module "vm" {
 ## 6. Outputs and the Ansible inventory
 
 Terraform knows which hosts exist, so it writes the inventory and Ansible never keeps a
-copy.
+copy. The VM module gives what the inventory needs:
 
 ```hcl
+# modules/hyperv-vm/outputs.tf
+output "fqdn" {
+  description = "Name Ansible connects to. Kerberos needs the name, not the address."
+  value       = "${var.name}.${var.domain}"
+}
+
+output "os" {
+  description = "windows or linux."
+  value       = var.os
+}
+
+output "role" {
+  description = "Ansible group, for example web or db."
+  value       = var.role
+}
+```
+
+The root module puts each host in two groups: its OS, for the connection settings
+(`group_vars/windows.yml` sets WinRM), and its role, for what it runs
+(`group_vars/web.yml`).
+
+```hcl
+# envs/staging/inventory.tf
 locals {
+  vms   = values(module.vm)
+  roles = distinct([for vm in local.vms : vm.role])
+
   inventory = {
     all = {
-      children = {
-        for os in ["windows", "linux"] : os => {
-          hosts = {
-            for name, vm in module.vm : vm.fqdn => { role = vm.role }
-            if vm.os == os
+      children = merge(
+        {
+          for os in ["windows", "linux"] : os => {
+            hosts = { for vm in local.vms : vm.fqdn => {} if vm.os == os }
           }
-        }
-      }
+        },
+        {
+          for role in local.roles : role => {
+            hosts = { for vm in local.vms : vm.fqdn => {} if vm.role == role }
+          }
+        },
+      )
     }
   }
 }
