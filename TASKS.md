@@ -416,7 +416,8 @@
 **What:** `skills/powershell/SKILL.md` for scripts and modules on Windows hosts and the Hyper-V host (D18).
 **Why:** PowerShell fills the gaps Packer and Terraform leave, and it is the one tool here with no skill at all.
 **How:**
-- `#Requires -Version 7`, `Set-StrictMode -Version Latest`, `$ErrorActionPreference = 'Stop'`, `try`/`catch` only where the script can do something about it.
+- `#Requires -Version 7` for scripts that run on the host or a runner; `#Requires -Version 5.1` for scripts that run inside a guest or a Packer provisioner, where only Windows PowerShell exists (T7.2). `Set-StrictMode -Version Latest`, `$ErrorActionPreference = 'Stop'`, `try`/`catch` only where the script can do something about it.
+- Creating and changing VMs without Terraform is `hyperv-deploy` (T7.8); this skill points there and keeps to scripts in general.
 - Functions with `[CmdletBinding(SupportsShouldProcess)]`, typed parameters with validation attributes, `-WhatIf` that really does nothing.
 - Idempotent: `Get-` before `New-`, exit code 0 when nothing changed. Objects on the pipeline, `Write-Host` only for people. Credentials as `PSCredential` from CI variables or SecretManagement, never plain text.
 - Remoting with `Invoke-Command`; the Hyper-V module for what the Terraform provider cannot do, as listed at the end of `terraform/references/hyperv.md`: the virtual TPM (`Set-VMKeyProtector`, `Enable-VMTPM`), trunk VLANs, `Copy-VMFile`, cluster roles and replication. Firmware, nested virtualisation, and integration services are in the provider, so a script must not set them: the next plan would revert it. Such a script runs as its own pipeline step after the apply.
@@ -428,6 +429,7 @@
 **What:** `skills/powershell-review/SKILL.md` and `agents/powershell-reviewer.md` (D17).
 **Why:** Scripts that touch the Hyper-V host and production VMs need an unattended check.
 **How:**
+- Do this after T7.8, so the review also covers `hyperv-deploy` scripts: a `-WhatIf` that changes something, a VM changed whose notes name another owner, a delete outside the VM's own folder, a re-run that is not a no-op.
 - Review sections like `ansible-review`: what fails silently (no `Stop`, `-ErrorAction SilentlyContinue`, unchecked `$LASTEXITCODE`); what is not idempotent or lies under `-WhatIf`; what leaks secrets (plain-text passwords, `ConvertTo-SecureString -AsPlainText` from a literal, secrets in logs); what breaks under StrictMode or remoting; unpinned module versions; a Commands section (`Invoke-ScriptAnalyzer`, `Invoke-Pester`); "How to report".
 - Agent copied from `agents/sql-reviewer.md` with the names changed.
 - Evals for the review skill, lint, commit.
@@ -450,6 +452,35 @@
 **What:** Add the Windows image checks to `skills/packer-review/SKILL.md`.
 **Why:** The review was written for Linux images. A Windows golden image fails in its own ways, and a bad image is cloned into every VM. T8.2 does the same for `ansible-review`.
 **How:** Add: sysprep `/generalize /oobe` missing or not the last provisioner; an answer file left in `%WINDIR%\Panther` (the seed ISO's `Autounattend.xml` is then ignored); the build's WinRM listener, firewall rule, or build account left enabled; a Windows Update step without a `windows-restart` after it; the Administrator password from a literal instead of a `PKR_VAR_` variable; on Linux images, the Hyper-V daemons missing. Keep the existing sections. Commit.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T7.7: Write the `bash` skill
+**What:** `skills/bash/SKILL.md` for Bash scripts in any project (D29).
+**Why:** `install.sh`, the eval scripts, CI job scripts, and every Linux provisioner are Bash, and no skill says how to write them.
+**How:**
+- Strict mode and where it bites: `set -euo pipefail`; `-e` is off inside conditions and `||` chains; `|| true` only with a comment; `${var:-}` for optional variables under `-u`.
+- Quoting: every expansion quoted, arrays for argument lists, `"$@"`, `printf` over `echo`, `local` in functions, `readonly` for constants.
+- Arguments and output: a usage line, `--dry-run` that changes nothing, exit codes (0 done, 1 a problem, 2 wrong usage), errors to stderr.
+- Safe re-runs: check before changing, `rm -rf "${dir:?}/"` so an empty variable cannot delete `/`, `mktemp` with a `trap` that removes it.
+- Portability: GNU against BSD tools (`sed -i`, `readlink -f`, `date`, `stat`), the Bash 3.2 that macOS ships (no `mapfile`, no associative arrays) when the script runs there, Git Bash paths and symlinks (T10.5).
+- Scripts that run unattended (CI jobs, Packer and cloud-init provisioners): no prompts (`DEBIAN_FRONTEND=noninteractive`), retries around network calls, output a log can be read from.
+- When not to use Bash: real data structures, JSON beyond one `jq` call, or a script past about 200 lines; then Python.
+- Worked example in `evals/examples/bash/`: a script with `--dry-run` and a `trap`, clean under `shellcheck` and run once in each mode. Add `evals/examples/bash/*.sh` to the lint's shellcheck. Point `packer` at `bash` for Linux provisioner scripts. Evals, lint, commit.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T7.8: Write the `hyperv-deploy` skill
+**What:** `skills/hyperv-deploy/SKILL.md` for creating and changing Hyper-V VMs with PowerShell, without Terraform (D18, changed 2026-11-15).
+**Why:** Some VMs do not need Terraform, or should not have it: a one-off or lab VM, a host the pipeline cannot reach, a VM that must exist before the pipeline does. A script written by hand has no plan and no state, so the skill gives it what Terraform would have: a preview, safe re-runs, and one owner per VM.
+**How:**
+- When to use it and when to use Terraform. Never both on one VM: the script writes `Managed-by: hyperv-deploy` in the VM's notes and refuses a VM whose notes name another owner.
+- Input: one data file (`.psd1`) per environment with the VMs keyed by name and the same fields as Terraform's `vms` map, all checked before anything changes.
+- Desired state: read the VM with `Get-VM`, list each difference, then apply it. `SupportsShouldProcess` everywhere, so `-WhatIf` prints that list and changes nothing. A second run with no changes changes nothing and exits 0. Say which changes need the VM off.
+- From the Packer image: a copy (the default) or a differencing disk, with the folder layout and the rules of `terraform/references/hyperv.md`; check that the image and the switch exist before creating anything.
+- The seed ISO made on the host (`oscdimg`, or IMAPI2 through COM when the ADK is missing): `CIDATA` with cloud-init files for Linux, `Autounattend.xml` for Windows, the same content as Terraform's seed.
+- Generation 2, the secure boot template per OS, memory, processors, switch and VLAN, checkpoints off, automatic start and stop actions, and the virtual TPM.
+- Runs on the host, or through `Invoke-Command -ComputerName` with a `PSCredential`; credentials never in the data file.
+- Removal is its own switch with `ConfirmImpact = 'High'` and deletes only the VM and its own folder.
+- Worked example in `evals/examples/hyperv-deploy/`: a script and a data file for one Windows and one Linux VM, clean under `Invoke-ScriptAnalyzer`, and Pester tests with the Hyper-V cmdlets mocked (they do not exist on Linux) that check `-WhatIf` calls no `New-`, `Set-`, or `Remove-` cmdlet and that a second run changes nothing. Evals, lint, commit.
 **Notes:** _(added after implementation if anything came up)_
 
 ## Stage 8: Configuration (Ansible)

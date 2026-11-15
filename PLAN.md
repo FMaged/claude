@@ -5,7 +5,7 @@ One git repo that holds my whole Claude Code setup. On any PC: clone it, open Cl
 
 The repo also holds the z2p skill chain: a repeatable process that takes a solo project from idea to production and beyond. One orchestrator skill walks through the stages. Each stage is a skill that also works alone.
 
-The repo also holds the DevOps skill set (Part C): the skills and reviewer agents for the production toolchain at work. Packer builds Hyper-V images, Terraform creates the VMs, Ansible configures them, GitLab CI builds and deploys .NET and Angular apps to IIS, Linux, and Docker.
+The repo also holds the DevOps skill set (Part C): the skills and reviewer agents for the production toolchain at work. Packer builds Hyper-V images, Terraform creates the VMs (or PowerShell, where Terraform is not wanted), Ansible configures them, GitLab CI builds and deploys .NET and Angular apps to IIS, Linux, and Docker.
 
 What the repo must do, and how to check it, is in `REQUIREMENTS.md`.
 
@@ -26,7 +26,8 @@ What the repo must do, and how to check it, is in `REQUIREMENTS.md`.
 - Deploy happens early: the first stage of every `TASKS.md` puts a hello-world version live.
 
 **Part C: DevOps skills** (decisions D17 to D26)
-- A writing skill for each tool: `terraform` (with a Hyper-V reference file), `packer`, `powershell`, `ansible`, `gitlab-ci`, `dotnet`, `angular`, `docker`.
+- A writing skill for each tool: `terraform` (with a Hyper-V reference file), `packer`, `powershell`, `hyperv-deploy` (VMs from PowerShell, without Terraform), `ansible`, `gitlab-ci`, `dotnet`, `angular`, `docker`.
+- A `bash` skill for shell scripts in any project (D29).
 - A review skill and a read-only reviewer agent for the tools that have none yet: `powershell-review`, `gitlab-ci-review`, `dotnet-review`, `angular-review`, and their `*-reviewer` agents. The existing terraform, packer, ansible, and docker reviews are reused.
 - The skills encode one way of working: Packer image, then Terraform VM, then Ansible; one central GitLab CI templates repo that app repos include; build once, promote the same artifact; secrets in GitLab variables; Terraform state in GitLab.
 - `task-runner`, `z2p-deploy`, and `z2p-release` know the new reviewers.
@@ -57,7 +58,7 @@ What the repo must do, and how to check it, is in `REQUIREMENTS.md`.
 | Platforms | Linux and macOS |
 | Chain progress | `STATUS.md` in each project, written only by `z2p` |
 | Chain artifacts | Markdown files in each project |
-| DevOps: VMs | Packer (`hyperv-iso`) golden images; Terraform with the `taliesins/hyperv` provider; Ansible (`ansible.windows` over WinRM, SSH for Linux) |
+| DevOps: VMs | Packer (`hyperv-iso`) golden images; Terraform with the `taliesins/hyperv` provider, or a PowerShell script (`hyperv-deploy`) where Terraform is not wanted; Ansible (`ansible.windows` over WinRM, SSH for Linux) |
 | DevOps: apps | .NET 10 LTS (ASP.NET Core, xUnit); current Angular (standalone, signals); Docker multi-stage images in the GitLab registry |
 | DevOps: pipeline | GitLab CI templates in one `ci-templates` project; runners picked by tag (`docker`, `windows`, `hyperv`); masked protected variables; GitLab-managed Terraform state |
 | DevOps: deploy | msdeploy to IIS on Windows VMs; systemd and nginx on Linux VMs; Docker on Linux VMs |
@@ -83,8 +84,10 @@ What the repo must do, and how to check it, is in `REQUIREMENTS.md`.
       terraform-review, web-security-review
     new: z2p (SKILL.md + CONVENTIONS.md), z2p-idea, z2p-validate,
       z2p-requirements, z2p-design, z2p-deploy, z2p-release, z2p-operate
-    devops (Part C): terraform (+ references/hyperv.md), packer, powershell, powershell-review,
-      ansible, gitlab-ci, gitlab-ci-review, dotnet, dotnet-review, angular, angular-review, docker
+    devops (Part C): terraform (+ references/hyperv.md), packer, powershell, hyperv-deploy,
+      powershell-review, ansible, gitlab-ci, gitlab-ci-review, dotnet, dotnet-review, angular,
+      angular-review, docker
+    any project: bash
 
 <a project made with the chain>/
   CLAUDE.md, STATUS.md
@@ -255,11 +258,13 @@ How later stages use them:
 - **Choice:** Every tool in the DevOps set gets a writing skill: `terraform`, `packer`, `powershell`, `ansible`, `gitlab-ci`, `dotnet`, `angular`, `docker`. Tools that already have a review skill and agent (terraform, packer, ansible, docker) keep them. The other four get `<tool>-review` and a `<tool>-reviewer` agent built like `agents/sql-reviewer.md`. Anthropic's built-in `terraform-iac`, `powershell`, `ci-pipelines`, and `container-builds` stay turned off; the repo's skills replace them.
 - **Why:** The pattern already exists for SQL and Svelte. The writing skill shapes the code while it is written, the review catches what slipped through, and the agent runs that review without a session. The built-in skills cannot be edited to match Hyper-V, msdeploy, or the templates repo.
 - **Alternatives:** Writing skills only (conventions without checks); review skills only (the conventions live nowhere); turning the built-ins back on (generic, not editable).
+- **Changed (2026-11-15):** PowerShell has a second writing skill, `hyperv-deploy`, for VMs made without Terraform (D18). `powershell-review` and its agent review both.
 
 ### D18: Hyper-V VMs come from a Packer image, then Terraform, then Ansible
 - **Choice:** Packer builds a golden image on Hyper-V with the `hyperv-iso` builder: Windows with `autounattend.xml` and sysprep as the last step, Linux with autoinstall and cloud-init. Terraform creates VMs from that image with the `taliesins/hyperv` provider (WinRM to the host), state in GitLab. Ansible configures each VM after first boot. PowerShell runs only inside Packer provisioners and for what the provider cannot do. There is no separate Hyper-V skill: the provider lives in `terraform/references/hyperv.md`, the builder in `packer`, the Hyper-V module in `powershell`.
 - **Why:** One state file and a plan before every apply, so drift is visible. The Packer and Terraform reviews already exist. A Hyper-V skill of its own would repeat the three tools' content.
 - **Alternatives:** PowerShell `New-VM` scripts (no plan, no state); Terraform calling PowerShell through `local-exec` (state that does not match reality); SCVMM (not in the stack).
+- **Changed (2026-11-15):** PowerShell may also create and change VMs, with the `hyperv-deploy` skill, where Terraform is not wanted: a one-off or lab VM, a host the pipeline cannot reach, a VM that must exist before the pipeline does. The owner asked for this path. The script makes VMs from the same Packer image and the same seed as Terraform, shows what it will change under `-WhatIf`, and does nothing on a re-run. A VM is managed by Terraform or by a script, never both: the script writes its name in the VM's notes and refuses a VM that another owner manages. The cost of the rejected alternative, no plan and no state, is accepted for these VMs and nowhere else.
 - **Risk:** `taliesins/hyperv` has had no release since v1.2.1 (2024-02-11) and no commit since March 2024; known bugs, such as the inverted `exists` of the `hyperv_vhd` data source, are still on `master`. Plan for no fixes: work around each bug in the module with a comment, and keep the workarounds in `terraform/references/hyperv.md`. If a bug cannot be worked around, fork the provider and build it in CI, or move that one piece to a PowerShell step after the apply.
 
 ### D19: Three deploy paths, one pipeline shape
@@ -296,9 +301,15 @@ How later stages use them:
 - **Choice:** Stage 7 builds `terraform`, `packer`, `powershell`, and `powershell-review` with its agent. Stage 8 builds `ansible` and updates `ansible-review` for Windows hosts. Stage 9 builds `gitlab-ci`, `dotnet`, `angular`, `docker`, their reviews and agents, and wires the reviewers into the chain.
 - **Why:** The VMs are what everything deploys onto, and two of the three VM tools already have reviews.
 - **Alternatives:** The app pipeline first (deploys to today's VMs sooner); Ansible first.
+- **Changed (2026-11-15):** Stage 7 also builds `hyperv-deploy` and `bash` (T7.7, T7.8), which the owner asked for.
 
 ### D26: Each skill is proven by trigger evals and one worked example
-- **Choice:** Every new skill gets at least two prompts that should fire and two that should not (`evals/lint.sh` requires it). Each writing skill is used once on a small example in `evals/examples/<skill>/`, and the result is checked with the tool's validator where this PC can run it: `terraform validate`, `packer validate`, PSScriptAnalyzer under `pwsh`, `dotnet build` and `dotnet test`, `ng build`, `ansible-lint`, `docker build`, and GitLab's CI lint when a token is at hand. A Hyper-V apply cannot run here; it is checked on the Windows side later.
+- **Choice:** Every new skill gets at least two prompts that should fire and two that should not (`evals/lint.sh` requires it). Each writing skill is used once on a small example in `evals/examples/<skill>/`, and the result is checked with the tool's validator where this PC can run it: `terraform validate`, `packer validate`, PSScriptAnalyzer and Pester under `pwsh`, `shellcheck`, `dotnet build` and `dotnet test`, `ng build`, `ansible-lint`, `docker build`, and GitLab's CI lint when a token is at hand. A Hyper-V apply cannot run here; it is checked on the Windows side later.
 - **Why:** This PC can validate the syntax of every tool but cannot run Hyper-V. The worked example catches a skill that reads well but produces code that does not parse.
 - **Alternatives:** Trigger evals only (a skill can trigger and still mislead); a full Hyper-V lab (not available here).
 - **Changed:** Worked examples used to live in a temp folder and be thrown away. The first one, for `terraform`, drifted from its skill and was nearly lost with the session folder. Examples now live in `evals/examples/<skill>/`, and `evals/lint.sh` runs the validator on them when it is installed.
+
+### D29: A `bash` skill for shell scripts
+- **Choice:** `bash` is a writing skill for Bash scripts in any project: install and setup scripts, CI job scripts, Packer and cloud-init provisioner scripts. It writes them the way this repo's own scripts are written: strict mode where it helps, quoted expansions, a usage line and `--dry-run`, safe re-runs, temporary files removed by a `trap`, and portable to macOS and Git Bash where the script must run there. `shellcheck` is its validator. It sits outside D17: there is no `bash-review` yet, because shellcheck catches most of what a review would.
+- **Why:** The owner writes scripts in both shells. PowerShell had a skill planned and Bash had none, although `install.sh`, the eval scripts, and every Linux provisioner are Bash.
+- **Alternatives:** Bash rules repeated inside each tool skill (they drift); one `shell` skill for Bash and PowerShell (two languages with opposite habits in one file); a `bash-review` and agent now (Later, if shellcheck turns out not to be enough).

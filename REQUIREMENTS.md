@@ -118,7 +118,7 @@ Acceptance:
 ### DevOps skills (Part C)
 
 #### R17: Skills for the work toolchain (Must)
-As the owner, I can write and review Packer, Terraform, PowerShell, Ansible, GitLab CI, .NET, Angular, and Docker code with skills made for the work stack, so that the code fits Hyper-V, the templates repo, and build-once from the start.
+As the owner, I can write and review Packer, Terraform, PowerShell (scripts, and Hyper-V VMs without Terraform), Ansible, GitLab CI, .NET, Angular, and Docker code, and write Bash scripts, with skills made for the work stack, so that the code fits Hyper-V, the templates repo, and build-once from the start.
 Acceptance:
 - [ ] Each tool in D17 has a writing skill, and a review skill with a reviewer agent.
 - [ ] Each new skill has at least two prompts that should fire and two that should not in `evals/trigger-prompts.tsv`, and they pass in `evals/run-trigger-evals.sh`, except for skills turned off in the settings.
