@@ -534,5 +534,5 @@
 ### [ ] T9.8: Wire the new reviewers into the chain and the docs
 **What:** The chain and the README know the four new reviewers and the eight writing skills.
 **Why:** `task-runner` step 7, `z2p-deploy` step 8, and `z2p-release` pick reviews by file type; without this they skip PowerShell, pipelines, .NET, and Angular.
-**How:** Add the mappings (`.ps1` to `powershell-review`, `.gitlab-ci.yml` to `gitlab-ci-review`, `.cs` and `.csproj` to `dotnet-review`, Angular files to `angular-review`) to `task-runner`, `z2p-deploy`, and `z2p-release`. Update the README agents line and the Structure in `PLAN.md`. Run `./install.sh`, `evals/lint.sh`, and the full trigger evals once. Commit.
+**How:** Add the mappings (`.ps1` to `powershell-review`, `.gitlab-ci.yml` to `gitlab-ci-review`, `.cs` and `.csproj` to `dotnet-review`, Angular files to `angular-review`) to `task-runner`, `z2p-deploy`, and `z2p-release`. Update the README agents line and the Structure in `PLAN.md`. Run `./install.sh`, `evals/lint.sh`, and the full trigger evals once, and check R17 in `REQUIREMENTS.md`. Commit.
 **Notes:** _(added after implementation if anything came up)_

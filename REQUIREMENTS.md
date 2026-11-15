@@ -2,7 +2,7 @@
 
 Status: Draft | Date: 2026-10-28 | Confirmed: _(date, once you agree)_
 
-This file says what the repo must do and how to check it. `PLAN.md` says how it is built. The test tasks (T1.7, T5.2) check every requirement here.
+This file says what the repo must do and how to check it. `PLAN.md` says how it is built. The test tasks (T1.7, T5.2) check every requirement here; T9.8 checks R17.
 
 ## Users and roles
 | Role | Who | What they need |
@@ -114,6 +114,16 @@ Acceptance:
 - [ ] Every Must requirement in a project's `REQUIREMENTS.md` is covered by a flow in `DESIGN.md`.
 - [ ] Every Must requirement is delivered by at least one task in `TASKS.md`.
 - [ ] `RELEASE.md` shows a pass or fail for every Must requirement's acceptance criteria.
+
+### DevOps skills (Part C)
+
+#### R17: Skills for the work toolchain (Must)
+As the owner, I can write and review Packer, Terraform, PowerShell, Ansible, GitLab CI, .NET, Angular, and Docker code with skills made for the work stack, so that the code fits Hyper-V, the templates repo, and build-once from the start.
+Acceptance:
+- [ ] Each tool in D17 has a writing skill, and a review skill with a reviewer agent.
+- [ ] Each new skill has at least two prompts that should fire and two that should not in `evals/trigger-prompts.tsv`, and they pass in `evals/run-trigger-evals.sh`, except for skills turned off in the settings.
+- [ ] Each writing skill has a worked example in `evals/examples/<skill>/` that passes the tool's validator where this PC can run it (D26).
+- [ ] `task-runner`, `z2p-deploy`, and `z2p-release` run the matching reviewer for each new file type (T9.8).
 
 ## Non-functional requirements
 | ID | Topic | Requirement | How we check it |
