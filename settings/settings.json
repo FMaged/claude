@@ -1,5 +1,5 @@
 {
-  "model": "sonnet",
+  "model": "fable[1m]",
   "theme": "dark",
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,
