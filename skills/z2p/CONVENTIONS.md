@@ -43,7 +43,7 @@ Cycle: 1
 
 ## Going back
 
-- **Stage 3 decides:** `Decision: Stop` ends the project; keep the brief and the validation and mark the later stages `skipped` with the note "stopped at validation". `Decision: Change` reopens stage 2 with the note saying what to change. `Decision: Go` passes the gate.
+- **Stage 3 decides:** `Decision: Stop` ends the project; keep the brief and the validation, mark stage 3 `done`, and mark the later stages `skipped` with the note "stopped at validation". `Decision: Change` reopens stage 2 with the note saying what to change, and sets stage 3 to `todo` so it runs again on the changed brief. `Decision: Go` passes the gate.
 - **Reopening a stage:** set it to `doing`. Every later stage that is `done` becomes `stale`. Before moving on, the orchestrator re-checks the gate of each stale stage. A passing gate returns it to `done`. A failing gate returns it to `todo`.
 - **Stage 10 backlog:** picked items go to stage 7. An item that adds a requirement goes to stage 4 instead. An item that changes the plan goes to stage 5. Cycle goes up by 1.
 

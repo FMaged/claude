@@ -25,7 +25,7 @@ You are the only thing that writes `STATUS.md`. Stage skills never do.
 Pick the first stage that is not `done` or `skipped`. A `stale` stage comes first: re-check its gate before moving on.
 
 - **Stage 1:** ask "Do you already have an idea?". If yes, mark it `skipped`.
-- **Stage 3:** if `VALIDATION.md` ends in `Decision: Change` or `Decision: Stop`, follow Going back in `CONVENTIONS.md` instead of moving on.
+- **Stage 3:** run it even if `VALIDATION.md` already has a `Decision:` line; after a `Change` the old file still has one. The decision is read in After the stage.
 - **A `waiting` stage:** ask whether the evidence has arrived. If not, say what it is waiting for and stop.
 - **Stage 5:** ask "Fast or coach mode?". Coach mode means project-planner's coach mode.
 - If the stage's skill is not installed, say so and offer to skip the stage.
@@ -36,11 +36,12 @@ Set the stage to `doing`, then run its skill from the stage table.
 
 1. Check the gate by reading the files, as `CONVENTIONS.md` lists it.
 2. At gates 3, 4, 5, 6, and 9, also ask the user for a yes.
-3. Write `STATUS.md`: state, gate result, date, note.
+3. **Stage 3 only.** If the stage stopped to wait for evidence, write `waiting` with a note saying what it waits for, and go to the last step. Otherwise read the `Decision:` line in `VALIDATION.md`. Only `Go` lets the gate pass. `Stop` and `Change` follow Going back in `CONVENTIONS.md` instead of the next step.
+4. Write `STATUS.md`: state, gate result, date, note.
    - Gate passes: `done`.
    - Gate fails: keep `doing` and tell the user what is missing.
-4. After stage 5 is `done`, add a line to `CLAUDE.md`: "Skills for this project: ..." with the skills that fit the chosen stack (for example `svelte`, `sql-writing`, `docker-review`).
-5. End with: "Run `/clear`, then `z2p` again."
+5. After stage 5 is `done`, add a line to `CLAUDE.md`: "Skills for this project: ..." with the skills that fit the chosen stack (for example `svelte`, `sql-writing`, `docker-review`).
+6. End with: "Run `/clear`, then `z2p` again."
 
 ## Going back
 
