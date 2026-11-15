@@ -229,7 +229,8 @@ resource "hyperv_machine_instance" "this" {
   for light utility VMs only.
 - **Switches and VLANs.** The virtual switch belongs to the host and is created once, not
   by each environment. Look it up with `data "hyperv_network_switch"` and a
-  postcondition (see the end of this file) so a typo fails the plan. `vlan_access` and `vlan_id` give an access port; the provider has no trunk mode.
+  postcondition (see the end of this file) so a typo fails the plan. `vlan_access` and
+  `vlan_id` give an access port; the provider has no trunk mode.
 - **Static MAC** only when a DHCP reservation or a licence is tied to it. Write it as 12
   hex digits and take it from a locally administered range (first byte `02`), so it
   cannot collide with the host's dynamic pool (`00155D…`). Validate it in the variable:
@@ -260,26 +261,33 @@ reach the guest on a small ISO in the VM's DVD drive, built by `hyperv_iso_image
 zip that the `archive_file` data source makes from strings, so no temporary files exist.
 
 ```hcl
+locals {
+  seed_files = var.os == "windows" ? {
+    "Autounattend.xml" = templatefile("${path.module}/templates/Autounattend.xml.tftpl", {
+      computer_name = upper(var.name)
+      time_zone     = var.time_zone
+    })
+    } : {
+    "meta-data" = yamlencode({ "instance-id" = "${var.name}-${var.image}", "local-hostname" = var.name })
+    "user-data" = "#cloud-config\n${yamlencode(local.cloud_config)}"
+  }
+}
+
 data "archive_file" "seed" {
   type        = "zip"
   output_path = "${path.root}/.seed/${var.name}.zip"
 
-  source {
-    filename = "meta-data"
-    content  = yamlencode({ "instance-id" = "${var.name}-${var.image}", "local-hostname" = var.name })
-  }
-  source {
-    filename = "user-data"
-    content  = "#cloud-config\n${yamlencode(local.cloud_config)}"
-  }
-  source {
-    filename = "network-config"
-    content  = yamlencode(local.network_config)
+  dynamic "source" {
+    for_each = local.seed_files
+    content {
+      filename = source.key
+      content  = source.value
+    }
   }
 }
 
 resource "hyperv_iso_image" "seed" {
-  volume_name               = "CIDATA"
+  volume_name               = var.os == "windows" ? "UNATTEND" : "CIDATA" # upper case only
   source_zip_file_path      = data.archive_file.seed.output_path
   source_zip_file_path_hash = data.archive_file.seed.output_sha
   destination_iso_file_path = "${var.vm_root}\\${var.name}\\seed.iso"
@@ -295,18 +303,18 @@ resource "hyperv_iso_image" "seed" {
 ```
 
 - **Linux: cloud-init NoCloud.** The volume label `CIDATA` (the provider allows only
-  upper case; cloud-init accepts `cidata` or `CIDATA`) with `meta-data`, `user-data`,
-  and optionally `network-config` at the root. cloud-init runs again whenever
-  `instance-id` changes, so derive it from the VM and its image, never from a timestamp.
-  An image change replaces the disk and the seed together, so a new `instance-id`
-  always meets a new disk.
+  upper case; cloud-init accepts `cidata` or `CIDATA`) with `meta-data` and `user-data`
+  at the root. Add a `network-config` entry for a static address; without it the guest
+  uses DHCP. cloud-init runs again whenever `instance-id` changes, so derive it from the
+  VM and its image, never from a timestamp. An image change replaces the disk and the
+  seed together, so a new `instance-id` always meets a new disk.
 - **Windows: `Autounattend.xml`.** After sysprep, Windows Setup reads an answer file named
   `Autounattend.xml` from the root of removable media in the `specialize` and
   `oobeSystem` passes: computer name, time zone, the WinRM listener, an offline domain
-  join. Make a second zip with that one file (any volume name). Setup looks in
-  `%WINDIR%\Panther` before removable media, so the image must not carry its own answer
-  file there, or the ISO is ignored. If the image has Cloudbase-Init, it can read the
-  same `CIDATA` ISO as Linux instead.
+  join. The Windows branch puts that one file on the seed instead; the label does not
+  matter. Setup looks in `%WINDIR%\Panther` before removable media, so the image must
+  not carry its own answer file there, or the ISO is ignored. If the image has
+  Cloudbase-Init, it can read the same `CIDATA` ISO as Linux instead.
 - **The seed is read once, at first boot.** It is built from module-wide `locals`, so
   one edit to the cloud-config or the answer file changes the seed of every VM. Without
   `ignore_changes`, the provider deletes and rebuilds the ISO of every running VM: that
@@ -319,9 +327,10 @@ resource "hyperv_iso_image" "seed" {
   twice in a row once: the second plan must show no change to the ISO.
 - **Secrets on the ISO are clear text**: in the ISO on the host, in the zip the provider
   uploads to the account's `%TEMP%` and keeps there while the ISO exists, in the
-  `.seed/` CI artifact, and in the state. Put only what is safe there: an SSH public key, a password hash, a local admin password that Ansible
-  changes on its first run, or an offline domain-join blob from `djoin /provision`
-  (it joins only that one computer). Never a reusable domain or service password.
+  `.seed/` CI artifact, and in the state. Put only what is safe there: an SSH public
+  key, a password hash, a local admin password that Ansible changes on its first run,
+  or an offline domain-join blob from `djoin /provision` (it joins only that one
+  computer). Never a reusable domain or service password.
 - `archive_file` comes from `hashicorp/archive`. Pin it like any provider, and add the
   `.seed/` folder to `.gitignore`.
 

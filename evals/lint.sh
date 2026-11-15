@@ -49,9 +49,10 @@ done
 
 # No machine-specific paths, no secrets (requirement N1).
 # PLAN.md, REQUIREMENTS.md, and TASKS.md may name the path they forbid.
+# 31bf3856ad364e35 is Microsoft's public key token, in every unattend file.
 grep -rn '/home/[a-z]' skills agents settings .claude install.sh README.md CLAUDE.md evals/run-trigger-evals.sh evals/test-install.sh evals/trigger-prompts.tsv && problem "found a /home/ path"
 grep -rnEi '(api[_-]?key|secret|token|password)[[:space:]]*[:=][[:space:]]*["'"'"']?[A-Za-z0-9_/+-]*[0-9][A-Za-z0-9_/+-]*' \
-  --exclude-dir=.git . | grep -v '^./evals/lint.sh' | grep -E '[:=][[:space:]]*["'"'"']?[A-Za-z0-9_/+-]{16,}' && problem "found what looks like a secret"
+  --exclude-dir=.git . | grep -v '^./evals/lint.sh' | grep -v 'publicKeyToken="31bf3856ad364e35"' | grep -E '[:=][[:space:]]*["'"'"']?[A-Za-z0-9_/+-]{16,}' && problem "found what looks like a secret"
 grep -rnE 'AKIA[0-9A-Z]{16}|sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,}' --exclude-dir=.git . && problem "found a credential"
 
 # Evals: every prompt names a skill that exists and has a 0/1 expectation.
@@ -67,6 +68,17 @@ done
 
 # Settings must be valid JSON.
 python3 -I -m json.tool settings/settings.json >/dev/null || problem "settings/settings.json is not valid JSON"
+
+# Worked examples: checked with their own tool when it is installed.
+if command -v terraform >/dev/null; then
+  terraform fmt -check -recursive evals/examples/terraform || problem "terraform fmt in evals/examples/terraform"
+  for root in evals/examples/terraform/infra/envs/*/; do
+    (cd "$root" && terraform init -backend=false -input=false >/dev/null && terraform validate) ||
+      problem "terraform validate in $root"
+  done
+else
+  echo "note: terraform not installed, examples not validated"
+fi
 
 # Shell scripts.
 if command -v shellcheck >/dev/null; then

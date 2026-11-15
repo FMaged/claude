@@ -1,0 +1,6 @@
+.terraform/
+plan.cache
+*.tfstate
+*.tfstate.*
+**/.seed/
+ansible/inventory/*.yml
