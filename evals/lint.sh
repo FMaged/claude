@@ -63,7 +63,8 @@ while IFS=$'\t' read -r skill expect prompt; do
 done < evals/trigger-prompts.tsv
 for skill in skills/*/ .claude/skills/*/; do
   s=$(basename "$skill")
-  grep -q "^$s	" evals/trigger-prompts.tsv || problem "skill '$s' has no trigger eval"
+  [ "$(grep -c "^$s	1	" evals/trigger-prompts.tsv)" -ge 2 ] || problem "skill '$s' needs 2 prompts that should fire"
+  [ "$(grep -c "^$s	0	" evals/trigger-prompts.tsv)" -ge 2 ] || problem "skill '$s' needs 2 prompts that should not fire"
 done
 
 # Settings must be valid JSON.

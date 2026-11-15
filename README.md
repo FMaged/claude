@@ -42,7 +42,7 @@ The installer does not translate settings, register Claude agent definitions wit
 
 ## Checks
 ```bash
-evals/lint.sh                 # frontmatter, references, paths, secrets, eval coverage
+evals/lint.sh                 # frontmatter, references, paths, secrets, eval coverage, examples
 evals/test-install.sh         # install.sh against an empty home
 evals/run-trigger-evals.sh    # which skill fires for each prompt (needs a logged-in claude)
 ```
