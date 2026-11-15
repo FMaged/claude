@@ -387,3 +387,132 @@
 **What:** `~/.claude/settings.json` has `skillOverrides` that turn off `ansible-review`, `network-review`, `packer-review`, `terraform-review`, and `svelte-review`. The agents still preload them. Decide whether that is wanted, and if so record it in the README or move the override into `settings/settings.json` so every PC matches.
 **Why:** The repo cannot reproduce the setup if part of it lives only in the local settings file. The trigger evals for those five skills are skipped here.
 **Notes:** _(added after implementation if anything came up)_
+
+## Stage 7: VM skills (Terraform, Packer, PowerShell for Hyper-V)
+
+### [ ] T7.1: Write the `terraform` skill with a Hyper-V reference file
+**What:** `skills/terraform/SKILL.md` for writing Terraform, plus `references/hyperv.md` for the `taliesins/hyperv` provider (D18, D23).
+**Why:** Only the review half exists. The writing skill is what shapes a module before `terraform-review` sees it.
+**How:**
+- SKILL.md in the style of `svelte` and `sql-writing`: one root module per environment, modules per thing; `required_version` and pinned providers with the lock file committed; variables with `type`, `description`, and `validation`; `for_each` keyed by name, never `count` over a list; outputs that feed the Ansible inventory (`local_file`, as in `~/elab`); the GitLab HTTP state backend configured from `CI_` variables, plan on merge request, apply on `main`; a "Before calling it done" list.
+- `references/hyperv.md`: provider setup over WinRM to the host with credentials from variables; a VM from the golden VHDX (differencing disk versus copy, and when each is right); generation 2, secure boot templates, checkpoints off, switches and VLANs, static MAC when DHCP reservations exist; injecting cloud-init or `unattend.xml` for first boot; what the provider cannot do and hands to PowerShell.
+- Worked example in a temp folder: one VM module and a root module; run `terraform validate` (download the binary once, or `tofu`).
+- Add 2 + 2 prompts to `evals/trigger-prompts.tsv`, run `evals/lint.sh` and the evals for the skill, commit.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T7.2: Write the `packer` skill
+**What:** `skills/packer/SKILL.md` for building Hyper-V golden images (D18).
+**Why:** The VMs clone an image; a bad image is cloned many times. `packer-review` exists, the writing side does not.
+**How:**
+- HCL2 only, `required_plugins` pinned, variables for secrets from `PKR_VAR_` environment variables, image names with date and git sha.
+- Windows: `hyperv-iso` builder, `autounattend.xml` that enables WinRM for the build only, PowerShell provisioners, Windows Update step, sysprep with generalize as the last provisioner.
+- Linux: autoinstall or preseed, cloud-init left enabled and cleaned for first boot, shell and `ansible` provisioners.
+- Build runs on the `hyperv` runner tag from GitLab CI; output goes to the image store Terraform reads (D21).
+- Worked example: a Windows Server template; run `packer validate`. Evals, lint, commit.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T7.3: Write the `powershell` skill
+**What:** `skills/powershell/SKILL.md` for scripts and modules on Windows hosts and the Hyper-V host (D18).
+**Why:** PowerShell fills the gaps Packer and Terraform leave, and it is the one tool here with no skill at all.
+**How:**
+- `#Requires -Version 7`, `Set-StrictMode -Version Latest`, `$ErrorActionPreference = 'Stop'`, `try`/`catch` only where the script can do something about it.
+- Functions with `[CmdletBinding(SupportsShouldProcess)]`, typed parameters with validation attributes, `-WhatIf` that really does nothing.
+- Idempotent: `Get-` before `New-`, exit code 0 when nothing changed. Objects on the pipeline, `Write-Host` only for people. Credentials as `PSCredential` from CI variables or SecretManagement, never plain text.
+- Remoting with `Invoke-Command`; the Hyper-V module for what Terraform cannot do (`Set-VMFirmware`, `Set-VMProcessor -ExposeVirtualizationExtensions`, integration services).
+- Modules with a manifest, Pester tests, PSScriptAnalyzer clean.
+- Worked example: a script that enables nested virtualisation on a VM, checked with `Invoke-ScriptAnalyzer` under `pwsh` (install `pwsh` on this PC once). Evals, lint, commit.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T7.4: Write `powershell-review` and the `powershell-reviewer` agent
+**What:** `skills/powershell-review/SKILL.md` and `agents/powershell-reviewer.md` (D17).
+**Why:** Scripts that touch the Hyper-V host and production VMs need an unattended check.
+**How:**
+- Review sections like `ansible-review`: what fails silently (no `Stop`, `-ErrorAction SilentlyContinue`, unchecked `$LASTEXITCODE`); what is not idempotent or lies under `-WhatIf`; what leaks secrets (plain-text passwords, `ConvertTo-SecureString -AsPlainText` from a literal, secrets in logs); what breaks under StrictMode or remoting; unpinned module versions; a Commands section (`Invoke-ScriptAnalyzer`, `Invoke-Pester`); "How to report".
+- Agent copied from `agents/sql-reviewer.md` with the names changed.
+- Evals for the review skill, lint, commit.
+**Notes:** _(added after implementation if anything came up)_
+
+## Stage 8: Configuration (Ansible)
+
+### [ ] T8.1: Write the `ansible` skill
+**What:** `skills/ansible/SKILL.md` for playbooks and roles that configure Windows and Linux VMs (D19, D24).
+**Why:** The hosts need IIS and Web Deploy, nginx and systemd, or Docker before any app can land. Only the review half exists.
+**How:**
+- Layout: inventory written by Terraform, `group_vars` per role and environment, one playbook per purpose, roles with defaults and handlers; FQCN module names.
+- Idempotency: `changed_when`, `creates`, check mode works; `no_log` on tasks with secrets; secrets from environment variables set by CI, Ansible Vault only for files in the repo.
+- Windows: `ansible_connection: winrm` with `kerberos`, `win_feature` for IIS and the Web Deploy install, `win_service`, `win_reboot` where a feature needs it, `become` with `runas`.
+- Linux: nginx site, systemd unit for Kestrel, Docker engine; the same role shape as `~/elab/ansible`.
+- Runs from the `docker` runner tag with `pywinrm` and Kerberos in the image.
+- Worked example: a role that prepares an IIS host; `ansible-lint` and `ansible-playbook --syntax-check` (installed here). Evals, lint, commit.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T8.2: Teach `ansible-review` about Windows hosts
+**What:** Add the Windows checks to `skills/ansible-review/SKILL.md`.
+**Why:** The review was written for Linux hosts. WinRM, `win_` modules, and reboots have their own ways to fail.
+**How:** Add: `become` without `runas` on Windows; `win_reboot` missing after a feature install; NTLM or basic transport outside a lab; `win_shell` where a `win_` module exists; Kerberos ticket handling in CI. Keep the existing sections. Commit.
+**Notes:** _(added after implementation if anything came up)_
+
+## Stage 9: App pipeline (GitLab CI, .NET, Angular, Docker)
+
+### [ ] T9.1: Write the `gitlab-ci` skill
+**What:** `skills/gitlab-ci/SKILL.md` for the templates repo and for the app repos that include it (D21, D22, D23).
+**Why:** The pipeline is where build-once, runner tags, and secrets handling are enforced. Nothing in the repo covers it.
+**How:**
+- Two audiences in one skill: writing a template in `ci-templates`, and the three-line `.gitlab-ci.yml` of an app that includes it pinned to a tag and sets its variables.
+- Stages build, test, package, deploy-staging, deploy-prod; `rules:` and a `workflow:` block, never `only`/`except`; `needs:` for the graph; artifacts with `expire_in`; cache keyed by the lockfile; `image:` pinned to a version; runners by `tags:` only.
+- `environment:` with `url` and `action`; the prod job `when: manual`, `resource_group`, protected refs; the deploy job downloads the build job's artifact or reuses the image digest, never rebuilds.
+- Terraform jobs with the GitLab state backend, Packer build on `hyperv`, Ansible run on `docker`; masked variables, nothing secret in logs.
+- Worked example: a template for a .NET app with the three deploy jobs, checked with `yamllint` and GitLab's CI lint if a token is at hand. Evals, lint, commit.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T9.2: Write `gitlab-ci-review` and the `gitlab-ci-reviewer` agent
+**What:** `skills/gitlab-ci-review/SKILL.md` and `agents/gitlab-ci-reviewer.md` (D17).
+**Why:** A pipeline that rebuilds for prod, runs on any runner, or prints a secret is invisible until it hurts.
+**How:** Sections: jobs without `tags` or with runner or host names; a prod job without `manual`, `resource_group`, or protected refs; a rebuild instead of a promote; `only`/`except`; unpinned includes and images; artifacts without expiry; `allow_failure` on tests; missing `workflow` rules (duplicate pipelines); secrets echoed or passed as unmasked variables. Agent from `sql-reviewer.md`. Evals, lint, commit.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T9.3: Write the `dotnet` skill
+**What:** `skills/dotnet/SKILL.md` for ASP.NET Core on .NET 10 with three publish targets (D19, D20).
+**Why:** The C# apps are what the pipeline ships, and the skill must publish for IIS, Linux, and Docker from one build.
+**How:**
+- Solution layout `src/` and `tests/`, `Directory.Build.props`, central package management, nullable and warnings as errors, analyzers.
+- Config by `appsettings.json` plus environment variables through the options pattern, no secrets in any appsettings; health endpoints; structured logging; EF Core migrations as a pipeline job with an idempotent script, never at startup.
+- Tests with xUnit and `WebApplicationFactory`.
+- Publish: Web Deploy package and the `msdeploy -verb:sync` call; framework-dependent folder with a systemd unit (own user, `Restart=always`, `DOTNET_` variables) behind nginx; multi-stage Dockerfile from the sdk and aspnet images, non-root. Version from the pipeline.
+- Worked example: `dotnet new webapi` with a test project; `dotnet build` and `dotnet test` (installed here). Evals, lint, commit.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T9.4: Write `dotnet-review` and the `dotnet-reviewer` agent
+**What:** `skills/dotnet-review/SKILL.md` and `agents/dotnet-reviewer.md` (D17).
+**Why:** The usual production failures in .NET apps are quiet: sync over async, migrations at startup, config baked in.
+**How:** Sections: what leaks (secrets in appsettings, connection strings in code, exception details to clients); what blocks (`.Result`, `.Wait()`, missing cancellation tokens, `HttpClient` created per call); what breaks in prod (migrations at startup, environment-specific config in the artifact, no health check, warnings ignored); what is untested; packages unpinned or vulnerable (`dotnet list package --vulnerable`). Agent from `sql-reviewer.md`. Evals, lint, commit.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T9.5: Write the `angular` skill
+**What:** `skills/angular/SKILL.md` for current Angular with run-time configuration (D20).
+**Why:** One production build has to serve staging and prod (D22), and the Angular apps deploy as static files on three hosts.
+**How:**
+- Standalone components, signals, the new control flow, `inject()`, strict TypeScript, `OnPush`; lazy routes.
+- Configuration loaded at start from `config.json` next to the app, never from build-time environment files.
+- HTTP interceptors for auth and errors; tests with the runner the CLI sets up; `angular-eslint`; `ng build --configuration production` with budgets.
+- Deploy as static files: IIS with a `web.config` rewrite to `index.html`, nginx with `try_files`, or an nginx Docker image.
+- Worked example: a new app with one lazy route and the config loader; `ng build` through `npx`. Evals, lint, commit.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T9.6: Write `angular-review` and the `angular-reviewer` agent
+**What:** `skills/angular-review/SKILL.md` and `agents/angular-reviewer.md` (D17).
+**Why:** The build-once rule and a few security mistakes are easy to break in a frontend and hard to see in a diff.
+**How:** Sections: what leaks (secrets in environment files, tokens stored without reason); what breaks build-once (build-time environment switches); what stops updating or leaks memory (subscriptions, mutated signal state); what is slow (no lazy routes, bundles over budget); XSS (`bypassSecurityTrust`, `innerHTML`); what is untested; basic accessibility. Agent from `sql-reviewer.md`. Evals, lint, commit.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T9.7: Write the `docker` skill
+**What:** `skills/docker/SKILL.md` for Dockerfiles and compose files of the apps that deploy as images (D19).
+**Why:** `docker-review` exists; the writing side does not, and image tags are how promotion works for this path.
+**How:** Multi-stage builds, pinned base images, non-root user, `HEALTHCHECK`, `.dockerignore`, labels with the git sha; images in the GitLab registry as `$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA`, promoted by re-tagging, never rebuilt; compose for one host with restart policies, env from files, named volumes, log limits; no secrets in build args; image scan in CI. Worked example: the Dockerfile from T9.3 built with `docker build` (installed here). Evals, lint, commit.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T9.8: Wire the new reviewers into the chain and the docs
+**What:** The chain and the README know the four new reviewers and the eight writing skills.
+**Why:** `task-runner` step 7, `z2p-deploy` step 8, and `z2p-release` pick reviews by file type; without this they skip PowerShell, pipelines, .NET, and Angular.
+**How:** Add the mappings (`.ps1` to `powershell-review`, `.gitlab-ci.yml` to `gitlab-ci-review`, `.cs` and `.csproj` to `dotnet-review`, Angular files to `angular-review`) to `task-runner`, `z2p-deploy`, and `z2p-release`. Update the README agents line and the Structure in `PLAN.md`. Run `./install.sh`, `evals/lint.sh`, and the full trigger evals once. Commit.
+**Notes:** _(added after implementation if anything came up)_

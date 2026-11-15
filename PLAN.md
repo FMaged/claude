@@ -5,6 +5,8 @@ One git repo that holds my whole Claude Code setup. On any PC: clone it, open Cl
 
 The repo also holds the z2p skill chain: a repeatable process that takes a solo project from idea to production and beyond. One orchestrator skill walks through the stages. Each stage is a skill that also works alone.
 
+The repo also holds the DevOps skill set (Part C): the skills and reviewer agents for the production toolchain at work. Packer builds Hyper-V images, Terraform creates the VMs, Ansible configures them, GitLab CI builds and deploys .NET and Angular apps to IIS, Linux, and Docker.
+
 What the repo must do, and how to check it, is in `REQUIREMENTS.md`.
 
 ## MVP Features
@@ -23,6 +25,13 @@ What the repo must do, and how to check it, is in `REQUIREMENTS.md`.
 - Stage 6 designs the architecture, entities, database, interfaces, and permissions in `DESIGN.md`.
 - Deploy happens early: the first stage of every `TASKS.md` puts a hello-world version live.
 
+**Part C: DevOps skills** (decisions D17 to D26)
+- A writing skill for each tool: `terraform` (with a Hyper-V reference file), `packer`, `powershell`, `ansible`, `gitlab-ci`, `dotnet`, `angular`, `docker`.
+- A review skill and a read-only reviewer agent for the tools that have none yet: `powershell-review`, `gitlab-ci-review`, `dotnet-review`, `angular-review`, and their `*-reviewer` agents. The existing terraform, packer, ansible, and docker reviews are reused.
+- The skills encode one way of working: Packer image, then Terraform VM, then Ansible; one central GitLab CI templates repo that app repos include; build once, promote the same artifact; secrets in GitLab variables; Terraform state in GitLab.
+- `task-runner`, `z2p-deploy`, and `z2p-release` know the new reviewers.
+- Every new skill has trigger evals and was used once on a worked example checked with the tool's own validator.
+
 ## Later / Out of Scope
 - Team roles, handoffs, sprint ceremonies
 - A fixed tech stack or hosting provider
@@ -34,6 +43,7 @@ What the repo must do, and how to check it, is in `REQUIREMENTS.md`.
 - A scheduled night run of the reviewer agents. Nothing is scheduled on this PC yet.
 - A migration skill. `schema-design` hands off to one, but it does not exist yet. Until then, `task-runner` writes migrations and `sql-review` checks them.
 - Automatic scheduling of stage 10 (operate) runs
+- DevOps, later: Kubernetes, HashiCorp Vault, Windows containers, .NET Framework 4.8 apps, the GitLab CI/CD components catalog, SCVMM or Azure, dedicated IIS and nginx skills, a release runbook skill, Proxmox (the lab in `~/elab` keeps its own files)
 
 ## Stack
 | Part | Choice |
@@ -47,6 +57,10 @@ What the repo must do, and how to check it, is in `REQUIREMENTS.md`.
 | Platforms | Linux and macOS |
 | Chain progress | `STATUS.md` in each project, written only by `z2p` |
 | Chain artifacts | Markdown files in each project |
+| DevOps: VMs | Packer (`hyperv-iso`) golden images; Terraform with the `taliesins/hyperv` provider; Ansible (`ansible.windows` over WinRM, SSH for Linux) |
+| DevOps: apps | .NET 10 LTS (ASP.NET Core, xUnit); current Angular (standalone, signals); Docker multi-stage images in the GitLab registry |
+| DevOps: pipeline | GitLab CI templates in one `ci-templates` project; runners picked by tag (`docker`, `windows`, `hyperv`); masked protected variables; GitLab-managed Terraform state |
+| DevOps: deploy | msdeploy to IIS on Windows VMs; systemd and nginx on Linux VMs; Docker on Linux VMs |
 
 ## Structure
 ```
@@ -61,7 +75,7 @@ What the repo must do, and how to check it, is in `REQUIREMENTS.md`.
   .claude/skills/
     setup-claude-code/       project-only skill: runs the whole setup
   settings/settings.json     plugins, marketplaces, model, theme (no secrets)
-  agents/                    8 reviewer agents
+  agents/                    reviewer agents: 8 today, plus powershell, gitlab-ci, dotnet, angular
   skills/
     existing: ansible-review, code-comments, docker-review, git-branch, git-commit,
       network-review, packer-review, plan-to-tasks, product-brief, project-planner,
@@ -69,6 +83,8 @@ What the repo must do, and how to check it, is in `REQUIREMENTS.md`.
       terraform-review, web-security-review
     new: z2p (SKILL.md + CONVENTIONS.md), z2p-idea, z2p-validate,
       z2p-requirements, z2p-design, z2p-deploy, z2p-release, z2p-operate
+    devops (Part C): terraform (+ references/hyperv.md), packer, powershell, powershell-review,
+      ansible, gitlab-ci, gitlab-ci-review, dotnet, dotnet-review, angular, angular-review, docker
 
 <a project made with the chain>/
   CLAUDE.md, STATUS.md
@@ -233,3 +249,53 @@ How later stages use them:
 - **Choice:** A new stage 4, `z2p-requirements`, writes `REQUIREMENTS.md`. It holds user stories with IDs and acceptance criteria, non-functional requirements, and constraints. The IDs are used in the design, the tasks, and the release check. This repo has its own `REQUIREMENTS.md` in the same format.
 - **Why:** The brief is short on purpose, and says a requirements document comes later, but no stage wrote one. Without acceptance criteria there is nothing concrete to test or release against. Non-functional needs like personal data, scale, or uptime should drive the stack choice, not follow it.
 - **Alternatives:** Requirements inside `PLAN.md` (mixes the "what" with the "with what"); a longer brief (loses its 3-minute read); no requirements, only tasks.
+
+### D17: One writing skill, one review skill, one reviewer agent per DevOps tool
+- **Choice:** Every tool in the DevOps set gets a writing skill: `terraform`, `packer`, `powershell`, `ansible`, `gitlab-ci`, `dotnet`, `angular`, `docker`. Tools that already have a review skill and agent (terraform, packer, ansible, docker) keep them. The other four get `<tool>-review` and a `<tool>-reviewer` agent built like `agents/sql-reviewer.md`. Anthropic's built-in `terraform-iac`, `powershell`, `ci-pipelines`, and `container-builds` stay turned off; the repo's skills replace them.
+- **Why:** The pattern already exists for SQL and Svelte. The writing skill shapes the code while it is written, the review catches what slipped through, and the agent runs that review without a session. The built-in skills cannot be edited to match Hyper-V, msdeploy, or the templates repo.
+- **Alternatives:** Writing skills only (conventions without checks); review skills only (the conventions live nowhere); turning the built-ins back on (generic, not editable).
+
+### D18: Hyper-V VMs come from a Packer image, then Terraform, then Ansible
+- **Choice:** Packer builds a golden image on Hyper-V with the `hyperv-iso` builder: Windows with `autounattend.xml` and sysprep as the last step, Linux with autoinstall and cloud-init. Terraform creates VMs from that image with the `taliesins/hyperv` provider (WinRM to the host), state in GitLab. Ansible configures each VM after first boot. PowerShell runs only inside Packer provisioners and for what the provider cannot do. There is no separate Hyper-V skill: the provider lives in `terraform/references/hyperv.md`, the builder in `packer`, the Hyper-V module in `powershell`.
+- **Why:** One state file and a plan before every apply, so drift is visible. The Packer and Terraform reviews already exist. A Hyper-V skill of its own would repeat the three tools' content.
+- **Alternatives:** PowerShell `New-VM` scripts (no plan, no state); Terraform calling PowerShell through `local-exec` (state that does not match reality); SCVMM (not in the stack).
+
+### D19: Three deploy paths, one pipeline shape
+- **Choice:** Apps deploy with msdeploy to IIS on Windows VMs, as systemd services behind nginx on Linux VMs, or as Docker images from the GitLab registry on Linux VMs. The `dotnet` skill publishes for all three (a Web Deploy package, a framework-dependent folder with a unit file, a multi-stage Dockerfile). `gitlab-ci` has one deploy job template per path. `ansible` prepares the hosts: IIS and Web Deploy on Windows, nginx and systemd on Linux, the Docker engine. `docker` writes the Dockerfiles and compose files.
+- **Why:** These are the apps that exist today. One path would mean migrating them first.
+- **Alternatives:** Containers everywhere (IIS apps would need Windows containers or a rewrite); Kubernetes (Later).
+
+### D20: .NET 10 LTS and current Angular, configured at run time
+- **Choice:** .NET 10 LTS with ASP.NET Core and xUnit. The current Angular major with standalone components and signals. Angular reads its environment from a `config.json` served next to the app, not from build-time environment files. .NET reads `appsettings.json` plus environment variables.
+- **Why:** Build once (D22) needs one artifact that serves every environment. .NET 10 is installed here, so the worked examples can be built.
+- **Alternatives:** .NET 8 (older LTS, nothing gained); .NET Framework 4.8 (Later: MSBuild and Windows-only builds); Angular build-time environments (one build per environment).
+
+### D21: Pipelines are a product: one central templates repo
+- **Choice:** A `ci-templates` GitLab project holds the pipeline templates: build, test, package, deploy to IIS, Linux, and Docker, Terraform plan and apply, Packer build, Ansible run. An app repo's `.gitlab-ci.yml` includes one template pinned to a tag and sets a few variables (app kind, paths). Jobs select runners by tag only (`docker`, `windows`, `hyperv`). No runner names, host names, or environment values appear in an app repo; those are GitLab group and project variables.
+- **Why:** The project must not know how CI is set up, because the number and kind of runners will change. A template change reaches every pipeline once.
+- **Alternatives:** A copy of the pipeline in each repo (drift); the CI/CD components catalog (newer and nicer, but `include` works on every GitLab version; Later).
+
+### D22: Build once, promote the same artifact
+- **Choice:** Every commit builds and tests. A merge to `main` deploys the artifact to staging. A manual job, guarded by `resource_group` and protected refs, deploys that same artifact (same job artifact or same image digest) to production. A rollback is a redeploy of the previous artifact.
+- **Why:** What was tested is what ships. Rollback needs no rebuild.
+- **Alternatives:** A git tag that builds and deploys production (rebuilds instead of promoting); a pipeline per environment (hardest to keep in sync).
+
+### D23: Secrets in GitLab variables, Terraform state in GitLab
+- **Choice:** Masked, protected CI variables: group level for shared values, project level for app-specific ones. Terraform state in GitLab-managed state with locking. Ansible reads secrets from CI variables at run time and uses Ansible Vault only for files that must live in a repo. Packer gets the build password from a variable.
+- **Why:** Nothing extra to run, locking is built in, and the variables are already where the jobs run.
+- **Alternatives:** HashiCorp Vault (better rotation and audit, one more service; Later); state on a file share (no locking, two applies collide).
+
+### D24: Ansible reaches Windows over WinRM and Linux over SSH
+- **Choice:** The `ansible.windows` and `community.windows` collections over WinRM with Kerberos (NTLM only in a lab), or SSH where OpenSSH is already installed. Linux over SSH. One inventory written by Terraform output, as the `~/elab` lab does. The control node is a Linux Docker runner with `pywinrm` and Kerberos.
+- **Why:** WinRM is the supported path for Windows and the existing Ansible layout carries over unchanged.
+- **Alternatives:** SSH only (every Windows host needs OpenSSH first); DSC (another tool to learn).
+
+### D25: Build order: VMs, then Ansible, then the app pipeline
+- **Choice:** Stage 7 builds `terraform`, `packer`, `powershell`, and `powershell-review` with its agent. Stage 8 builds `ansible` and updates `ansible-review` for Windows hosts. Stage 9 builds `gitlab-ci`, `dotnet`, `angular`, `docker`, their reviews and agents, and wires the reviewers into the chain.
+- **Why:** The VMs are what everything deploys onto, and two of the three VM tools already have reviews.
+- **Alternatives:** The app pipeline first (deploys to today's VMs sooner); Ansible first.
+
+### D26: Each skill is proven by trigger evals and one worked example
+- **Choice:** Every new skill gets at least two prompts that should fire and two that should not (`evals/lint.sh` requires it). Each writing skill is used once on a small example in a temp folder, and the result is checked with the tool's validator where this PC can run it: `terraform validate`, `packer validate`, PSScriptAnalyzer under `pwsh`, `dotnet build` and `dotnet test`, `ng build`, `ansible-lint`, `docker build`, and GitLab's CI lint when a token is at hand. A Hyper-V apply cannot run here; it is checked on the Windows side later.
+- **Why:** This PC can validate the syntax of every tool but cannot run Hyper-V. The worked example catches a skill that reads well but produces code that does not parse.
+- **Alternatives:** Trigger evals only (a skill can trigger and still mislead); a full Hyper-V lab (not available here).
