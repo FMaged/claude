@@ -150,16 +150,16 @@ the rough edge on deleting a disk says why the name matters.
 
 ```hcl
 resource "hyperv_machine_instance" "this" {
-  name                 = var.name
-  generation           = 2
-  processor_count      = var.cpus
-  static_memory        = true
-  memory_startup_bytes = var.memory_gb * 1024 * 1024 * 1024
-  checkpoint_type      = "Disabled"
+  name                   = var.name
+  generation             = 2
+  processor_count        = var.cpus
+  static_memory          = true
+  memory_startup_bytes   = var.memory_gb * 1024 * 1024 * 1024
+  checkpoint_type        = "Disabled"
   automatic_start_action = "StartIfRunning"
   automatic_stop_action  = "ShutDown"
-  state                = "Running"
-  notes                = "Managed by Terraform."
+  state                  = "Running"
+  notes                  = "Managed by Terraform."
 
   vm_firmware {
     enable_secure_boot   = "On"

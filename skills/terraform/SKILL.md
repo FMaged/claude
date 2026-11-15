@@ -89,13 +89,13 @@ would fail late (in the middle of an apply, or on the host) instead of at plan t
 variable "vms" {
   description = "VMs in this environment, keyed by VM name. The key becomes the Hyper-V name and the hostname."
   type = map(object({
-    image     = string                 # golden image file name, for example win2025-20261115-a1b2c3d.vhdx
-    os        = string                 # "windows" or "linux"
-    role      = string                 # Ansible group, for example "web" or "db"
+    image     = string # golden image file name, for example win2025-20261115-a1b2c3d.vhdx
+    os        = string # "windows" or "linux"
+    role      = string # Ansible group, for example "web" or "db"
     cpus      = optional(number, 2)
     memory_gb = optional(number, 4)
     vlan_id   = optional(number)
-    mac       = optional(string)       # only when a DHCP reservation needs it
+    mac       = optional(string) # only when a DHCP reservation needs it
   }))
 
   validation {
@@ -134,8 +134,8 @@ module "vm" {
   source   = "../../modules/hyperv-vm"
   for_each = var.vms
 
-  name      = each.key
-  image     = each.value.image
+  name  = each.key
+  image = each.value.image
   # …
 }
 ```
