@@ -126,7 +126,9 @@ foreach ($vmName in $Name) {
   changes, output an object per thing with a `Changed` property.
 - A change that needs the machine off or restarted is never done quietly. Ask for it
   with a switch (`-AllowRestart`), and without it, throw with a message that says what
-  to do.
+  to do. Shut a VM down with `Stop-VM -Force`: that is still a shutdown through the
+  guest, and `-Force` only skips the prompt a locked VM raises, which would fail an
+  unattended run. `-TurnOff` pulls the plug. Start it again in `finally`.
 
 ## 4. `-WhatIf` that really changes nothing
 

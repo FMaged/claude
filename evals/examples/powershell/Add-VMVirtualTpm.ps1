@@ -47,7 +47,7 @@ foreach ($vmName in $Name) {
     $action = if ($wasRunning) { 'Restart and turn on a virtual TPM' } else { 'Turn on a virtual TPM' }
     if (-not $PSCmdlet.ShouldProcess($vmName, $action)) { continue }
 
-    if ($wasRunning) { Stop-VM -VM $vm } # through the guest's shutdown, not -Force
+    if ($wasRunning) { Stop-VM -VM $vm -Force } # a shutdown through the guest; -Force only skips the prompt
     try {
         # A new key protector is safe only here, while the TPM is off. On a VM whose TPM
         # is on it would throw away everything the guest sealed, BitLocker keys included.

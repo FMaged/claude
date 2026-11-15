@@ -6,7 +6,7 @@ BeforeAll {
         function Get-VMSecurity { param($VM) }
         function Set-VMKeyProtector { param($VM, [switch] $NewLocalKeyProtector) }
         function Enable-VMTPM { param($VM) }
-        function Stop-VM { param($VM) }
+        function Stop-VM { param($VM, [switch] $Force, [switch] $TurnOff) }
         function Start-VM { param($VM) }
     } | Import-Module
 
@@ -64,7 +64,8 @@ Describe 'Add-VMVirtualTpm' {
     It 'restarts a running VM with -AllowRestart' {
         Set-TestVM -State 'Running'
         & $script -Name web01 -AllowRestart | Out-Null
-        Should -Invoke Stop-VM -Times 1 -Exactly
+        # -Force skips the prompt a locked VM raises; -TurnOff would pull the plug.
+        Should -Invoke Stop-VM -Times 1 -Exactly -ParameterFilter { $Force -and -not $TurnOff }
         Should -Invoke Enable-VMTPM -Times 1 -Exactly
         Should -Invoke Start-VM -Times 1 -Exactly
     }
