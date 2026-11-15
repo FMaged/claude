@@ -20,7 +20,7 @@ The most useful thing you can say. Check these first:
 ## 2. Secrets and state
 
 - Credentials, tokens, passwords, or private keys written in `.tf` or in a committed `.tfvars`.
-- A real `terraform.tfvars` not in `.gitignore` (only the `.example` belongs in git).
+- A committed `.tfvars` that holds a secret or a personal value (a home path, someone's token). Non-secret environment values in a committed `terraform.tfvars` are fine.
 - Outputs that expose a secret without `sensitive = true`.
 - State: remote with locking for anything shared, and remember state holds secrets in clear text, so check it is not committed or world-readable.
 - `local_file` writing a secret, or writing with default permissions when it needs `file_permission = "0600"`.

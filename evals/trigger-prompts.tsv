@@ -110,3 +110,7 @@ web-security-review	1	is this app secure?
 web-security-review	1	can a user see someone else's data through this endpoint?
 web-security-review	0	add a login page to my app
 web-security-review	0	review this Dockerfile for security
+terraform	1	write a terraform module that creates a Hyper-V VM from our golden VHDX
+terraform	1	set up the GitLab state backend for my terraform root module
+terraform	0	review my terraform plan before I apply it
+terraform	0	write a packer template that builds a Windows Server image
