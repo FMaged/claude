@@ -13,6 +13,10 @@ two applies racing on one state.
 For Hyper-V VMs, read `references/hyperv.md` before writing a VM resource. For a review of
 finished code or a plan, use `terraform-review`. For comments, `code-comments`.
 
+Sections 6 to 8 (the Ansible inventory, GitLab state, the `ci-templates` pipeline) and the
+committed `terraform.tfvars` are the default for a new project on the work stack. In a
+project that already has its own backend, pipeline, or tfvars convention, that one wins.
+
 ## 0. Check what is installed
 
 Run `terraform version` (or `tofu version`) and read `versions.tf` and
