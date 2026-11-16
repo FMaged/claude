@@ -194,7 +194,11 @@ Ansible prepares the host; the deploy job sends the app. The order matters:
 3. **The Hosting Bundle after IIS**: installed before IIS, it does not register the
    ASP.NET Core Module, and every app fails with HTTP 500.19. Then restart IIS.
 4. **Open WMSvc**: `EnableRemoteManagement` = 1, the service on `auto` and started, and
-   the firewall open on 8172 to the CI runners only. Web Deploy also installs its own
+   the existing inbound TCP 8172 allow rule restricted to the CI runners. Verify that
+   the configured display name identifies exactly one existing rule on this image
+   before modifying it; `win_firewall_rule` otherwise creates a new rule and leaves
+   the original broad allow rule enabled. Run this read-only check under `--check` too.
+   Web Deploy also installs its own
    agent service (`MsDepSvc`) on port 80; disable it.
 5. **The sites**: a folder per site under `C:\inetpub` (it inherits read access for
    `IIS_IUSRS`), an application pool with No Managed Code, and the site.

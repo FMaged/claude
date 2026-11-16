@@ -1,4 +1,30 @@
 ---
+- name: Verify the existing Web Management Service firewall rule
+  ansible.windows.win_powershell:
+    error_action: stop
+    parameters:
+      RuleName: "{{ iis_host_wmsvc_firewall_rule }}"
+    script: |
+      param(
+          [Parameter(Mandatory)]
+          [ValidateNotNullOrEmpty()]
+          [string] $RuleName
+      )
+      Set-StrictMode -Version Latest
+      $ErrorActionPreference = 'Stop'
+      $Ansible.Changed = $false
+      $policy = New-Object -ComObject HNetCfg.FwPolicy2
+      $rules = @($policy.Rules | Where-Object { $_.Name -eq $RuleName })
+      if ($rules.Count -ne 1) {
+          throw "Expected exactly one existing WMSvc firewall rule named '$RuleName'; found $($rules.Count). Check the image's rule display name."
+      }
+      $rule = $rules[0]
+      # INetFwRule uses 1 for inbound/allow and 6 for TCP.
+      if ($rule.Direction -ne 1 -or $rule.Action -ne 1 -or $rule.Protocol -ne 6 -or $rule.LocalPorts -ne '8172') {
+          throw "The rule '$RuleName' is not an inbound TCP 8172 allow rule. Refusing to modify it."
+      }
+  check_mode: false
+
 # A separate allow rule would leave the feature's broader built-in rule enabled.
 - name: Restrict the Web Management Service to the CI runners
   community.windows.win_firewall_rule:
