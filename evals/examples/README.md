@@ -18,5 +18,5 @@ its skill: a fix to a snippet in the skill is a fix here too.
 | `bash/` | `bash` | `shellcheck` on both scripts, then `test-fetch-tool.sh`, which runs `fetch-tool.sh` 11 times against local archives and makes 17 checks (each mode, a second run, bad input, a wrong checksum, a zip) | Passed 2026-11-15 with Bash 5.2 and ShellCheck 0.10.0 |
 
 `evals/lint.sh` runs these checks when the tool is installed and skips them otherwise.
-CI installs Terraform 1.17.2, Packer 1.16.2, PSScriptAnalyzer, Pester, and ShellCheck (on Linux), so they always run there. The Bash test needs only curl, tar, unzip, and python3, which both runners have.
+CI installs Terraform 1.17.2, Packer 1.16.2, PSScriptAnalyzer, Pester, ShellCheck (on Linux), and, in one Python venv, ansible-core, ansible-lint, yamllint, and check-jsonschema, so they always run there. The Bash test needs only curl, tar, unzip, and python3, which both runners have.
 Nothing here is applied or built: a Hyper-V apply or image build needs a host (see T7.5).
