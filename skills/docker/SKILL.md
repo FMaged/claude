@@ -64,10 +64,11 @@ ENTRYPOINT ["<program>", "<args>"]
   number (`RUN useradd --system --uid 10001 app`, then `USER 10001`). The app's files stay
   owned by root, so the process cannot change its own code; `COPY --chown` only for a path
   it must write, and a volume is better for that.
-- **`HEALTHCHECK` asks the app,** not the port: `/health` for the API, `/` for a static
-  site, with a client the runtime image has (curl in the .NET example, busybox `wget` in an
-  Alpine image). Compose's `--wait` waits for it, and the deploy fails when the container
-  turns unhealthy.
+- **`HEALTHCHECK` asks the app,** not the port: `/health` for the API, the mounted
+  `/config.json` for a static site that reads one (`/` otherwise), with a client the
+  runtime image has (curl in the .NET example, busybox `wget` in an Alpine image).
+  Compose's `--wait` waits for it, and the deploy fails when the container turns
+  unhealthy.
 - **Exec form** for `ENTRYPOINT` and `CMD` (a JSON array). The app runs as PID 1 and gets
   SIGTERM directly; the shell form puts `/bin/sh -c` in between, and the app is killed
   after the grace period instead of stopping cleanly. An entrypoint script ends with

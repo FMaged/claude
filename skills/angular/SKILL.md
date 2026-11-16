@@ -472,7 +472,7 @@ COPY deploy/nginx-docker.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /src/dist/orders-web/browser /usr/share/nginx/html
 EXPOSE 8080
 HEALTHCHECK --interval=10s --timeout=3s --retries=3 \
-    CMD ["wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/"]
+    CMD ["wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/config.json"]
 ```
 
 - `deploy/nginx-docker.conf` is the server block above with `listen 8080;` and
@@ -482,6 +482,9 @@ HEALTHCHECK --interval=10s --timeout=3s --retries=3 \
 - The compose file mounts the host's file:
   `./config.json:/etc/orders-web/config.json:ro`, with mode 0644 so user 101 can read it
   (it holds nothing secret). Never `COPY` a `config.json` into the image.
+- The health check fetches `/config.json`, not `/`. Without the mount it gets a 404, so
+  the container turns unhealthy and `docker compose up --wait` fails, instead of passing
+  while every user sees "The app could not start".
 - `.dockerignore` keeps `node_modules/`, `dist/`, `.angular/`, and `.git` out of the build.
 - The compose file that runs the image is in `docker` (section 4); `docker-review` checks
   both.
