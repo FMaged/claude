@@ -100,10 +100,13 @@ done
 # 31bf3856ad364e35 is Microsoft's public key token, in every unattend file.
 grep -rn '/home/[a-z]' skills agents settings .claude install.sh README.md CLAUDE.md evals/run-trigger-evals.sh evals/test-install.sh evals/trigger-prompts.tsv && problem "found a /home/ path"
 # Only the file and line are printed, so a real secret does not land in a CI log.
+# Build output of the examples is git-ignored but not grep-ignored; skip it.
+skip=(--exclude-dir=.git --exclude-dir=.terraform --exclude-dir=node_modules --exclude-dir=bin
+  --exclude-dir=obj --exclude-dir=dist --exclude-dir=.angular --exclude-dir=publish)
 found=$(grep -rnEi '(api[_-]?key|secret|token|password)[[:space:]]*[:=][[:space:]]*["'"'"']?[A-Za-z0-9_/+-]*[0-9][A-Za-z0-9_/+-]*' \
-  --exclude-dir=.git --exclude-dir=.terraform . | grep -v '^./evals/lint.sh' | grep -v 'publicKeyToken="31bf3856ad364e35"' | grep -E '[:=][[:space:]]*["'"'"']?[A-Za-z0-9_/+-]{16,}')
+  "${skip[@]}" . | grep -v '^./evals/lint.sh' | grep -v 'publicKeyToken="31bf3856ad364e35"' | grep -E '[:=][[:space:]]*["'"'"']?[A-Za-z0-9_/+-]{16,}')
 [ -n "$found" ] && { echo "$found" | cut -d: -f1,2; problem "found what looks like a secret"; }
-found=$(grep -rnE 'AKIA[0-9A-Z]{16}|sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,}' --exclude-dir=.git --exclude-dir=.terraform .)
+found=$(grep -rnE 'AKIA[0-9A-Z]{16}|sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,}' "${skip[@]}" .)
 [ -n "$found" ] && { echo "$found" | cut -d: -f1,2; problem "found a credential"; }
 
 # Evals: every prompt names a skill that exists and has a 0/1 expectation.
