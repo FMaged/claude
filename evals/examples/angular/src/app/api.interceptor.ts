@@ -14,6 +14,7 @@ export const apiInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req.clone({ withCredentials: true })).pipe(
     catchError((error: unknown) => {
       if (error instanceof HttpErrorResponse && error.status === 401) {
+        // The app needs a /login route; without one this navigation fails silently.
         void router.navigate(['/login'], { queryParams: { returnUrl: router.url } });
       }
       return throwError(() => error);
