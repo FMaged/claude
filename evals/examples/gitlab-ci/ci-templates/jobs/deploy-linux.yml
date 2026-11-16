@@ -1,0 +1,19 @@
+.deploy-linux:
+  extends: .ssh-deploy
+  script:
+    - ': "${APP_NAME:?}" "${DEPLOY_HOSTS:?DEPLOY_HOSTS is not set for $CI_ENVIRONMENT_NAME}"'
+    - |
+      for host in $DEPLOY_HOSTS; do
+        rsync -a --delete publish/ "$DEPLOY_USER@$host:/opt/$APP_NAME/releases/$CI_COMMIT_SHA/"
+        ssh "$DEPLOY_USER@$host" sh -s -- "$APP_NAME" "$CI_COMMIT_SHA" <<'EOF'
+      set -eu
+      app=/opt/$1
+      ln -sfn "$app/releases/$2" "$app/current.new"
+      # a rename is atomic, so the service never finds the link missing
+      mv -T "$app/current.new" "$app/current"
+      sudo -n systemctl restart "$1"
+      # keep the five newest; a rollback to an older release copies it again
+      ls -1dt "$app"/releases/* | tail -n +6 | xargs -r rm -rf
+      EOF
+      done
+    - curl --fail --silent --show-error --retry 12 --retry-delay 5 --retry-all-errors "$CI_ENVIRONMENT_URL/health"

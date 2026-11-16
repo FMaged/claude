@@ -1,0 +1,19 @@
+# An ASP.NET Core app, deployed as a systemd service behind nginx on Linux.
+# The app's .gitlab-ci.yml sets APP_NAME (the service) and DOTNET_PROJECT (the .csproj to publish).
+# Project variables per environment: DEPLOY_HOSTS, APP_URL, DEPLOY_USER,
+# and the file variables SSH_PRIVATE_KEY_FILE and SSH_KNOWN_HOSTS.
+include:
+  - local: /jobs/base.yml
+  - local: /jobs/dotnet.yml
+  - local: /jobs/deploy-linux.yml
+
+dotnet-build:
+  extends: .dotnet-publish
+
+deploy-staging:
+  extends: [.deploy-linux, .staging]
+  needs: [dotnet-build, dotnet-test]
+
+deploy-prod:
+  extends: [.deploy-linux, .production]
+  needs: [dotnet-build, deploy-staging]

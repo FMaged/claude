@@ -1,0 +1,37 @@
+.docker-image:
+  image: docker:29.9.3
+  services: [docker:29.9.3-dind]
+  tags: [docker]
+  stage: package
+  variables:
+    DOCKER_TLS_CERTDIR: /certs
+  script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login --username "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker build --label "org.opencontainers.image.revision=$CI_COMMIT_SHA"
+      --tag "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+    # Deploys pull by digest: a later push to the same tag cannot change what they get.
+    - echo "IMAGE=$(docker inspect --format '{{index .RepoDigests 0}}' "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA")" > image.env
+  artifacts:
+    reports:
+      dotenv: image.env
+    expire_in: 90 days
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+.deploy-docker:
+  extends: .ssh-deploy
+  script:
+    - ': "${APP_NAME:?}" "${IMAGE:?}" "${DEPLOY_HOSTS:?DEPLOY_HOSTS is not set for $CI_ENVIRONMENT_NAME}"'
+    - |
+      for host in $DEPLOY_HOSTS; do
+        ssh "$DEPLOY_USER@$host" sh -s -- "$APP_NAME" "$IMAGE" <<'EOF'
+      set -eu
+      cd "/opt/$1"
+      # compose.yaml reads ${IMAGE} from .env; Ansible owns every other file here
+      printf 'IMAGE=%s\n' "$2" > .env
+      docker compose pull --quiet
+      docker compose up --detach --wait
+      EOF
+      done
+    - curl --fail --silent --show-error --retry 12 --retry-delay 5 --retry-all-errors "$CI_ENVIRONMENT_URL/health"

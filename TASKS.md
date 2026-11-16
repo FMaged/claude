@@ -505,7 +505,7 @@
 
 ## Stage 9: App pipeline (GitLab CI, .NET, Angular, Docker)
 
-### [ ] T9.1: Write the `gitlab-ci` skill
+### [x] T9.1: Write the `gitlab-ci` skill
 **What:** `skills/gitlab-ci/SKILL.md` for the templates repo and for the app repos that include it (D21, D22, D23).
 **Why:** The pipeline is where build-once, runner tags, and secrets handling are enforced. Nothing in the repo covers it.
 **How:**
@@ -514,7 +514,12 @@
 - `environment:` with `url` and `action`; the prod job `when: manual`, `resource_group`, protected refs; the deploy job downloads the build job's artifact or reuses the image digest, never rebuilds.
 - Terraform jobs with the GitLab state backend, Packer build on `hyperv`, Ansible run on `docker`; masked variables, nothing secret in logs.
 - Worked example: a template for a .NET app with the three deploy jobs, checked with `yamllint` and GitLab's CI lint if a token is at hand. Evals, lint, commit.
-**Notes:** _(added after implementation if anything came up)_
+**Notes:** Done 2026-11-16, written against GitLab 19.5 (its docs and `ci.json` at tag v19.5.5-ee).
+- Layout: one template per app kind and deploy path (`templates/dotnet-iis.yml`, `-linux`, `-docker`). Each includes hidden jobs from `jobs/`. The app picks a deploy path by choosing the file, not with a variable, so a wrong name fails when the pipeline is created.
+- No GitLab token was at hand, so CI lint was not run. Instead, `evals/check-gitlab-ci.py` merges each template the way GitLab does and checks tags, stages, `needs`, and `extends`; then `check-jsonschema` validates the merged result. The schema alone skips hidden jobs, and every deploy job is hidden. Both run in `evals/lint.sh`, and CI installs yamllint 1.38.0 and check-jsonschema 0.39.0. Partway through the task the owner asked to skip testing for skill tasks, so the trigger evals and `./install.sh` were not run. The four trigger prompts are in the TSV only.
+- Decision: the IIS deploy account is one domain account per environment, local admin on that environment's IIS hosts only (WMSvc's default). Non-admin deploys with Web Deploy delegation rules are not set up.
+- Gaps in other skills: (1) the `ansible` iis_host role does not bind a CA certificate to WMSvc, so msdeploy rejects the host until it does; (2) the `ansible` skill does not create the Linux `deploy` user, its sudoers rule for `systemctl restart <app>`, or the `/opt/<app>/releases` layout that the Linux deploy job expects; (3) `terraform` section 8 runs a plan on merge requests, but the Hyper-V credentials are protected and Hyper-V has no read-only role, so that plan cannot connect from an unprotected branch. The `gitlab-ci` skill leaves the MR plan out; the `terraform` skill needs the same decision.
+- For T9.3: deploy jobs check `GET /health` after every deploy, and the test job expects test projects with `JunitXml.TestLogger` and `packages.lock.json` files (it restores in locked mode).
 
 ### [ ] T9.2: Write `gitlab-ci-review` and the `gitlab-ci-reviewer` agent
 **What:** `skills/gitlab-ci-review/SKILL.md` and `agents/gitlab-ci-reviewer.md` (D17).

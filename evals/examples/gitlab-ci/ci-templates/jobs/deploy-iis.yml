@@ -1,0 +1,21 @@
+.deploy-iis:
+  tags: [windows]
+  variables:
+    GIT_STRATEGY: empty
+  script:
+    - |
+      if (-not $env:APP_NAME -or -not $env:DEPLOY_HOSTS) {
+        throw "APP_NAME and DEPLOY_HOSTS must be set for $env:CI_ENVIRONMENT_NAME"
+      }
+      $msdeploy = 'C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe'
+      foreach ($server in (($env:DEPLOY_HOSTS -split '\s+') -ne '')) {
+        # No value may hold a comma: msdeploy splits its settings on commas.
+        $dest = "contentPath=$env:APP_NAME" +
+          ",computerName=https://${server}:8172/msdeploy.axd?site=$env:APP_NAME" +
+          ",userName=$env:DEPLOY_USER,password=$env:DEPLOY_PASSWORD,authType=Basic"
+        # AppOffline stops the app first, so its DLLs are not locked during the copy.
+        & $msdeploy -verb:sync "-source:contentPath=$PWD\publish" "-dest:$dest" -enableRule:AppOffline
+        if ($LASTEXITCODE -ne 0) { throw "msdeploy to $server failed with exit code $LASTEXITCODE" }
+      }
+    - curl.exe --fail --silent --show-error --retry 12 --retry-delay 5 --retry-all-errors
+      "$env:CI_ENVIRONMENT_URL/health"

@@ -162,6 +162,21 @@ else
   echo "note: ansible-lint or ansible-playbook not installed, Ansible example not validated"
 fi
 
+# GitLab CI: the schema skips hidden jobs, so each pipeline is merged first, as GitLab would.
+if command -v yamllint >/dev/null && command -v check-jsonschema >/dev/null; then
+  (
+    cd evals/examples/gitlab-ci || exit 1
+    merged=$(mktemp -d) || exit 1
+    trap 'rm -rf "$merged"' EXIT
+    yamllint --strict -c ci-templates/.yamllint . || exit 1
+    python3 -I "$here/check-gitlab-ci.py" --project platform/ci-templates=ci-templates --out "$merged" \
+      ci-templates/.gitlab-ci.yml ci-templates/templates/*.yml app/.gitlab-ci.yml || exit 1
+    check-jsonschema --builtin-schema vendor.gitlab-ci "$merged"/*.json
+  ) || problem "GitLab CI example"
+else
+  echo "note: yamllint or check-jsonschema not installed, GitLab CI example not validated"
+fi
+
 # Shell scripts.
 if command -v shellcheck >/dev/null; then
   shellcheck install.sh evals/*.sh evals/examples/bash/*.sh || problem "shellcheck"

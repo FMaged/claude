@@ -1,0 +1,18 @@
+# An ASP.NET Core app, deployed to IIS through Web Deploy.
+# The app's .gitlab-ci.yml sets APP_NAME (the IIS site) and DOTNET_PROJECT (the .csproj to publish).
+# Project variables per environment: DEPLOY_HOSTS, APP_URL, DEPLOY_USER, DEPLOY_PASSWORD.
+include:
+  - local: /jobs/base.yml
+  - local: /jobs/dotnet.yml
+  - local: /jobs/deploy-iis.yml
+
+dotnet-build:
+  extends: .dotnet-publish
+
+deploy-staging:
+  extends: [.deploy-iis, .staging]
+  needs: [dotnet-build, dotnet-test]
+
+deploy-prod:
+  extends: [.deploy-iis, .production]
+  needs: [dotnet-build, deploy-staging]

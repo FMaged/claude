@@ -1,0 +1,38 @@
+.dotnet:
+  image: mcr.microsoft.com/dotnet/sdk:10.0.404
+  tags: [docker]
+  interruptible: true
+  variables:
+    # The cache can only hold paths inside the project folder.
+    NUGET_PACKAGES: $CI_PROJECT_DIR/.nuget/packages
+    DOTNET_NOLOGO: "true"
+    DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+  cache:
+    key:
+      prefix: nuget
+      files: ["**/packages.lock.json"]
+    paths: [.nuget/packages]
+
+dotnet-test:
+  extends: .dotnet
+  stage: test
+  needs: []
+  script:
+    - dotnet test --configuration Release -p:RestoreLockedMode=true
+      --logger "junit;LogFilePath=$CI_PROJECT_DIR/test-results/{assembly}.xml"
+  artifacts:
+    when: always
+    reports:
+      junit: test-results/*.xml
+    expire_in: 30 days
+
+.dotnet-publish:
+  extends: .dotnet
+  stage: build
+  script:
+    - dotnet publish "${DOTNET_PROJECT:?Set DOTNET_PROJECT in .gitlab-ci.yml}"
+      --configuration Release --output publish -p:RestoreLockedMode=true
+  artifacts:
+    paths: [publish/]
+    # A rollback re-runs an old deploy job, which downloads this artifact again.
+    expire_in: 90 days

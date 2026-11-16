@@ -26,11 +26,12 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Install Ansible and collections
+      - name: Install Ansible, its collections, yamllint, and check-jsonschema
         run: |
           ansible_venv="$RUNNER_TEMP/ansible-venv"
           python3 -m venv "$ansible_venv"
-          "$ansible_venv/bin/python" -m pip install ansible-core==2.19.11 ansible-lint==25.6.1
+          "$ansible_venv/bin/python" -m pip install ansible-core==2.19.11 ansible-lint==25.6.1 \
+            yamllint==1.38.0 check-jsonschema==0.39.0
           export PATH="$ansible_venv/bin:$PATH"
           printf '%s\n' "$ansible_venv/bin" >> "$GITHUB_PATH"
           ansible-galaxy collection install -r evals/examples/ansible/requirements.yml

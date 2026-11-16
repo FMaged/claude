@@ -1,0 +1,15 @@
+# The templates repo's own pipeline. Apps include a tag, so main may change freely.
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+lint:
+  image: python:3.13.18-slim
+  tags: [docker]
+  script:
+    - pip install --no-cache-dir --quiet yamllint==1.38.0 check-jsonschema==0.39.0
+    - yamllint --strict .
+    - check-jsonschema --builtin-schema vendor.gitlab-ci .gitlab-ci.yml jobs/*.yml templates/*.yml

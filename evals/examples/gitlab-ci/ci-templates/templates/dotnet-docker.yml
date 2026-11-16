@@ -1,0 +1,19 @@
+# An ASP.NET Core app, built into an image from the repo's Dockerfile and run with compose.
+# The app's .gitlab-ci.yml sets APP_NAME (the folder under /opt on the hosts).
+# Project variables per environment: DEPLOY_HOSTS, APP_URL, DEPLOY_USER,
+# and the file variables SSH_PRIVATE_KEY_FILE and SSH_KNOWN_HOSTS.
+include:
+  - local: /jobs/base.yml
+  - local: /jobs/dotnet.yml
+  - local: /jobs/deploy-docker.yml
+
+docker-image:
+  extends: .docker-image
+
+deploy-staging:
+  extends: [.deploy-docker, .staging]
+  needs: [docker-image, dotnet-test]
+
+deploy-prod:
+  extends: [.deploy-docker, .production]
+  needs: [docker-image, deploy-staging]

@@ -1,0 +1,8 @@
+include:
+  - project: platform/ci-templates
+    ref: refs/tags/v1.0.0
+    file: /templates/dotnet-iis.yml
+
+variables:
+  APP_NAME: orders
+  DOTNET_PROJECT: src/Orders.Api/Orders.Api.csproj

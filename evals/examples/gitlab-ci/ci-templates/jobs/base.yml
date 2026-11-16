@@ -1,0 +1,44 @@
+stages: [build, test, package, deploy-staging, deploy-prod]
+
+workflow:
+  auto_cancel:
+    on_new_commit: interruptible
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # A branch with an open merge request already gets the merge request pipeline.
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+.staging:
+  stage: deploy-staging
+  environment:
+    name: staging
+    url: $APP_URL
+  resource_group: staging
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+.production:
+  stage: deploy-prod
+  environment:
+    name: production
+    url: $APP_URL
+  resource_group: production
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
+      # A manual job in rules blocks the pipeline by default; a commit never promoted would stay blocked.
+      allow_failure: true
+
+.ssh-deploy:
+  image: alpine:3.24.4
+  tags: [docker]
+  variables:
+    GIT_STRATEGY: empty
+  before_script:
+    - apk add --no-cache openssh-client rsync curl
+    - install -d -m 700 ~/.ssh
+    - cp "$SSH_KNOWN_HOSTS" ~/.ssh/known_hosts
+    - chmod 400 "$SSH_PRIVATE_KEY_FILE"
+    - printf 'IdentityFile %s\nBatchMode yes\n' "$SSH_PRIVATE_KEY_FILE" > ~/.ssh/config
