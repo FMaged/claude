@@ -59,8 +59,9 @@ ansible/
       templates/
 ```
 
-- Every command names the environment: `-i inventory/staging`. `ansible.cfg` sets no
-  `inventory`, so a forgotten `-i` reaches no host at all instead of a default one.
+- Every command names the environment: `-i inventory/staging`. Set `inventory = /dev/null`
+  in `ansible.cfg` to prevent fallback to `/etc/ansible/hosts` when `-i` is omitted.
+  Do not set `ANSIBLE_INVENTORY` in the runner: it overrides this config default.
   Never `-i inventory/`, which loads every environment at once.
 - Terraform puts each host in two groups: its OS and its role. Keep what each group's
   file holds apart. `windows.yml` and `linux.yml` hold only connection settings; the role
@@ -83,7 +84,8 @@ ansible/
 ```ini
 # ansible.cfg
 [defaults]
-# No default inventory: a run without -i inventory/<env> then reaches no host at all.
+# Prevent fallback to /etc/ansible/hosts when -i inventory/<env> is omitted.
+inventory = /dev/null
 roles_path = roles
 interpreter_python = auto_silent
 callback_result_format = yaml
