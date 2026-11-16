@@ -521,11 +521,15 @@
 - Gaps in other skills: (1) the `ansible` iis_host role does not bind a CA certificate to WMSvc, so msdeploy rejects the host until it does; (2) the `ansible` skill does not create the Linux `deploy` user, its sudoers rule for `systemctl restart <app>`, or the `/opt/<app>/releases` layout that the Linux deploy job expects; (3) `terraform` section 8 runs a plan on merge requests, but the Hyper-V credentials are protected and Hyper-V has no read-only role, so that plan cannot connect from an unprotected branch. The `gitlab-ci` skill leaves the MR plan out; the `terraform` skill needs the same decision.
 - For T9.3: deploy jobs check `GET /health` after every deploy, and the test job expects test projects with `JunitXml.TestLogger` and `packages.lock.json` files (it restores in locked mode).
 
-### [ ] T9.2: Write `gitlab-ci-review` and the `gitlab-ci-reviewer` agent
+### [x] T9.2: Write `gitlab-ci-review` and the `gitlab-ci-reviewer` agent
 **What:** `skills/gitlab-ci-review/SKILL.md` and `agents/gitlab-ci-reviewer.md` (D17).
 **Why:** A pipeline that rebuilds for prod, runs on any runner, or prints a secret is invisible until it hurts.
 **How:** Sections: jobs without `tags` or with runner or host names; a prod job without `manual`, `resource_group`, or protected refs; a rebuild instead of a promote; `only`/`except`; unpinned includes and images; artifacts without expiry; `allow_failure` on tests; missing `workflow` rules (duplicate pipelines); secrets echoed or passed as unmasked variables. Agent from `sql-reviewer.md`. Evals, lint, commit.
-**Notes:** _(added after implementation if anything came up)_
+**Notes:** Done 2026-11-16. Files written only: per the owner's instruction, the trigger evals, `evals/lint.sh`, and `./install.sh` were not run, and the agent has not run. The four trigger prompts, plus a review prompt that must not fire `gitlab-ci`, are in the TSV.
+- The sections are ordered by harm, not as listed in How: secrets, who can deploy to production, what ships untested, deploys that pass without deploying, tests that cannot stop the pipeline, runners, workflow and rules, pinning and drift from the template, artifacts and cache. Added beyond How: section 0 (review the merged job: `extends` replaces lists, `default:` supplies tags and images, a template you cannot read is marked unconfirmed), a short section on infrastructure jobs (apply without the saved plan, merge request plans on unprotected credentials), and a list of what only the project settings show, with `glab` commands whose `jq` filter keeps variable values off the screen.
+- `gitlab-ci-review` stays on as a skill, like `powershell-review`; only the five reviews of T6.6 are agent-only. The `gitlab-ci` skill now names the skill and the agent.
+- Not checked against the GitLab 19.5 docs, unlike T9.1: `include:integrity` (from 17.9), `rules:changes` always true for a new branch and in scheduled, web, and API pipelines, `CI_DEBUG_SERVICES`, and the `glab ci lint` and `glab api :id` commands. Check them when the evals run in T9.8.
+- Wiring the review into `task-runner`, `z2p-deploy`, and `z2p-release` stays with T9.8.
 
 ### [ ] T9.3: Write the `dotnet` skill
 **What:** `skills/dotnet/SKILL.md` for ASP.NET Core on .NET 10 with three publish targets (D19, D20).

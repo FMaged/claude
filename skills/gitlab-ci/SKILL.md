@@ -1,6 +1,6 @@
 ---
 name: gitlab-ci
-description: 'Use when writing or changing GitLab CI — a template in the central ci-templates repo, an app''s .gitlab-ci.yml that includes one, stages, rules and workflow, needs, artifacts and cache, runner tags, environments, a manual production deploy with resource_group, build once and promote the same artifact, deploy jobs for IIS with msdeploy, for Linux with systemd, or for Docker hosts from the GitLab registry, masked and protected variables, and the jobs that run Terraform, Packer, and Ansible (e.g. "write the .gitlab-ci.yml for our new .NET API", "add a manual prod deploy that reuses the staging artifact", "why does my pipeline run twice on a merge request", "add an IIS deploy job to ci-templates", "pin the template version in this repo", "where do the deploy credentials go?"). Not for GitHub Actions. For the Terraform, Packer, or Ansible code that the jobs run, use those skills.'
+description: 'Use when writing or changing GitLab CI — a template in the central ci-templates repo, an app''s .gitlab-ci.yml that includes one, stages, rules and workflow, needs, artifacts and cache, runner tags, environments, a manual production deploy with resource_group, build once and promote the same artifact, deploy jobs for IIS with msdeploy, for Linux with systemd, or for Docker hosts from the GitLab registry, masked and protected variables, and the jobs that run Terraform, Packer, and Ansible (e.g. "write the .gitlab-ci.yml for our new .NET API", "add a manual prod deploy that reuses the staging artifact", "why does my pipeline run twice on a merge request", "add an IIS deploy job to ci-templates", "pin the template version in this repo", "where do the deploy credentials go?"). Not for GitHub Actions. For the Terraform, Packer, or Ansible code that the jobs run, use those skills; for reviewing a pipeline, use gitlab-ci-review.'
 ---
 
 # GitLab CI
@@ -13,8 +13,9 @@ that broke every app at once, or a deploy that deployed nothing and still passed
 The jobs run code that other skills write. Terraform state and the plan/apply commands
 are in the `terraform` skill (sections 7 and 8). The Packer build job is in the `packer`
 skill (section 8). The Ansible job's image and inventory are in the `ansible` skill
-(section 6). For scripts too long to inline, `bash` or `powershell`. For comments,
-`code-comments`. The worked example is `evals/examples/gitlab-ci/` in the skills repo:
+(section 6). For scripts too long to inline, `bash` or `powershell`. For a review of
+finished pipelines, the `gitlab-ci-review` skill, or the `gitlab-ci-reviewer` agent for a
+check that runs unattended. For comments, `code-comments`. The worked example is `evals/examples/gitlab-ci/` in the skills repo:
 the templates repo from section 1 and an app that includes it.
 
 ## 0. Check what is there
@@ -570,3 +571,6 @@ Then, in one app, change `ref` to the new tag in a merge request and check:
   the button. Both deploy jobs downloaded the build job's artifact; neither built.
 - The prod job's log shows `[MASKED]` wherever a secret would have appeared.
 - A rollback from Operate > Environments re-deploys the previous version.
+
+Then run the `gitlab-ci-reviewer` agent on the change (in Codex, the `gitlab-ci-review`
+skill).
