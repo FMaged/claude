@@ -531,7 +531,7 @@
 - Not checked against the GitLab 19.5 docs, unlike T9.1: `include:integrity` (from 17.9), `rules:changes` always true for a new branch and in scheduled, web, and API pipelines, `CI_DEBUG_SERVICES`, and the `glab ci lint` and `glab api :id` commands. Check them when the evals run in T9.8.
 - Wiring the review into `task-runner`, `z2p-deploy`, and `z2p-release` stays with T9.8.
 
-### [ ] T9.3: Write the `dotnet` skill
+### [x] T9.3: Write the `dotnet` skill
 **What:** `skills/dotnet/SKILL.md` for ASP.NET Core on .NET 10 with three publish targets (D19, D20).
 **Why:** The C# apps are what the pipeline ships, and the skill must publish for IIS, Linux, and Docker from one build.
 **How:**
@@ -540,7 +540,13 @@
 - Tests with xUnit and `WebApplicationFactory`.
 - Publish: Web Deploy package and the `msdeploy -verb:sync` call; framework-dependent folder with a systemd unit (own user, `Restart=always`, `DOTNET_` variables) behind nginx; multi-stage Dockerfile from the sdk and aspnet images, non-root. Version from the pipeline.
 - Worked example: `dotnet new webapi` with a test project; `dotnet build` and `dotnet test` (installed here). Evals, lint, commit.
-**Notes:** _(added after implementation if anything came up)_
+**Notes:** Done 2026-11-16, files written only: per the owner's instruction nothing was built, tested, or installed, and the trigger evals and lint were not run. The four trigger prompts are in the TSV.
+- The worked example `evals/examples/dotnet/` (`Orders.Api`, the app the gitlab-ci example deploys) was written by hand, not with `dotnet new`, and has never been built. It has no `packages.lock.json` files yet, so the CI's locked-mode restore and the Docker build fail until a first `dotnet restore` writes them and they are committed. It is not in `evals/lint.sh`. The examples README says so.
+- Not checked, because nothing ran: the test package versions (Microsoft.NET.Test.Sdk 17.14.1, xunit.v3 3.1.0, xunit.runner.visualstudio 3.1.5, JunitXml.TestLogger 6.1.0; the Microsoft packages at 10.0.15 come from the installed templates); that .NET 10 makes the top-level `Program` public (the tests depend on it); the `KnownIPNetworks` name; that `WebApplicationFactory` defaults to `Development`; and the xUnit v3 analyzer that wants `TestContext.Current.CancellationToken`.
+- Changed from How: no Web Deploy package. Building one needs Windows and the build job runs on Linux, so IIS gets the same publish folder through `msdeploy -source:contentPath`, as the `gitlab-ci` IIS job already does. `UseAppHost` is off, so that one folder starts as `dotnet Orders.Api.dll` on IIS, under systemd, and in the image.
+- Decisions: `AnalysisLevel` `latest`, not `latest-recommended`, whose naming rules fight test names and minimal APIs; NuGet audit fails the build for high and critical advisories only. `ASPNETCORE_ENVIRONMENT` stays unset on staging and prod. The version is `VersionPrefix` plus the commit sha from `CI_COMMIT_SHA`; for that, the `gitlab-ci` Docker build (skill and example) now passes `--build-arg CI_COMMIT_SHA`. The runtime image installs curl for its `HEALTHCHECK`.
+- Gaps in other skills: (1) `ci-templates` has no migration jobs: the build job should write `migrations.sql` as an artifact, and a migrate job per environment should run it before that environment's deploy, with its own database account; (2) the `ansible` iis_host role does not set a site's environment variables on its application pool, which is where the skill says they go; (3) the `ansible` unit template has no `Type=notify` (optional: without it the deploy's health check retries until the app answers).
+- The skill does not name `dotnet-review` yet, because the lint fails on a skill that does not exist; T9.4 adds the pointer.
 
 ### [ ] T9.4: Write `dotnet-review` and the `dotnet-reviewer` agent
 **What:** `skills/dotnet-review/SKILL.md` and `agents/dotnet-reviewer.md` (D17).

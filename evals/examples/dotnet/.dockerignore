@@ -1,0 +1,9 @@
+**/bin/
+**/obj/
+.git
+.nuget/
+publish/
+test-results/
+tests/
+**/*.user
+.env

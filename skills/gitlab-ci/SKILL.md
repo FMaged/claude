@@ -390,7 +390,7 @@ lists what the host must already have.
   script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login --username "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     - docker build --label "org.opencontainers.image.revision=$CI_COMMIT_SHA"
-      --tag "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" .
+      --build-arg "CI_COMMIT_SHA=$CI_COMMIT_SHA" --tag "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" .
     - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
     # Deploys pull by digest: a later push to the same tag cannot change what they get.
     - echo "IMAGE=$(docker inspect --format '{{index .RepoDigests 0}}' "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA")" > image.env
