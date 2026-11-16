@@ -577,11 +577,17 @@
 - Gaps: (1) `ci-templates` has no Angular jobs: a Node image job, a test job with the JUnit report, a build job that moves `dist/orders-web/browser` to `publish/`, a Linux deploy without the service restart, the IIS `-skip` rule for `config.json`, and a health check on `/` and `/config.json`. The skill describes them in its pipeline section; they need a task. (2) The `ansible` IIS role does not install the URL Rewrite module, and the nginx role has no static-site variant with the `config.json` alias. (3) The `dotnet` example API has no CORS policy for the app's origin.
 - The skill does not name `angular-review` yet, because the lint fails on a skill that does not exist; T9.6 adds the pointer.
 
-### [ ] T9.6: Write `angular-review` and the `angular-reviewer` agent
+### [x] T9.6: Write `angular-review` and the `angular-reviewer` agent
 **What:** `skills/angular-review/SKILL.md` and `agents/angular-reviewer.md` (D17).
 **Why:** The build-once rule and a few security mistakes are easy to break in a frontend and hard to see in a diff.
 **How:** Sections: what leaks (secrets in environment files, tokens stored without reason); what breaks build-once (build-time environment switches); what stops updating or leaks memory (subscriptions, mutated signal state); what is slow (no lazy routes, bundles over budget); XSS (`bypassSecurityTrust`, `innerHTML`); what is untested; basic accessibility. Agent from `sql-reviewer.md`. Evals, lint, commit.
-**Notes:** _(added after implementation if anything came up)_
+**Notes:** Done 2026-11-16. Files written only: per the owner's instruction, the trigger evals, `evals/lint.sh`, and `./install.sh` were not run, and the agent has not run. The four trigger prompts are in the TSV; the `angular` block already has a review prompt that must not fire it.
+- Sections: read the setup first (the version, zoneless or `zone.js`, `angular.json`, the hosts), what leaks, what breaks build-once, what stops updating, what leaks memory, XSS, what is slow, serving the build, what is untested, accessibility, strictness and packages. Added beyond How: credentials sent to any origin by a loose URL check in an interceptor, navigation to a `returnUrl` through `window.location` (`javascript:` and open redirects), `resource.value()` read in the error state, a `track` that changes, `.only` left in a spec, and the serving rules of the `angular` skill (deep links, a missing chunk answered with `index.html`, caching, the nginx `add_header` trap, a deploy that deletes the host's `config.json`).
+- Blockers: a secret in the bundle or `config.json`, credentials sent to another origin, XSS through `bypassSecurityTrust…` or the DOM written directly, a build per environment or a `config.json` shipped in the build or image, a deploy that deletes the host's `config.json`, a high or critical vulnerable package in what ships. A long-lived refresh token in `localStorage` is a blocker; other stored tokens are should-fix.
+- What the API allows each user goes to `web-security-review`, the API code to `dotnet-review`, the Dockerfile to `docker-review`, the pipeline to `gitlab-ci-review`.
+- `angular-review` stays on as a skill, like `dotnet-review`. The `angular` skill now names the skill and the agent (description, intro, and "Before calling it done").
+- Not checked against the docs: Angular's support window (18 months per major, so 20 ends at the end of November 2026), NG0203 as the error for `takeUntilDestroyed()` outside an injection context, and IIS answering 500.19 when the URL Rewrite module is missing. Check them when the evals run in T9.8.
+- Wiring the review into `task-runner`, `z2p-deploy`, and `z2p-release` stays with T9.8.
 
 ### [ ] T9.7: Write the `docker` skill
 **What:** `skills/docker/SKILL.md` for Dockerfiles and compose files of the apps that deploy as images (D19).

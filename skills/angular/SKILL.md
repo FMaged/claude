@@ -1,6 +1,6 @@
 ---
 name: angular
-description: Use when writing or changing an Angular app on the current major (22) — standalone components, signals and resources, the @if and @for control flow, inject(), OnPush and zoneless change detection, strict TypeScript, lazy routes, functional HTTP interceptors, configuration read at start from a config.json next to the app instead of build-time environment files, Vitest tests through ng test, angular-eslint, ng build with budgets, and deploying the one build as static files on IIS with a web.config rewrite, on nginx with try_files, or in an nginx Docker image (e.g. "start a new Angular app", "add a lazy route", "load the API URL at run time", "why does a page reload give a 404 on the server", "add an auth interceptor", "make this component use signals", "write a test for this component", "deploy the Angular build to IIS and nginx"). For the pipeline that builds and deploys it, use gitlab-ci; for the API behind it, use dotnet.
+description: Use when writing or changing an Angular app on the current major (22) — standalone components, signals and resources, the @if and @for control flow, inject(), OnPush and zoneless change detection, strict TypeScript, lazy routes, functional HTTP interceptors, configuration read at start from a config.json next to the app instead of build-time environment files, Vitest tests through ng test, angular-eslint, ng build with budgets, and deploying the one build as static files on IIS with a web.config rewrite, on nginx with try_files, or in an nginx Docker image (e.g. "start a new Angular app", "add a lazy route", "load the API URL at run time", "why does a page reload give a 404 on the server", "add an auth interceptor", "make this component use signals", "write a test for this component", "deploy the Angular build to IIS and nginx"). For the pipeline that builds and deploys it, use gitlab-ci; for the API behind it, use dotnet; for reviewing Angular code, use angular-review.
 ---
 
 # Angular
@@ -14,8 +14,9 @@ page reload that gives the server's 404, an old `index.html` still cached after 
 or a deploy that deleted the host's configuration.
 
 The pipeline is `gitlab-ci`; the hosts (IIS, nginx, Docker) are prepared by `ansible`;
-the API behind the app is `dotnet`. For who may see what, `web-security-review`. For
-comments, `code-comments`. The worked example is `evals/examples/angular/` in the skills
+the API behind the app is `dotnet`. For who may see what, `web-security-review`. For a
+review of finished code, the `angular-review` skill, or the `angular-reviewer` agent for a
+check that runs unattended. For comments, `code-comments`. The worked example is `evals/examples/angular/` in the skills
 repo: `orders-web`, a new app with one lazy route and the config loader, which reads an
 order from the `Orders.Api` of `evals/examples/dotnet/`.
 
@@ -514,3 +515,5 @@ docker build -t orders-web .          # Docker path only
   `docker run --rm -p 8080:8080 -v "$PWD/public/config.json:/etc/orders-web/config.json:ro" orders-web`):
   `curl -I localhost:8080/orders/1` gives 200 with `no-cache`, a missing `.js` gives 404,
   and without the mount the page says it could not start.
+
+Then run the `angular-reviewer` agent on the change (in Codex, the `angular-review` skill).
