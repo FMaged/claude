@@ -35,9 +35,9 @@ Set the stage to `doing`, then run its skill from the stage table.
 
 ## 3. After the stage
 
-1. Check the gate by reading the files, as `CONVENTIONS.md` lists it.
-2. At gates 3, 4, 5, 6, and 9, also ask the user for a yes.
-3. **Stage 3 only.** If the stage stopped to wait for evidence, write `waiting` with a note saying what it waits for, and go to the last step. Otherwise read the `Decision:` line in `VALIDATION.md`. Only `Go` lets the gate pass. `Stop` and `Change` follow Going back in `CONVENTIONS.md` instead of the next step.
+1. **Stage 3 only.** If the stage stopped to wait for evidence, write `waiting` with a note saying what it waits for, and go to the last step. Otherwise read the `Decision:` line in `VALIDATION.md`. Only `Go` lets the gate pass. `Stop` and `Change` follow Going back in `CONVENTIONS.md`, then go to the last step.
+2. Check the gate by reading the files, as `CONVENTIONS.md` lists it.
+3. Gates 3, 4, 5, 6, and 9 also need the user's yes. If the stage skill got it in this run and wrote `Confirmed: <today>`, do not ask again. Otherwise ask. An old `Confirmed:` date is not a yes to content that changed since.
 4. Write `STATUS.md`: state, gate result, date, note.
    - Gate passes: `done`.
    - Gate fails: keep `doing` and tell the user what is missing.

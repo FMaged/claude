@@ -18,7 +18,7 @@ The rules every stage of the chain follows. The orchestrator (`z2p`) and every s
 | 9 Release | `z2p-release` | `RELEASE.md` | Tests and CI green; every Must requirement's acceptance criteria checked; matching reviews run; no open high findings; MVP live where users get it and works; rollback tried; backup restored once if there is data; `Release: approved` line | **yes** |
 | 10 Operate | `z2p-operate` | `BACKLOG.md` | Errors and uptime visible; an alert reached the user; backlog started | no |
 
-A gate with "user yes" is not passed by the files alone. The orchestrator asks, and records the answer.
+A gate with "user yes" is not passed by the files alone. The orchestrator asks, unless the stage skill got the yes in this run, and records the answer.
 
 ## STATUS.md
 
