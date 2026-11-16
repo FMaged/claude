@@ -548,11 +548,17 @@
 - Gaps in other skills: (1) `ci-templates` has no migration jobs: the build job should write `migrations.sql` as an artifact, and a migrate job per environment should run it before that environment's deploy, with its own database account; (2) the `ansible` iis_host role does not set a site's environment variables on its application pool, which is where the skill says they go; (3) the `ansible` unit template has no `Type=notify` (optional: without it the deploy's health check retries until the app answers).
 - The skill does not name `dotnet-review` yet, because the lint fails on a skill that does not exist; T9.4 adds the pointer.
 
-### [ ] T9.4: Write `dotnet-review` and the `dotnet-reviewer` agent
+### [x] T9.4: Write `dotnet-review` and the `dotnet-reviewer` agent
 **What:** `skills/dotnet-review/SKILL.md` and `agents/dotnet-reviewer.md` (D17).
 **Why:** The usual production failures in .NET apps are quiet: sync over async, migrations at startup, config baked in.
 **How:** Sections: what leaks (secrets in appsettings, connection strings in code, exception details to clients); what blocks (`.Result`, `.Wait()`, missing cancellation tokens, `HttpClient` created per call); what breaks in prod (migrations at startup, environment-specific config in the artifact, no health check, warnings ignored); what is untested; packages unpinned or vulnerable (`dotnet list package --vulnerable`). Agent from `sql-reviewer.md`. Evals, lint, commit.
-**Notes:** _(added after implementation if anything came up)_
+**Notes:** Done 2026-11-16. Files written only: per the owner's instruction, the trigger evals, `evals/lint.sh`, and `./install.sh` were not run, and the agent has not run. The four trigger prompts, plus a review prompt that must not fire `dotnet`, are in the TSV.
+- Sections: read the build first (a nested `Directory.Build.props` that does not import the root one, the target framework, which hosts run it), what leaks, what blocks, service lifetimes and shared state, what makes the artifact differ per environment, what breaks at start, on deploy, or on another host, warnings switched off, EF Core, what is untested, packages. Added beyond How: the lifetimes section (a scoped `DbContext` in a singleton is checked only in Development, so a Production test run does not catch it), EF Core (`FromSqlRaw` with interpolation, migrations the running release cannot use, edited applied migrations, N+1), and the host differences of the three deploy targets (case-sensitive paths, time zone, culture, writes inside the app folder, a port in code, a publish tied to one OS).
+- Blockers: a leaked secret or exception detail, sync over async or `async void` on a request path, `HttpClient` per call, a scoped service in a singleton, a migration at startup or one the running release cannot use, an environment baked into the artifact, SQL injection, a high or critical vulnerable package.
+- Authorization, login, and CORS go to `web-security-review`, the SQL itself to `sql-review`, the Dockerfile to `docker-review`, the pipeline to `gitlab-ci-review`; the skill names them and stays on the .NET side.
+- `dotnet-review` stays on as a skill, like `gitlab-ci-review`. The `dotnet` skill now names the skill and the agent (description, intro, and "Before calling it done").
+- Not checked against the docs: `net8.0` and `net9.0` ending support on 10 November 2026 (STS extended to 24 months), `<EnvironmentName>` writing `ASPNETCORE_ENVIRONMENT` into the published `web.config`, `CentralPackageFloatingVersionsEnabled`, and whether `dotnet list package` still works next to the .NET 10 `dotnet package list` form. Check them when the evals run in T9.8.
+- No review fixture with planted bugs; How did not ask for one. Wiring the review into `task-runner`, `z2p-deploy`, and `z2p-release` stays with T9.8.
 
 ### [ ] T9.5: Write the `angular` skill
 **What:** `skills/angular/SKILL.md` for current Angular with run-time configuration (D20).

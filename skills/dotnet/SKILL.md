@@ -1,6 +1,6 @@
 ---
 name: dotnet
-description: Use when writing or changing a C# ASP.NET Core app on .NET 10 — the solution layout, Directory.Build.props, central package management and lock files, nullable and warnings as errors, configuration from appsettings.json and environment variables with the options pattern, health endpoints, logging, EF Core migrations run by the pipeline, xUnit tests with WebApplicationFactory, and one publish that runs on IIS with Web Deploy, as a systemd service behind nginx, or in a Docker image (e.g. "start a new .NET 10 web API", "add a config section with validation", "add a health check", "add an EF Core migration", "write an integration test for this endpoint", "publish this API for IIS and Linux", "why does the app read the wrong settings in production"). For the pipeline that builds and deploys it, use gitlab-ci.
+description: Use when writing or changing a C# ASP.NET Core app on .NET 10 — the solution layout, Directory.Build.props, central package management and lock files, nullable and warnings as errors, configuration from appsettings.json and environment variables with the options pattern, health endpoints, logging, EF Core migrations run by the pipeline, xUnit tests with WebApplicationFactory, and one publish that runs on IIS with Web Deploy, as a systemd service behind nginx, or in a Docker image (e.g. "start a new .NET 10 web API", "add a config section with validation", "add a health check", "add an EF Core migration", "write an integration test for this endpoint", "publish this API for IIS and Linux", "why does the app read the wrong settings in production"). For the pipeline that builds and deploys it, use gitlab-ci; for reviewing .NET code, use dotnet-review.
 ---
 
 # .NET
@@ -15,7 +15,9 @@ machine.
 
 The pipeline is `gitlab-ci`; the hosts (IIS, nginx, the systemd unit, Docker) are
 prepared by `ansible`. For the database schema, `schema-design`; for SQL inside the app,
-`sql-writing`. For comments, `code-comments`. The worked example is
+`sql-writing`. For a review of finished code, the `dotnet-review` skill, or the
+`dotnet-reviewer` agent for a check that runs unattended. For comments, `code-comments`.
+The worked example is
 `evals/examples/dotnet/` in the skills repo: `Orders.Api` with a test project and the
 Dockerfile, the app that `evals/examples/gitlab-ci/app/` deploys.
 
@@ -502,3 +504,5 @@ docker build --build-arg CI_COMMIT_SHA=$(git rev-parse HEAD) .   # Docker path o
   `curl --fail http://localhost:5000/health` answers 200. Without them, it stops at
   start with the name of the missing setting.
 - `grep -ri password src/*/appsettings*.json` finds nothing.
+
+Then run the `dotnet-reviewer` agent on the change (in Codex, the `dotnet-review` skill).
