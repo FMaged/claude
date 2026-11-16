@@ -4,7 +4,7 @@ Shared skills for Claude Code and Codex, plus Claude-specific agents and setting
 
 ## What is in it
 - `skills/`: one folder per skill, each with a `SKILL.md`.
-- `agents/`: the reviewer agents. Each one preloads its skill.
+- `agents/`: the reviewer agents, one per review skill: angular, ansible, docker, dotnet, gitlab-ci, network, packer, powershell, sql, svelte, terraform, and web-security. Each one preloads its skill.
 - `settings/settings.json`: shared settings (plugins, marketplaces, model, theme). No secrets.
 - `install.sh`: links skills into `~/.claude/skills` and `~/.agents/skills` (Codex), and agent definitions into `~/.claude/agents`.
 - `.claude/skills/setup-claude-code/`: the skill that runs the setup. It only exists while Claude is opened in this repo.

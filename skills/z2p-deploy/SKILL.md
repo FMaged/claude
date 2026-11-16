@@ -19,13 +19,13 @@ Puts the product live the same safe way every time. It runs inside the Stage 1 t
 1. **Read.** The hosting in `PLAN.md`, the architecture, database, and cross-cutting sections of `DESIGN.md`, and the non-functional requirements (`N`) about availability, cost, and backup. If `RELEASE.md` exists, update it.
 2. **Host.** Deploy the smallest working version (a hello-world page, endpoint, or command) to the chosen host.
    - No URL (CLI, library, app): deploy to where users get it, such as a package registry, an app store, or a download. Then install it from there and run it.
-   - A container only if the host needs one. Write the smallest Dockerfile that works (pinned base image, non-root user, one process), and run `docker-review` on it.
+   - A container only if the host needs one. Write the smallest Dockerfile that works (pinned base image, non-root user, one process; the `docker` skill), and run `docker-review` on it.
 3. **Secrets.** Keep them in the host's secret store or CI secrets. Commit a `.env.example` with names only. Check that `.env` is in `.gitignore` and that no secret is in the git history.
-4. **CI.** Use the host's or the git forge's own pipeline (for example GitHub Actions). The pipeline runs the tests and then deploys from `main`. A failing test stops the deploy.
+4. **CI.** Use the host's or the git forge's own pipeline (for example GitHub Actions, or GitLab CI with the `gitlab-ci` skill). The pipeline runs the tests and then deploys from `main`. A failing test stops the deploy.
 5. **Database.** Skip if `DESIGN.md` says "no stored data". Otherwise create the database in production, keep its credentials as secrets, and run migrations from the pipeline before the new version starts. Never run them by hand.
 6. **Error tracking.** Add one error tracker. Cause a test error in production and check that it shows up.
 7. **Rollback.** Try one: deploy a second version, roll back to the first, and check that the first is live again. If there is a database, say how a migration is undone or why it need not be.
-8. **Infra review.** Run the reviewer agent that matches the files present: `terraform-reviewer`, `ansible-reviewer`, `packer-reviewer`, `network-reviewer`, `docker-reviewer`. In Codex, which has no agents, run the matching review skill. Fix high findings now.
+8. **Infra review.** Run the reviewer agent that matches the files present: `terraform-reviewer`, `ansible-reviewer`, `packer-reviewer`, `network-reviewer`, `docker-reviewer`, `powershell-reviewer` for PowerShell scripts, and `gitlab-ci-reviewer` for `.gitlab-ci.yml`. If the deploy changed the app's code, also `dotnet-reviewer` for `.cs` and `.csproj` files and `angular-reviewer` for Angular files. In Codex, which has no agents, run the matching review skill. Fix high findings now.
 9. **Write `RELEASE.md`.** Fill the `## Deploy` and `## Rollback` sections from the template below. Keep every other section as is.
 10. **Check.** The live version works where users get it, CI is green, the test error arrived, and the rollback was tried. Fix what fails.
 

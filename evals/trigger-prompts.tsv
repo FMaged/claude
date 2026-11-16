@@ -47,7 +47,7 @@ ansible	1	set up an Ansible playbook to configure nginx and a systemd service on
 ansible	0	review this Ansible playbook for security problems
 ansible	0	write a Terraform module for a Hyper-V VM
 gitlab-ci	1	write the .gitlab-ci.yml for our new .NET API: include the dotnet template from ci-templates and deploy to IIS
-gitlab-ci	1	add a manual production deploy job to our GitLab CI template that promotes the staging artifact instead of rebuilding
+gitlab-ci	1	how do I write a manual production deploy job in GitLab CI that promotes the staging artifact instead of rebuilding?
 gitlab-ci	0	write a GitHub Actions workflow that runs my tests on every push
 gitlab-ci	0	set up the GitLab state backend for my terraform root module
 gitlab-ci	0	review this .gitlab-ci.yml: is the prod deploy job safe, and can it leak a secret?
@@ -56,7 +56,7 @@ gitlab-ci-review	1	check this GitLab CI template from ci-templates before I tag 
 gitlab-ci-review	0	write a GitLab CI job that deploys our .NET app to IIS with msdeploy
 gitlab-ci-review	0	review this GitHub Actions workflow for leaked secrets
 dotnet	1	start a new .NET 10 web API with a test project, central package management, and warnings as errors
-dotnet	1	add an EF Core migration for the new Status column on orders and make it run from the pipeline instead of at startup
+dotnet	1	how should a .NET 10 API run its EF Core migrations from the pipeline instead of calling Migrate() at startup?
 dotnet	0	write a GitLab CI job that deploys our .NET app to IIS with msdeploy
 dotnet	0	write a Spring Boot REST controller in Java that returns an order by id
 dotnet	0	review this C# service before I merge it: does it block threads with .Result, and does it create an HttpClient per call?

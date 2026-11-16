@@ -76,7 +76,8 @@ What the repo must do, and how to check it, is in `REQUIREMENTS.md`.
   .claude/skills/
     setup-claude-code/       project-only skill: runs the whole setup
   settings/settings.json     plugins, marketplaces, model, theme (no secrets)
-  agents/                    reviewer agents: 8 today, plus powershell, gitlab-ci, dotnet, angular
+  agents/                    12 reviewer agents, one per review skill (powershell, gitlab-ci,
+                             dotnet, and angular added in Part C)
   skills/
     existing: ansible-review, code-comments, docker-review, git-branch, git-commit,
       network-review, packer-review, plan-to-tasks, product-brief, project-planner,
