@@ -212,7 +212,7 @@ Ansible prepares the host; the deploy job sends the app. The order matters:
   ansible.windows.win_package:
     path: '{{ iis_host_installer_dir }}\dotnet-hosting-{{ iis_host_aspnetcore_version }}-win.exe'
     arguments: /install /quiet /norestart
-    creates_path: 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\{{ iis_host_aspnetcore_version }}'
+    product_id: "{{ iis_host_hosting_bundle_product_id }}"
     state: present
   notify: Restart IIS
 
@@ -245,8 +245,12 @@ Ansible prepares the host; the deploy job sends the app. The order matters:
     label: "{{ item.name }}"
 ```
 
-The handler restarts `WAS` with `force_dependent_services: true`, which restarts `W3SVC`
-too. `microsoft.iis.website` fails if `physical_path` does not exist yet, so create the
+Set `iis_host_hosting_bundle_product_id` to the uninstall registry key for the exact
+Hosting Bundle EXE. The shared runtime directory alone does not prove that the bundle
+or IIS's ASP.NET Core Module is installed.
+
+The handler stops `WAS` with `force_dependent_services: true`, then starts `W3SVC`,
+which starts WAS too. `microsoft.iis.website` fails if `physical_path` does not exist yet, so create the
 folder first. The `Default Web Site` holds `*:80`; remove it before a site takes port 80.
 
 By default WMSvc accepts only Windows accounts that are local administrators. Letting a
