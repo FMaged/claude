@@ -194,16 +194,17 @@
 **Notes:** _(added after implementation if anything came up)_
 
 ### [ ] T2.8: Dry-run the thin chain, then commit
-**What:** Run the orchestrator and the 4 wired skills on a toy project.
-**Why:** Find broken handoffs now, before 7 more skills depend on them.
+**What:** Run the orchestrator from stage 0 to the first build task on a toy project, and through each way the chain goes back.
+**Why:** Trigger evals show which skill fires, not that the state moves right. Every stage skill exists now, and none of the handoffs has run.
 **How:**
-- In a temp folder, run `z2p` with a trivial idea (for example, "a page that lists my books").
-- Skip stages 1, 3, 4, and 6, which are not built yet. Run brief → plan → tasks → the first task.
-- Check each of these:
-  - Each skill read the previous file.
-  - Each gate was checked correctly.
-  - `STATUS.md` is right.
-  - `/clear` between stages lost nothing.
+- In a temp folder, run `z2p` with a trivial idea (for example, "a page that lists my books"), one stage per session with `/clear` in between. Nothing deploys; that is T5.2, so the skeleton task stops before the host.
+- Run brief → validate → requirements → plan → design → tasks → the first task. At stage 3, first stop after the test plan: the stage is `waiting` and no yes is asked. Then come back with made-up evidence and a Go.
+- The going-back cases, each in a copy of the folder at the right point:
+  - Adopt: a folder with only a README, and one with the planning files done but no git and no `CLAUDE.md`. Both keep their files, stage 0 is `done`, and the next stage is the first open one, never stage 0 (F1).
+  - Stop at stage 3, then reopen it and Go: stage 4 is next, and stage 1, skipped because the user brought an idea, stays skipped (F2).
+  - Change at stage 3 with a new target user: the old evidence moves under "Earlier brief" and does not decide the new run (F4).
+  - A second cycle: a `BACKLOG.md` with two bugs, one picked for cycle 2, then stage 7 after `/clear`. One new stage holds only the picked bug; every old task, box, and note is kept (F3).
+- Check each time: each skill read the previous file, each gate was checked correctly, the yes was asked once per gate, `STATUS.md` is right, and `/clear` lost nothing.
 - Fix what broke and commit.
 **Notes:** _(added after implementation if anything came up)_
 
