@@ -612,6 +612,65 @@
 - R17 checked: (1) met, each of the eight D17 tools has a writing skill, a review skill, and a reviewer agent; (2) met for every Part C skill, with the two prompts above rewritten; (3) not met, the `dotnet`, `angular`, and `docker` examples have never been built, which T9.9 does; (4) met by this task. R17 stays open until T9.9 passes.
 - T9.9 to T9.17 were added after this task, from the gaps in the T9.3 to T9.7 notes and this run. The stage review of `task-runner` step 7 runs after the last of them.
 
+### [ ] T9.9: Build the .NET, Angular, and Docker worked examples
+**What:** `evals/examples/dotnet/`, `evals/examples/angular/`, and `evals/examples/docker/` built and tested on this PC, with their lock files committed and their checks in `evals/lint.sh`.
+**Why:** R17 needs every writing skill's example to pass its validator where this PC can run it (D26). These three were written without running anything (T9.3, T9.5, T9.7), and this PC has the .NET 10 SDK, Node 24, and Docker.
+**How:**
+- .NET: `dotnet restore` once to write the `packages.lock.json` files, then `dotnet build`, `dotnet test --configuration Release`, `dotnet publish`, and `dotnet list package --vulnerable --include-transitive`.
+- Angular: `npm install` once to write `package-lock.json`, then `npm ci`, `npx ng lint`, `npx ng test --configuration ci`, and `npx ng build`; check that `dist/orders-web/browser/` has no `config.json`.
+- Docker: `hadolint` and `docker build` on both Dockerfiles; `docker compose up --detach --wait` with the example compose file and a copied `orders.env`; the deep-link and caching `curl` checks of the `angular` skill on the web image.
+- Check the "not checked" items in the T9.3, T9.5, and T9.7 notes that a build or test run answers (the public `Program` class, `TestBed.tick()` with `httpResource`, the angular-eslint class suffix rule, the unit-test reporters, busybox `wget`, the hadolint entrypoint, the `docker-proxy` source address).
+- A fix to an example is a fix to the snippet in its skill. Add each check to `evals/lint.sh` behind a `command -v` test, like the others, and update the rows in `evals/examples/README.md`.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T9.10: Make the .NET example work behind nginx in Docker and for the Angular app
+**What:** `Orders.Api` trusts the proxy networks named in configuration for forwarded headers, and allows the Angular app's origin with CORS.
+**Why:** On a Docker host nginx reaches the container from the compose network's gateway, not loopback, so the example ignores `X-Forwarded-For` and `X-Forwarded-Proto` (T9.7). The Angular example calls the API from another origin with credentials, which the API does not allow (T9.5).
+**How:** Read the trusted networks from configuration (for example `ForwardedHeaders__KnownNetworks__0=172.30.10.0/24`) and add them to `KnownIPNetworks`, so no address is in the code. A CORS policy for the origins in configuration, with credentials, on the API endpoints only. Tests for both with `WebApplicationFactory`. Update `dotnet` sections 2 and 3, and the `docker` skill's forwarded-headers line.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T9.11: Add the Angular jobs to `ci-templates`
+**What:** `jobs/angular.yml` and templates for an Angular app on IIS, on Linux with nginx, and in Docker, in `evals/examples/gitlab-ci/`.
+**Why:** The `angular` skill describes the jobs (its section 7), but `ci-templates` has only .NET templates (T9.5).
+**How:** A Node job on `node:24.22.3` with `npm ci` and the npm cache inside the project; a test job with `npx ng lint` and `npx ng test --configuration ci` and the JUnit report `when: always`; a build job that runs `npx ng build` and moves `dist/<app>/browser` to `publish/`. A Linux deploy for static files: the releases folder and `current` link, no service restart. The IIS deploy with `-skip:objectName=filePath,absolutePath=\\config\.json$`. A health check on `/` and `/config.json`. Validate with `evals/check-gitlab-ci.py` and the schema, and update the `gitlab-ci` skill.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T9.12: Add the EF Core migration jobs to `ci-templates`
+**What:** The .NET templates write `migrations.sql` in the build job and run it in a migrate job before each environment's deploy.
+**Why:** The `dotnet` skill says migrations run from an idempotent script in the pipeline, never at startup (section 5), but no template does it (T9.3).
+**How:** The build job adds `dotnet tool restore` and `dotnet ef migrations script --idempotent --output publish-migrations/migrations.sql` as a second artifact; the test job runs `dotnet ef migrations has-pending-model-changes`. A `.migrate` hidden job per environment, with the same `resource_group` as the deploy, that runs `sqlcmd -b -i` (SQL Server) or `psql -v ON_ERROR_STOP=1 -f` (Postgres) with a migration account from protected, environment-scoped variables. The deploy `needs` the migrate job. Validate the example and update the `gitlab-ci` skill.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T9.13: Add the Dockerfile lint and the image scan to `ci-templates`
+**What:** `hadolint` in the test stage and `.container-scan` with Trivy after the image build, in the Docker templates of `evals/examples/gitlab-ci/`.
+**Why:** The `docker` skill shows both jobs (its section 3), but the templates have neither, and `deploy-staging` does not wait for a scan (T9.7).
+**How:** Copy the jobs from the `docker` skill; `deploy-staging` needs the scan; the scan reads `$IMAGE` from the build job's dotenv report and fails on a high or critical finding with a fix. Validate the example and update the `gitlab-ci` skill.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T9.14: Prepare IIS for the .NET and Angular apps with Ansible
+**What:** The `ansible` IIS role sets each site's environment variables on its application pool and installs the URL Rewrite module.
+**Why:** The `dotnet` skill keeps IIS settings on the application pool, outside the deployed folder (T9.3), and the Angular `web.config` needs URL Rewrite, or the site answers 500.19 (T9.5).
+**How:** Environment variables per site from CI variables (`no_log` for secrets), written to the pool's `environmentVariables` in `applicationHost.config`; URL Rewrite by product id and checksum, like the Hosting Bundle; a static site variant whose pool runs with No Managed Code. Check mode and a second run change nothing. `ansible-lint` and `--syntax-check` on the example; update the `ansible` skill.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T9.15: Prepare Linux and Docker hosts for the apps with Ansible
+**What:** The `ansible` roles for Linux hosts cover what the `dotnet`, `angular`, and `docker` skills expect from them.
+**Why:** The unit has no `Type=notify` (T9.3), the nginx role has no static site with the `config.json` alias (T9.5), and the Docker role installs only the engine (T9.7).
+**How:** `Type=notify` in the systemd unit template. A static nginx site with the locations of the `angular` skill and `/etc/<app>/config.json` from CI variables. For Docker hosts: `/etc/docker/daemon.json` with log limits, a weekly prune timer, `/opt/<app>/compose.yaml`, and the app's env file owned by the deploy user with mode 0600. Check mode and a second run change nothing. Validate the example and update the `ansible` skill.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T9.16: Check the stage 9 facts that were written from memory
+**What:** Each fact that the T9.2 to T9.7 notes list as not checked against the docs is confirmed or corrected in its skill.
+**Why:** Those skills were written without builds or doc checks, on the owner's instruction, and a skill that states a wrong fact misleads every later session.
+**How:** GitLab: `include:integrity` (17.9), `rules:changes` in new branches and scheduled pipelines, `CI_DEBUG_SERVICES`, `glab ci lint` and `glab api projects/:id/...`. .NET: .NET 8 and 9 ending support on 10 November 2026, `<EnvironmentName>` writing into `web.config`, `CentralPackageFloatingVersionsEnabled`, `dotnet list package` next to `dotnet package list`, `KnownIPNetworks`. Angular: the 18-month support window, NG0203, IIS 500.19 without URL Rewrite. Trivy: `--ignore-unfixed` and `exp:` in `.trivyignore`. Fix the skill where a fact is wrong, and note the source in this task's Notes.
+**Notes:** _(added after implementation if anything came up)_
+
+### [ ] T9.17: Make the older trigger prompts stand alone
+**What:** The prompts of `z2p-validate`, `sql-review`, `sql-writing`, and `web-security-review` that miss in the trigger evals pass every time.
+**Why:** The full run in T9.8 had seven misses in skills outside stage 9, and a second run missed again, not always on the same prompt. Prompts that point at something that is not there ("is this UPDATE safe", "the settings table", "is this app secure?") make the model look for it in the empty working folder, and its one turn runs out before it chooses a skill, as in T7.3 and T9.8.
+**How:** For each prompt that misses, see what the model did first (`--output-format stream-json`). Put the code or the question into the prompt itself, without making it easier than what it tests. Change a skill's description only if a prompt that stands alone still misses. Run each skill's evals twice.
+**Notes:** _(added after implementation if anything came up)_
+
 ## Stage 10: VS Code agent mode with a self-hosted model
 
 ### [ ] T10.1: Record the VS Code decisions
