@@ -227,8 +227,9 @@ pipeline, check:
 - `terraform apply` without the saved plan from the same pipeline (`-auto-approve` with no
   plan file). It applies what nobody looked at. The apply job `needs` the plan job and
   runs `terraform apply plan.cache`.
-- A plan on merge requests that works only because the infrastructure credentials are
-  unprotected. Every branch can then change the hosts.
+- A plan on merge requests, or an Ansible `--check` against hosts, that works only because
+  the infrastructure credentials are unprotected. Every branch can then change the hosts.
+  On a merge request, Ansible gets only `ansible-lint` and `--syntax-check`.
 - One `resource_group` for apply and Ansible in each environment (section 2).
 - No `entrypoint: [""]` on an image whose entrypoint is the tool itself (Terraform,
   Packer). The script then runs as arguments to the tool. Nit: it fails at once.

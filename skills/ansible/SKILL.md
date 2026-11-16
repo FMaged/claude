@@ -399,8 +399,11 @@ so in a comment.
   with only a warning.
 - `WINRM_USER` and `WINRM_PASSWORD` are masked, protected variables;
   `SSH_PRIVATE_KEY_FILE` is a file variable, so the environment holds its path.
-- A merge request runs `--check --diff` against staging. `main` runs the playbook for
-  real, staging first; prod is a manual job with `resource_group`, as for Terraform.
+- **No check against hosts on merge requests:** the credentials are protected, and a
+  merge request pipeline gets none (`gitlab-ci`, section 6). A merge request runs
+  `ansible-lint` and `--syntax-check`. `main` runs `--check --diff` against staging, then
+  the playbook for real, staging first; prod is a manual job with `resource_group`, as
+  for Terraform.
 
 ## Before calling it done
 
