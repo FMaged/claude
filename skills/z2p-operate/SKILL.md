@@ -20,11 +20,12 @@ Makes production problems visible and turns them into the next round of work. Re
 4. **Error tracking.** Check that the tracker from the walking skeleton still works. Cause one test error and see it arrive.
 5. **Look deeper where it fits.** If they are installed (they are claude.ai skills, not part of this repo): use `observability` for metrics, logs, and traces; use `incident-triage` when something is already broken.
 6. **Write `BACKLOG.md`.** Each item has a source (error, user feedback, idea), a rough size (S, M, L), and a value (low, medium, high). Start it with open errors and the Later items from `PLAN.md` and `REQUIREMENTS.md`.
-7. **Pick.** Ask the user which items to do next. Say where each goes:
+7. **Pick.** Ask the user which items to do next. Write where each goes in `Goes to`:
    - Adds a requirement: stage 4.
    - Changes the plan: stage 5.
    - Anything else: stage 7.
-   The orchestrator counts the cycle. Do not edit `STATUS.md`.
+
+   Write the new cycle in `Cycle` for every item picked now: one more than the highest number in the column, or 2 the first time. That is how the next stage finds them after a `/clear`. The orchestrator counts the cycle in `STATUS.md`; do not edit it.
 8. **Gate check.** Errors and uptime are visible, an alert reached the user, and the backlog is started. Fix what fails.
 
 ## Template
@@ -39,9 +40,9 @@ Makes production problems visible and turns them into the next round of work. Re
 - **Error tracking:** <tool and where to look>
 
 ## Items
-| # | Item | Source | Size | Value | Goes to |
-|---|------|--------|------|-------|---------|
-| 1 | | error / feedback / idea | S/M/L | low/medium/high | stage 4 / 5 / 7 |
+| # | Item | Source | Size | Value | Goes to | Cycle |
+|---|------|--------|------|-------|---------|-------|
+| 1 | | error / feedback / idea | S/M/L | low/medium/high | stage 4 / 5 / 7 | <empty until picked> |
 ````
 
 ## Hand-off
