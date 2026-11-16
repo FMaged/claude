@@ -16,7 +16,9 @@ Test the brief's risky assumptions with the cheapest real evidence, and make the
 
 ## Steps
 
-1. **Read `PRODUCT_BRIEF.md`**, especially the Risks and assumptions table and the `Riskiest assumption:` line. Read `IDEA.md` for the people the user can reach. If `VALIDATION.md` exists, continue from it (see step 5).
+1. **Read `PRODUCT_BRIEF.md`**, especially the Risks and assumptions table and the `Riskiest assumption:` line. Read `IDEA.md` for the people the user can reach. If `VALIDATION.md` exists, compare its test plan with the brief:
+   - Same assumptions and same target user: continue from it (step 5).
+   - The brief changed, as after a `Change`: move the old tables under `## Earlier brief (<its date>)` and clear `Decision:`, `Reason:`, and `Confirmed:`. Copy back only the evidence for an assumption that is still in the brief, unchanged and about the same target user. Plan tests for every other assumption from step 2. Evidence about other people never decides for the new target user.
 2. **Plan the tests.** For each risky assumption, pick the cheapest test:
    - search and competitor check (do people already pay for this?)
    - talking to 3 to 5 people from the target group
