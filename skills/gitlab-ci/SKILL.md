@@ -421,7 +421,8 @@ lists what the host must already have.
 
 - The image is built once from the repo's multi-stage `Dockerfile`, in the `package`
   stage, only on `main`. Every later job uses `$IMAGE`, the digest, from the dotenv
-  report. The `docker-review` skill checks the Dockerfile.
+  report. The `docker` skill writes the Dockerfile, the image scan, and the host's compose
+  file; `docker-review` checks them.
 - Docker-in-Docker needs a privileged runner: `privileged = true` and
   `volumes = ["/certs/client"]` in that runner's `config.toml`. Where the `docker`
   runner may not be privileged, build with Buildah instead. Never mount the host's

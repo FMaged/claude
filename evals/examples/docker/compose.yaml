@@ -1,0 +1,38 @@
+# /opt/orders/compose.yaml on a Docker host, for the image of ../dotnet/Dockerfile.
+# Ansible writes this file and orders.env; the deploy job writes .env with
+# IMAGE=<the digest the pipeline built>.
+name: orders
+
+services:
+  api:
+    image: ${IMAGE:?IMAGE is not set}
+    restart: unless-stopped
+    env_file: orders.env
+    ports:
+      # Only nginx on this host reaches the app; a published port skips the host firewall.
+      - "127.0.0.1:5000:8080"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    # .NET waits up to 30 seconds for running requests; Docker's default is 10.
+    stop_grace_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "5"
+
+networks:
+  default:
+    ipam:
+      config:
+        # Fixed, so the app can trust this network's gateway, nginx on the host, for forwarded headers.
+        - subnet: 172.30.10.0/24

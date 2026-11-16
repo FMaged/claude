@@ -589,11 +589,17 @@
 - Not checked against the docs: Angular's support window (18 months per major, so 20 ends at the end of November 2026), NG0203 as the error for `takeUntilDestroyed()` outside an injection context, and IIS answering 500.19 when the URL Rewrite module is missing. Check them when the evals run in T9.8.
 - Wiring the review into `task-runner`, `z2p-deploy`, and `z2p-release` stays with T9.8.
 
-### [ ] T9.7: Write the `docker` skill
+### [x] T9.7: Write the `docker` skill
 **What:** `skills/docker/SKILL.md` for Dockerfiles and compose files of the apps that deploy as images (D19).
 **Why:** `docker-review` exists; the writing side does not, and image tags are how promotion works for this path.
 **How:** Multi-stage builds, pinned base images, non-root user, `HEALTHCHECK`, `.dockerignore`, labels with the git sha; images in the GitLab registry as `$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA`, promoted by re-tagging, never rebuilt; compose for one host with restart policies, env from files, named volumes, log limits; no secrets in build args; image scan in CI. Worked example: the Dockerfile from T9.3 built with `docker build` (installed here). Evals, lint, commit.
-**Notes:** _(added after implementation if anything came up)_
+**Notes:** Done 2026-11-16. Files written only: per the owner's instruction, nothing was built (no `docker build` of the T9.3 Dockerfile, which How asked for), and the trigger evals, `evals/lint.sh`, and `./install.sh` were not run. The four trigger prompts are in the TSV, plus a writing prompt that must not fire `docker-review`.
+- The worked example `evals/examples/docker/` is the compose file for `/opt/orders/` that runs the image of `evals/examples/dotnet/Dockerfile`, and `orders.env.example` with what Ansible writes to `orders.env`. Building the image needs the `dotnet/` lock files first (T9.3 notes).
+- Versions: Trivy `aquasec/trivy:0.76.2` and `hadolint/hadolint:v2.15.1-alpine` from Docker Hub on 2026-11-16; Docker 29.9.3 and Compose v5.7.1 are what this PC runs, and `docker:29.9.3` is the CI image `gitlab-ci` already uses.
+- Decisions: promotion stays deploy-by-digest as in `gitlab-ci`; re-tagging (`docker buildx imagetools create --tag …:production`) is only a label for people, never what a host pulls. Build secrets through `RUN --mount=type=secret`, with the CI File variable as the source. Compose: `restart: unless-stopped`, ports on `127.0.0.1` (Docker's rules skip the host firewall), read-only root with `tmpfs`, `cap_drop: [ALL]`, `no-new-privileges`, memory and CPU limits, `json-file` with `max-size` and `max-file`, `stop_grace_period: 30s` for .NET's shutdown timeout, and a fixed subnet so the app can trust nginx's gateway address.
+- Pointers added: `dotnet`, `angular`, and `gitlab-ci` name `docker`; `docker-review` says where the writing rules are.
+- Not checked, because nothing ran: `--ignore-unfixed` and `exp:` in `.trivyignore` on Trivy 0.76; the entrypoint of the hadolint Alpine image; `docker buildx imagetools create` with the job's registry login inside dind; that the container sees host connections through `docker-proxy` as the network's gateway. Check them in T9.8 or when the example is first built.
+- Gaps: (1) `ci-templates` has no `hadolint` or `.container-scan` job, and its `deploy-staging` does not need a scan; the skill shows both jobs. (2) The `dotnet` example's `Program.cs` trusts only loopback for forwarded headers, so behind nginx on a Docker host it ignores `X-Forwarded-*` until it trusts the compose network. (3) The `ansible` Docker role installs the engine only: no `daemon.json` log defaults, no prune timer, and no `orders.env` owned by the deploy user.
 
 ### [ ] T9.8: Wire the new reviewers into the chain and the docs
 **What:** The chain and the README know the four new reviewers and the eight writing skills.

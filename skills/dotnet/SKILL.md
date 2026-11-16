@@ -14,7 +14,8 @@ that ran at startup, a call that blocks a thread, or a build that worked only on
 machine.
 
 The pipeline is `gitlab-ci`; the hosts (IIS, nginx, the systemd unit, Docker) are
-prepared by `ansible`. For the database schema, `schema-design`; for SQL inside the app,
+prepared by `ansible`; the compose file and the image's way through the registry are
+`docker`. For the database schema, `schema-design`; for SQL inside the app,
 `sql-writing`. For a review of finished code, the `dotnet-review` skill, or the
 `dotnet-reviewer` agent for a check that runs unattended. For comments, `code-comments`.
 The worked example is
@@ -484,7 +485,8 @@ ENTRYPOINT ["dotnet", "Orders.Api.dll"]
 - The images listen on 8080 (`ASPNETCORE_HTTP_PORTS`). Environment values come from the
   compose file's `env_file` on the host, never from `ENV` or `ARG` in the Dockerfile.
 - The pipeline builds this image once, on `main`, and deploys it by digest
-  (`gitlab-ci`, section 5). `docker-review` checks the Dockerfile.
+  (`gitlab-ci`, section 5). The compose file that runs it on a host is in `docker`
+  (section 4); `docker-review` checks both.
 - `.dockerignore` keeps `bin/`, `obj/`, `.git`, `tests/`, and local `.env` files out of the
   build.
 

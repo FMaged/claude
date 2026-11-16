@@ -7,6 +7,8 @@ description: Use when reviewing a Dockerfile, a compose file, or a container set
 
 Review Dockerfiles, `compose.yaml`, `.dockerignore`, and entrypoint scripts. Report problems. Do not rewrite unless asked.
 
+The writing rules, including the registry, the image scan, and compose on one host, are in the `docker` skill.
+
 ## 1. Secrets and layers
 
 - A secret in `ENV`, `ARG`, or a `RUN` command. Every layer is kept, so deleting the file in a later layer does not remove it. Use a build secret mount or inject it at run time.

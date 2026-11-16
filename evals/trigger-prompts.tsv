@@ -73,6 +73,10 @@ angular-review	1	review this Angular component before I merge it: ngOnInit() { t
 angular-review	1	check our Angular app: does anything leak a token, break when the same build goes to prod, or stop the view from updating?
 angular-review	0	start a new Angular app with one lazy route and a config.json loader
 angular-review	0	review the Dockerfile that serves our Angular build with nginx: does it run as root?
+docker	1	write a Dockerfile and a compose file for our .NET API: multi-stage, non-root, with a healthcheck, restart policy, and log limits
+docker	1	how do we promote the same Docker image from staging to prod in the GitLab registry without rebuilding, and scan it in CI?
+docker	0	review my Dockerfile for security problems
+docker	0	install the Docker engine on these Ubuntu hosts with Ansible
 code-comments	1	add comments to this function
 code-comments	1	are the comments in this file any good?
 code-comments	0	write a commit message for this change
@@ -80,6 +84,7 @@ code-comments	0	remove all the console.log calls from this file
 docker-review	1	review my Dockerfile
 docker-review	1	why is this docker image so big?
 docker-review	0	write a docker-compose file for postgres and redis
+docker-review	0	write a compose file for our API with a restart policy, an env file, and log limits
 docker-review	0	how do I install docker on debian?
 git-branch	1	make a branch for this work
 git-branch	1	what should I call the branch for the login fix?

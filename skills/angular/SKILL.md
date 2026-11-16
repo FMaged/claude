@@ -14,7 +14,8 @@ page reload that gives the server's 404, an old `index.html` still cached after 
 or a deploy that deleted the host's configuration.
 
 The pipeline is `gitlab-ci`; the hosts (IIS, nginx, Docker) are prepared by `ansible`;
-the API behind the app is `dotnet`. For who may see what, `web-security-review`. For a
+the compose file and the image's way through the registry are `docker`; the API behind
+the app is `dotnet`. For who may see what, `web-security-review`. For a
 review of finished code, the `angular-review` skill, or the `angular-reviewer` agent for a
 check that runs unattended. For comments, `code-comments`. The worked example is `evals/examples/angular/` in the skills
 repo: `orders-web`, a new app with one lazy route and the config loader, which reads an
@@ -482,7 +483,8 @@ HEALTHCHECK --interval=10s --timeout=3s --retries=3 \
   `./config.json:/etc/orders-web/config.json:ro`, with mode 0644 so user 101 can read it
   (it holds nothing secret). Never `COPY` a `config.json` into the image.
 - `.dockerignore` keeps `node_modules/`, `dist/`, `.angular/`, and `.git` out of the build.
-- `docker-review` checks the Dockerfile.
+- The compose file that runs the image is in `docker` (section 4); `docker-review` checks
+  both.
 
 ### In the pipeline
 
