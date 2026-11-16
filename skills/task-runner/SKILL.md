@@ -11,5 +11,22 @@ description: Use when the user wants to implement tasks from TASKS.md (e.g. "nex
 4. If anything came up (a change from the plan, a problem, a decision), write it in the task's **Notes**. Otherwise leave Notes as is.
 5. Mark it done: `### [ ]` → `### [x]`. Only do this once it works.
 6. If a PLAN.md or DESIGN.md decision had to change, ask the user first, then update the file with a "Changed: <why>" line.
-7. When the last task of a TASKS.md stage is done, run the reviews that match the files changed in that stage. These go to their reviewer agents: Terraform (`terraform-reviewer`), Packer (`packer-reviewer`), Ansible (`ansible-reviewer`), network config (`network-reviewer`), Svelte (`svelte-reviewer`), PowerShell `.ps1`, `.psm1`, and `.psd1` (`powershell-reviewer`), `.gitlab-ci.yml` and the `ci-templates` files (`gitlab-ci-reviewer`), `.cs`, `.csproj`, and `Directory.*.props` (`dotnet-reviewer`), and Angular files, meaning `angular.json` and the `.ts` and `.html` files of its project (`angular-reviewer`). The first five review skills are turned off and run only through the agents. Everything else gets its review skill (`sql-review` for SQL, `docker-review` for Dockerfiles, and so on). In Codex, which has no agents, run the review skill for every type. Fix high findings now, or add them as tasks.
+7. When the last task of a TASKS.md stage is done, run the reviews that match the files changed in that stage. Every review has a reviewer agent; run the agent:
+
+   | Files | Agent |
+   |---|---|
+   | Terraform | `terraform-reviewer` |
+   | Packer templates | `packer-reviewer` |
+   | Ansible playbooks, roles, inventory, templates | `ansible-reviewer` |
+   | Network config | `network-reviewer` |
+   | Svelte and SvelteKit | `svelte-reviewer` |
+   | PowerShell `.ps1`, `.psm1`, `.psd1` | `powershell-reviewer` |
+   | `.gitlab-ci.yml` and the `ci-templates` files | `gitlab-ci-reviewer` |
+   | `.cs`, `.csproj`, `Directory.*.props` | `dotnet-reviewer` |
+   | `angular.json` and the `.ts` and `.html` files of its project | `angular-reviewer` |
+   | Dockerfiles and compose files | `docker-reviewer` |
+   | SQL, also inside app code | `sql-reviewer` |
+   | Routes, login, sessions, uploads | `web-security-reviewer` |
+
+   The Terraform, Packer, Ansible, network, and Svelte review skills are turned off and run only through their agents. In Codex, which has no agents, run the matching review skill instead (`terraform-review` for `terraform-reviewer`, and so on). Fix high findings now, or add them as tasks.
 8. Give a short summary. If `STATUS.md` exists, end with the hand-off line from `CONVENTIONS.md` in the `z2p` skill folder and do not write `STATUS.md`. Otherwise ask whether to continue.
