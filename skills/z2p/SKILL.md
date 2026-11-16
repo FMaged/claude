@@ -12,7 +12,7 @@ You are the only thing that writes `STATUS.md`. Stage skills never do.
 ## 1. Find the state
 
 - **No `STATUS.md`, folder empty:** start the project (see Start).
-- **No `STATUS.md`, but files or code exist:** adopt the project (see Adopt in `CONVENTIONS.md`).
+- **No `STATUS.md`, but files or code exist:** adopt the project (see Adopt mode in `CONVENTIONS.md`). It does the Start steps that are missing, so stage 0 is `done` afterwards.
 - **`STATUS.md` exists:** read it, then go to Next stage.
 
 ### Start
@@ -24,6 +24,7 @@ You are the only thing that writes `STATUS.md`. Stage skills never do.
 
 Pick the first stage that is not `done` or `skipped`. A `stale` stage comes first: re-check its gate before moving on.
 
+- **Stage 0:** do the Start steps that are missing here and mark it `done`. Never run `z2p` from itself.
 - **Stage 1:** ask "Do you already have an idea?". If yes, mark it `skipped`.
 - **Stage 3:** run it even if `VALIDATION.md` already has a `Decision:` line; after a `Change` the old file still has one. The decision is read in After the stage.
 - **A `waiting` stage:** ask whether the evidence has arrived. If not, say what it is waiting for and stop.

@@ -50,9 +50,9 @@ Cycle: 1
 ## Adopt mode
 
 If there is no `STATUS.md` but the folder has files or code:
-1. Check each stage's gate from the files that exist.
+1. Check the gates of stages 1 to 10 from the files that exist. Stage 0 is set up in step 3, not checked.
 2. Show the user a table: stage, gate result, proposed state.
-3. After the user confirms, write `STATUS.md` with the passing stages as `done` and the rest as `todo`. Stages with a "user yes" gate need the user's yes now too.
+3. After the user confirms, do the Start steps of `z2p` that are missing and change no other file: `git init` if this is not a git repo, and a `CLAUDE.md` if there is none (an existing one keeps its text and gets the `STATUS.md` line and the list of stage files). Then write `STATUS.md` with stage 0 and the passing stages as `done` and the rest as `todo`. Stages with a "user yes" gate need the user's yes now too.
 
 ## Rules for stage skills
 
