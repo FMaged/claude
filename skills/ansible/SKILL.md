@@ -184,7 +184,8 @@ ansible_become_user: SYSTEM
 Apps reach IIS with msdeploy through the Web Management Service (WMSvc) on port 8172.
 Ansible prepares the host; the deploy job sends the app. The order matters:
 
-1. **IIS and WMSvc first**: `win_feature` with `Web-Server` and `Web-Mgmt-Service`, then
+1. **IIS and WMSvc first**: `win_feature` with `Web-Server`, `Web-Mgmt-Service`, and
+   `Web-Scripting-Tools` (the IIS modules import `WebAdministration`), then
    `win_reboot` when `reboot_required` is true.
 2. **Web Deploy after WMSvc**: its IIS deployment handler installs only when the
    Management Service is already there. Without it, `msdeploy.axd` answers 404.

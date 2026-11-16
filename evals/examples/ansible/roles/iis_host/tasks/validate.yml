@@ -4,9 +4,10 @@
     that:
       - "'Web-Server' in iis_host_features"
       - "'Web-Mgmt-Service' in iis_host_features"
+      - "'Web-Scripting-Tools' in iis_host_features"
       - iis_host_deploy_from | length > 0
       - iis_host_wmsvc_firewall_rule | length > 0
-    fail_msg: Keep both IIS features and supply the CI runner addresses and the built-in WMSvc firewall rule name.
+    fail_msg: Keep IIS, Web Management Service, and scripting tools; supply CI runner addresses and the built-in WMSvc rule name.
 
 - name: Require real installer metadata
   ansible.builtin.assert:

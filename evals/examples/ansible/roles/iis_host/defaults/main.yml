@@ -2,6 +2,7 @@
 iis_host_features:
   - Web-Server
   - Web-Mgmt-Service
+  - Web-Scripting-Tools
 iis_host_installer_dir: C:\ProgramData\Ansible\installers
 iis_host_sites_root: C:\inetpub\sites
 iis_host_sites: []
