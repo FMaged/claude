@@ -350,10 +350,19 @@ WantedBy=multi-user.target
 Kestrel listens on loopback only; nginx in front of it is the only way in. The handler
 for a changed unit uses `ansible.builtin.systemd_service` with `daemon_reload: true`.
 
-**The Docker engine.** From Docker's own repository, for Debian or Ubuntu (it needs facts),
-and update the apt cache only when the repository changed:
+**The Docker engine.** From Docker's own repository, for Debian or Ubuntu (it needs facts).
+Install `python3-debian` for the managed host's system Python before calling
+`deb822_repository`; ansible-core 2.19 does not install this dependency automatically.
+Refresh the apt cache after adding Docker's repository:
 
 ```yaml
+- name: Install the repository module dependency
+  ansible.builtin.apt:
+    name: python3-debian
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
 - name: Add Docker's apt repository
   ansible.builtin.deb822_repository:
     name: docker
