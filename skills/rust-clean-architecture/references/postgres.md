@@ -93,9 +93,16 @@ impl Postgres {
 - sea-orm entities (`Model`, `ActiveModel`) never leave the storage crate. Convert to and
   from the domain entity with `TryFrom` inside the adapter; a row that does not make a
   valid domain value is an error, not a panic.
-- Turn the driver's error into the domain error at the edge, keeping the cause as the
-  source (`impl From<sea_orm::DbErr> for DbError`). Give the caller variants it can act on
-  (`NotFound`, `Connection`, `Query`), not one catch-all.
+- `DbError` is the storage crate's own `thiserror` enum, with `#[from]` for
+  `sea_orm::DbErr` and `sqlx::Error`, so `?` works inside the crate. It never crosses a
+  port. The port methods return the domain error, through `impl From<DbError> for
+  RepositoryError` in the storage crate (legal, because `DbError` is local to it). An
+  `impl From<sea_orm::DbErr> for RepositoryError` is not: the adapter owns neither type,
+  and Rust rejects it (E0117). In a repository method, `.map_err(DbError::from)?` takes
+  both steps.
+- Give the caller variants it can act on (`NotFound`, `Connection`, `Query`), not one
+  catch-all. The domain error keeps the cause as
+  `#[source] Box<dyn std::error::Error + Send + Sync>`, which needs no driver crate.
 - Rows that must land together are written in one transaction
   (`db_connection.begin().await?` … `txn.commit().await?`).
 
