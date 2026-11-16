@@ -12,8 +12,9 @@
       # a rename is atomic, so the service never finds the link missing
       mv -T "$app/current.new" "$app/current"
       sudo -n systemctl restart "$1"
-      # keep the five newest; a rollback to an older release copies it again
-      ls -1dt "$app"/releases/* | tail -n +6 | xargs -r rm -rf
+      # keep the live release and the four newest others; rsync keeps the build's
+      # folder time, so a rolled-back release sorts oldest
+      ls -1dt "$app"/releases/* | grep -vxF "$app/releases/$2" | tail -n +5 | xargs -r rm -rf
       EOF
       done
     - curl --fail --silent --show-error --retry 12 --retry-delay 5 --retry-all-errors "$CI_ENVIRONMENT_URL/health"
