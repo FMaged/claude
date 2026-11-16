@@ -1,0 +1,6 @@
+ignored:
+  # apt-get without versions: a pinned version breaks when the mirror drops it, and
+  # the image is built once and promoted by digest, so prod runs what staging tested
+  - DL3008
+  # USER $APP_UID: the base image sets it to the number of its non-root app user
+  - DL3066

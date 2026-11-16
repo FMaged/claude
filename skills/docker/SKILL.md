@@ -76,7 +76,8 @@ ENTRYPOINT ["<program>", "<args>"]
   local `.env` files, and test results. Without it `COPY . .` sends the whole folder,
   secrets included, and every edit breaks the cache.
 - **Packages in one `RUN`:** `apt-get update && apt-get install --yes --no-install-recommends …
-  && rm -rf /var/lib/apt/lists/*`. Only what the runtime needs.
+  && rm -rf /var/lib/apt/lists/*`. Only what the runtime needs, without versions
+  (section 3 says why hadolint is told so).
 - **`COPY`, not `ADD`.** `ADD` unpacks archives and fetches URLs, mostly by accident.
 - **No environment values in the image:** no `ENV` with a URL or connection string, no
   config file per environment. Settings come at run time from the env file or a mounted
@@ -137,6 +138,21 @@ hadolint:
   script:
     - hadolint Dockerfile
 ```
+
+- hadolint reads `.hadolint.yaml` from the folder it runs in. Two rules fail on what this
+  skill asks for, so a Debian-based image needs the file from its first merge request:
+
+```yaml
+ignored:
+  # apt-get without versions: a pinned version breaks when the mirror drops it, and
+  # the image is built once and promoted by digest, so prod runs what staging tested
+  - DL3008
+  # USER $APP_UID: the base image sets it to the number of its non-root app user
+  - DL3066
+```
+
+  Ignore a rule only with its reason next to it. Any other finding is fixed in the
+  Dockerfile.
 
 - **Trivy** on the image the build job pushed, before staging gets it:
 

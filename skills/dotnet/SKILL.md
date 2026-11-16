@@ -489,6 +489,8 @@ ENTRYPOINT ["dotnet", "Orders.Api.dll"]
   (section 4); `docker-review` checks both.
 - `.dockerignore` keeps `bin/`, `obj/`, `.git`, `tests/`, and local `.env` files out of the
   build.
+- hadolint flags the unversioned `curl` and `USER $APP_UID`; the `.hadolint.yaml` in
+  `docker` (section 3) goes next to this Dockerfile.
 
 ## Before calling it done
 
