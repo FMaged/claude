@@ -23,9 +23,16 @@ jobs:
           Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
           Install-Module PSScriptAnalyzer -RequiredVersion 1.25.0 -Scope CurrentUser
           Install-Module Pester -RequiredVersion 6.2.0 -Scope CurrentUser -SkipPublisherCheck
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
       - name: Install Ansible and collections
         run: |
-          python3 -m pip install --user ansible-core==2.19.11 ansible-lint==25.6.1
+          ansible_venv="$RUNNER_TEMP/ansible-venv"
+          python3 -m venv "$ansible_venv"
+          "$ansible_venv/bin/python" -m pip install ansible-core==2.19.11 ansible-lint==25.6.1
+          export PATH="$ansible_venv/bin:$PATH"
+          printf '%s\n' "$ansible_venv/bin" >> "$GITHUB_PATH"
           ansible-galaxy collection install -r evals/examples/ansible/requirements.yml
       - run: evals/lint.sh
         env:
